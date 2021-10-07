@@ -19,6 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{753E6246
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "devops", "devops", "{F32BFCA0-2478-44A5-A122-31F722D5A279}"
+	ProjectSection(SolutionItems) = preProject
+		devops\create-code-coverage-report = devops\create-code-coverage-report
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2C0C7F28-E5F3-4966-BCB6-0963D7BD5FBE}"
 	ProjectSection(SolutionItems) = preProject
