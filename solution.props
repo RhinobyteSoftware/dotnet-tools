@@ -1,0 +1,103 @@
+<Project>
+
+    <!-- SOLUTION WIDE CUSTOMIZATIONS HERE-->
+    <PropertyGroup>
+        <SolutionPropsIsImported>true</SolutionPropsIsImported>
+        <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+        <SolutionSummary>Tools libraries for the .NET</SolutionSummary>
+        
+        <!-- Set RunOnlyOnceBeforeBuildTarget to 'BeforeBuild' for single target projects and 'DispatchToInnerBuilds' for cross taretting projects -->
+        <RunOnlyOnceBeforeBuildTarget Condition=" '$(TargetFrameworks)' == '' AND '$(TargetFramework)' != '' ">BeforeBuild</RunOnlyOnceBeforeBuildTarget>
+        <RunOnlyOnceBeforeBuildTarget Condition=" '$(TargetFrameworks)' != '' AND '$(TargetFramework)' == '' ">DispatchToInnerBuilds</RunOnlyOnceBeforeBuildTarget>
+
+        <DefaultTargetFrameworks>netstandard2.0;netstandard2.1;net48;netcoreapp3.1;net5.0</DefaultTargetFrameworks>
+        <InternalMsbuildMessageImportance>normal</InternalMsbuildMessageImportance>
+        <Msbuild16TargetFrameworks>net472;net5.0</Msbuild16TargetFrameworks>
+        <UseProjectReferences Condition=" '$(UseProjectReferences)' == '' ">true</UseProjectReferences>
+
+
+        <!-- General Compiler / Msbuild Settings -->
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+        <!-- Common Package/Project Property Values -->
+        <Authors>Ryan Thomas</Authors>
+        <Company>Rhinobyte Software</Company>
+        <Copyright>Copyright © Ryan Thomas $([System.DateTime]::Now.ToString("yyyy"))</Copyright>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <PackageIcon>Icon.png</PackageIcon>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageOutputPath>$(RepoRoot)build\$(Configuration)\</PackageOutputPath>
+        <PackageProjectUrl>https://github.com/RhinobyteSoftware/dotnet-tools</PackageProjectUrl>
+        <!-- 
+            Enable The <PackageReadmeFile> tag once the .NET 6 SDK version is released (need at least .NET SDK RC2)
+            Needed to solve this problem: https://github.com/NuGet/Home/issues/10791#issuecomment-926218883
+        -->
+        <!-- <PackageReadmeFile>README.md</PackageReadmeFile> -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/RhinobyteSoftware/dotnet-tools</RepositoryUrl>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- External Dependency Versions-->
+        <!-- I'm guessing the msbuild nuget package major version needs to match the available tools version? -->
+        <!-- If so I'll have to downgrade this to a 15.x version if I wan't to support VS 2017? -->
+        <MicrosoftBuildVersion>16.10.0</MicrosoftBuildVersion>
+        <MicrosoftBuildTasksCoreVersion>16.10.0</MicrosoftBuildTasksCoreVersion>
+        <MicrosoftSourceLinkGitHubVersion>1.0.0</MicrosoftSourceLinkGitHubVersion>
+        <SystemCodeDomVersion>5.0.0</SystemCodeDomVersion>
+    </PropertyGroup>
+
+    <Import Condition="Exists('$(RepoRoot)\development.local.props')" Project="$(RepoRoot)\development.local.props"/>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release' OR '$(Configuration)' == 'ReleaseTesting'">
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'ReleaseTesting' ">
+        <DefineConstants>IS_RELEASE_TESTING_BUILD</DefineConstants>
+    </PropertyGroup>
+
+
+    <!-- SOLUTION WIDE CODE ANALYZER PACKAGES -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.9.60">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+
+    <!-- ASSEMBLY ATTRIBUTE GENERATION -->
+    <ItemGroup Condition=" '$(Configuration)' == 'Debug' OR '$(Configuration)' == 'ReleaseTesting' ">
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>$(ProjectName).Tests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>$(ProjectName).UnitTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(IsClsCompliant)' == 'true' ">
+        <AssemblyAttribute Include="System.CLSCompliant">
+            <_Parameter1>true</_Parameter1>
+            <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+
+    <!-- NUGET PACKAGE FILE INCLUDES -->
+    <ItemGroup Condition="'$(IsPackable)' == 'true'">
+        <None Include="$(RepoRoot)\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+        <None Include="$(RepoRoot)\RhinobytePackageIcon.png" Pack="true" PackagePath="Icon.png" />
+        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="README.md" />
+    </ItemGroup>
+
+</Project>

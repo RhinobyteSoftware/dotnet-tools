@@ -1,0 +1,10 @@
+<Project>
+
+    <Import Project="..\solution.props" Condition="'$(SolutionPropsIsImported)' == ''" />
+
+    <PropertyGroup>
+        <IsClsCompliant>true</IsClsCompliant>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+</Project>

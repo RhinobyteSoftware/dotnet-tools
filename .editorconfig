@@ -1,0 +1,322 @@
+# Reference: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+
+# top-most .editorconfig file
+root = true
+
+
+##################################
+##    Defaults For All Files    ##
+##################################
+# Don't set global [*] level whitespace settings, too many unintended consequences
+
+
+
+
+###########################
+##    Mark Down Files    ##
+###########################
+[*.md]
+indent_style = space
+trim_trailing_whitespace = true
+
+
+
+
+########################################
+##    Xml Project And Config Files    ##
+########################################
+# Xml project files
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# Xml config files
+[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# .editorconfig files
+[*.editorconfig]
+
+dotnet_diagnostic.EC101.severity    = error
+# Rule (EC104)  - Language rules must specify severity  - Reason: No longer required as of VS 2019 v16.9+ but editor config analyzer incorrectly flags it
+dotnet_diagnostic.EC104.severity    = suggestion
+dotnet_diagnostic.EC112.severity    = error
+
+
+
+
+########################
+##    CSharp Files    ##
+########################
+[*.{cs,csx}]
+indent_style = tab
+trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8-bom
+
+
+
+# Default analyzer severity to error for all rules. Any non error severity values will be explicitly configured below
+dotnet_analyzer_diagnostic.severity     = error
+
+
+########################################
+##    Code Analysis Configurations    ##
+########################################
+
+# Rule: (CA1028) Enum storage should be Int32.
+dotnet_diagnostic.CA1028.severity       = suggestion
+
+# Rule: (CA1030) Use events where appropriate.
+dotnet_diagnostic.CA1030.severity       = suggestion
+
+# Rule: (CA1051) Do not declare visible instance fields.
+dotnet_diagnostic.CA1051.severity       = suggestion
+dotnet_code_quality.CA1051.api_surface  = public, internal
+
+# Rule: (CA1062) Validate arguments of externally visible public methods. Reason: These should be validated to ensure we add necessary guards to ensure the ArgumentNullExceptions are thrown in lieu of null reference exceptions in unexpected locations. This rule is important to ensure we add guards to public methods where the the parameter type is a non-nullable reference type but the method is public so it might be consumed in projects that don't have nullable reference types enabled.
+dotnet_diagnostic.CA1062.severity       = error
+
+# Rule: (CA1068) CancellationToken parameters must come last.
+dotnet_diagnostic.CA1068.severity       = suggestion
+
+# Rule: (CA1303) Do not pass literals as localized parameters. Retrieve the string(s) from a resource table instead
+dotnet_diagnostic.CA1303.severity       = warning
+dotnet_code_quality.CA1303.excluded_type_names_with_derived_types = System.Exception
+
+# Rule: (CA1810) Initialize reference type static fields inline. (Initialize all static fields when those fields are declared and remove the explicit static constructor.)  Reason: Static initialization is weird.  It is safer to do it in a static constructor.
+#dotnet_diagnostic.CA1810.severity    = none
+
+# Rule: (CA2211) Non-constant fields should not be visible.
+#dotnet_diagnostic.CA2211.severity    = suggestion
+
+
+
+
+#############################
+##    Basic Code Checks    ##
+#############################
+# e.g. Rules in the CS00XX range
+
+
+
+############################################
+##    Nullable Reference Type Severity    ##
+############################################
+# e.g. Rules in the CS8000 ish range
+
+
+
+
+#####################################################################################
+## Microsoft.VisualStudio.Threading.Analyzers                                      ##
+## https://github.com/microsoft/vs-threading/blob/master/doc/analyzers/index.md    ##
+#####################################################################################
+
+# Rule: Avoid legacy thread switching methods. Reason: Specific to Visual Studio.
+dotnet_diagnostic.VSTHRD001.severity = none
+
+# Rule: Avoid awaiting foreign Tasks. Reason: Specific to Visual Studio.
+dotnet_diagnostic.VSTHRD003.severity = none
+
+# Rule: Await SwitchToMainThreadAsync. Reason: Specific to Visual Studio.
+dotnet_diagnostic.VSTHRD004.severity = none
+
+# Rule: Invoke single-threaded types on Main thread. Reason: Specific to Visual Studio.
+dotnet_diagnostic.VSTHRD010.severity = none
+
+# Rule: Provide JoinableTaskFactory where allowed. Reason: Specific to Visual Studio.
+dotnet_diagnostic.VSTHRD012.severity = none
+
+# Rule: Assert thread affinity unconditionally. Reason: Doesn't apply to this project.
+#dotnet_diagnostic.VSTHRD108.severity = none
+
+# Rule: Switch instead of assert in async methods. Reason: Doesn't apply to this project.
+#dotnet_diagnostic.VSTHRD109.severity = none
+
+# Rule: Use .ConfigureAwait(bool). Reason: Covered by CA2007.
+dotnet_diagnostic.VSTHRD111.severity = none
+
+# Rule: Use Async naming convention. Reason: Better enforced by the visual studio style rules.
+dotnet_diagnostic.VSTHRD200.severity = none
+
+
+
+
+###############################
+##    CODE STYLE SETTINGS    ##
+###############################
+
+# Rule (IDE0001)    -  Name Can Be Simplified (Full Type Name)    - Reason: Sometimes useful/preferred for clarity
+dotnet_diagnostic.IDE0001.severity                      = suggestion
+
+# Rule (IDE0002)    -  Name Can Be Simplified                     - Reason: Sometimes useful/preferred for clarity
+dotnet_diagnostic.IDE0002.severity                      = suggestion
+
+# Rule (IDE0003)    -  Name Can Be Simplified (this keyword)      - Reason: Sometimes useful/preferred for clarity
+dotnet_diagnostic.IDE0003.severity                      = suggestion
+
+# this keyword style rules
+dotnet_style_qualification_for_field                    = false
+dotnet_style_qualification_for_property                 = false
+dotnet_style_qualification_for_method                   = false
+dotnet_style_qualification_for_event                    = false
+
+# IDE0007 and IDE0008 - Use 'var' keyword
+csharp_style_var_for_built_in_types                     = true
+csharp_style_var_when_type_is_apparent                  = true
+csharp_style_var_elsewhere                              = true
+
+# Rule (IDE0011)    - If Statement Braces
+csharp_prefer_braces                                    = when_multiline
+
+# Rule (IDE0017)    - Use Object Initializers   - Reason: Mostly preferred, but not required and sometimes exceptions to the rule
+dotnet_style_object_initializer                         = true
+
+# IDE0022: Use block body for methods
+dotnet_diagnostic.IDE0022.severity                      = suggestion
+csharp_style_expression_bodied_methods                  = when_on_single_line
+
+# IDE0024: Use block body for operators
+csharp_style_expression_bodied_operators = when_on_single_line
+
+# Rule (IDE0028)    - Use Collection Initializers
+#dotnet_diagnostic.IDE0028.severity                     = refactoring
+#dotnet_style_collection_initializer                    = true
+
+# Rule (IDE0029) and (IDE0030)  - Use Coalesce Expression
+dotnet_style_coalesce_expression                        = true
+
+# Rule (IDE0031)    - Use Null Propagation
+dotnet_style_null_propagation                           = true
+
+# Rule (IDE0032)    - Use Auto Property
+dotnet_style_prefer_auto_properties                     = true
+
+# Rule (IDE0033)    - Use Explicitly Provided Tuple Name
+dotnet_style_explicit_tuple_names                       = true
+
+# Rule (IDE0037)    - Use inferred member name for tuples
+dotnet_style_prefer_inferred_tuple_names                    = true
+dotnet_style_prefer_inferred_anonymous_type_member_names    = true
+
+# Rule (IDE0046)    - If Statement Can Be Simplified        - Reason: Suggestion only. We only prefer ternary conditional expressions for very simple conditionals.
+dotnet_diagnostic.IDE0046.severity      = suggestion
+
+# Rule (IDE0055)    - Fix Formatting
+csharp_indent_case_contents             = true
+csharp_indent_case_contents_when_block  = false
+csharp_indent_labels                    = one_less_than_current
+csharp_indent_switch_labels             = true
+
+# Rule (IDE0056)    - Indexing can be simplified    - Reason: Suggestion only. Range operator not supported in older versions of .NET
+dotnet_diagnostic.IDE0056.severity      = suggestion
+
+# Rule (IDE0047)    - Remove unnecessary parentheses
+dotnet_diagnostic.IDE0047.severity                          = refactoring
+
+# Rule (IDE0048)    - Add parentheses for clarity
+#dotnet_diagnostic.IDE0048.severity                          = suggestion
+dotnet_style_parentheses_in_arithmetic_binary_operators     = true
+dotnet_style_parentheses_in_relational_binary_operators     = true
+dotnet_style_parentheses_in_other_binary_operators          = true
+dotnet_style_parentheses_in_other_operators                 = true
+
+# Rule (IDE0057)    - Substring can be simplified (range operator)      - Reason: Only available in .net core
+dotnet_diagnostic.IDE0057.severity                          = silent
+
+# Rule (IDE0066)    - Use Switch Expression
+dotnet_diagnostic.IDE0066.severity                          = refactoring
+
+# Rule (IDE0078)    - Use Pattern Matching
+csharp_style_prefer_pattern_matching                                = false
+dotnet_style_prefer_is_null_check_over_reference_equality_method    = true:
+
+# Rule (IDE0090)    - New Expression Can Be Simplified      - Reason: Explicit new expression preferred for clarity
+dotnet_diagnostic.IDE0090.severity                          = refactoring
+
+# Rule (IDE0130)    - Namespace does not match folder structure     - Reason: Not required and analyzer is broken
+dotnet_diagnostic.IDE0130.severity                      = refactoring
+
+
+
+
+#############################
+##    CODE NAMING RULES    ##
+#############################
+
+# Rule (IDE1006)    - Naming Rules
+dotnet_diagnostic.IDE1006.severity                         = warning
+
+# camel_case_style
+dotnet_naming_style.CamelCaseStyle.capitalization = camel_case
+
+# pascal_case_style
+dotnet_naming_style.PascalCaseStyle.capitalization = pascal_case
+
+# underscore_prefix_camel_case_style
+dotnet_naming_style.CamelCase_WithUnderscorePrefix_Style.capitalization = camel_case
+dotnet_naming_style.CamelCase_WithUnderscorePrefix_Style.required_prefix = _
+
+
+# ReadOnly Static Fields
+dotnet_naming_symbols.ReadOnlyStaticFields.applicable_kinds = field
+dotnet_naming_symbols.ReadOnlyStaticFields.applicable_accessibilities = public, protected, internal, protected_internal, private_protected, private
+dotnet_naming_symbols.ReadOnlyStaticFields.required_modifiers = readonly, static
+
+dotnet_naming_rule.ReadOnlyStaticFields_ShouldBePascalCase.symbols = ReadOnlyStaticFields
+dotnet_naming_rule.ReadOnlyStaticFields_ShouldBePascalCase.style = PascalCaseStyle
+
+# Private ReadOnly Fields
+dotnet_naming_symbols.PrivateReadOnlyFields.applicable_kinds = field
+dotnet_naming_symbols.PrivateReadOnlyFields.applicable_accessibilities = private
+dotnet_naming_symbols.PrivateReadOnlyFields.required_modifiers = readonly
+
+dotnet_naming_rule.PrivateReadOnlyFields_ShouldBeUnderscorePrefixCamelCaseStyle.symbols = PrivateReadOnlyFields
+dotnet_naming_rule.PrivateReadOnlyFields_ShouldBeUnderscorePrefixCamelCaseStyle.style = CamelCase_WithUnderscorePrefix_Style
+
+
+
+
+######################################
+##    CSharp Whitespace Settings    ##
+######################################
+# Newline settings
+csharp_new_line_before_open_brace                     = all
+csharp_new_line_before_else                           = true
+csharp_new_line_before_catch                          = true
+csharp_new_line_before_finally                        = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types     = true
+csharp_new_line_between_query_expression_clauses      = true
+
+# Space settings
+csharp_space_after_cast                                                  = false
+csharp_space_after_keywords_in_control_flow_statements                   = true
+csharp_space_between_parentheses                                         = false
+csharp_space_before_colon_in_inheritance_clause                          = true
+csharp_space_after_colon_in_inheritance_clause                           = true
+csharp_space_around_binary_operators                                     = ignore
+csharp_space_between_method_declaration_parameter_list_parentheses       = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis        = false
+csharp_space_between_method_call_parameter_list_parentheses              = false
+csharp_space_between_method_call_empty_parameter_list_parentheses        = false
+csharp_space_between_method_call_name_and_opening_parenthesis            = false
+csharp_space_after_comma                                                 = true
+csharp_space_before_comma                                                = false
+csharp_space_after_dot                                                   = false
+csharp_space_before_dot                                                  = false
+csharp_space_after_semicolon_in_for_statement                            = true
+csharp_space_before_semicolon_in_for_statement                           = false
+csharp_space_around_declaration_statements                               = false
+csharp_space_before_open_square_brackets                                 = false
+csharp_space_between_empty_square_brackets                               = false
+csharp_space_between_square_brackets                                     = false
+
+# Wrap settings
+csharp_preserve_single_line_statements                                   = true
+csharp_preserve_single_line_blocks                                       = true
