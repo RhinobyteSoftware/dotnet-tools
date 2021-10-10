@@ -36,9 +36,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7DE61D8
 		tests\directory.build.targets = tests\directory.build.targets
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.Tools.SqlProjectReference", "src\Rhinobyte.Tools.SqlProjectReference\Rhinobyte.Tools.SqlProjectReference.csproj", "{860A644A-6CE8-4496-9818-9488C0480A37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.Tools.CustomProjectReference", "src\Rhinobyte.Tools.CustomProjectReference\Rhinobyte.Tools.CustomProjectReference.csproj", "{860A644A-6CE8-4496-9818-9488C0480A37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhinobyte.Tools.SqlProjectReference.Tests", "tests\Rhinobyte.Tools.SqlProjectReference.Tests\Rhinobyte.Tools.SqlProjectReference.Tests.csproj", "{9EC0E815-3759-4B3D-9483-88136754D473}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhinobyte.Tools.CustomProjectReference.Tests", "tests\Rhinobyte.Tools.CustomProjectReference.Tests\Rhinobyte.Tools.CustomProjectReference.Tests.csproj", "{9EC0E815-3759-4B3D-9483-88136754D473}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

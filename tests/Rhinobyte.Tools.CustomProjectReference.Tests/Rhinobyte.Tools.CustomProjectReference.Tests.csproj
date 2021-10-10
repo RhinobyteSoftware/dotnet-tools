@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFrameworks>net5.0;net472;</TargetFrameworks>
-        <ImportPropsTestFile>$(MSBuildProjectDirectory)\..\..\src\Rhinobyte.Tools.SqlProjectReference\build\Rhinobyte.Tools.SqlProjectReference.props</ImportPropsTestFile>
-        <ImportTargetsTestFile>$(MSBuildProjectDirectory)\..\..\src\Rhinobyte.Tools.SqlProjectReference\build\Rhinobyte.Tools.SqlProjectReference.targets</ImportTargetsTestFile>
+        <ImportPropsTestFile>$(MSBuildProjectDirectory)\..\..\src\Rhinobyte.Tools.CustomProjectReference\build\Rhinobyte.Tools.CustomProjectReference.props</ImportPropsTestFile>
+        <ImportTargetsTestFile>$(MSBuildProjectDirectory)\..\..\src\Rhinobyte.Tools.CustomProjectReference\build\Rhinobyte.Tools.CustomProjectReference.targets</ImportTargetsTestFile>
 
 
          
@@ -18,7 +18,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Rhinobyte.Tools.SqlProjectReference\Rhinobyte.Tools.SqlProjectReference.csproj" />
+        <ProjectReference Include="..\..\src\Rhinobyte.Tools.CustomProjectReference\Rhinobyte.Tools.CustomProjectReference.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,6 +27,6 @@
     </ItemGroup>
     
     <ItemGroup>
-        <SqlProjectReference Include="Test.sqlproj" />
+        <CustomProjectReference Include="Test.sqlproj" />
     </ItemGroup>
 </Project>

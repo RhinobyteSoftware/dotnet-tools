@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.Build.NoTargets/3.1.0">
 
     <PropertyGroup>
-        <PackageId>Rhinobyte.Tools.SqlProjectReference</PackageId>
+        <PackageId>Rhinobyte.Tools.CustomProjectReference</PackageId>
         
         <!-- Have to use specific target frameworks for MSBuild extension packages -->
         <TargetFrameworks>$(Msbuild16TargetFrameworks)</TargetFrameworks>
@@ -11,7 +11,7 @@
 
         <!-- Have to use a .nuspec file because of the stupid NU5017 error -->
         <!-- Msbuild won't let you pack a project that doesn't output an assembly or have any other package dependencies -->
-        <PackageVersion>$(SqlProjectReferenceToolsPackageVersion)</PackageVersion>
+        <PackageVersion>$(CustomProjectReferenceToolsPackageVersion)</PackageVersion>
         <IncludeSymbols>false</IncludeSymbols>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>

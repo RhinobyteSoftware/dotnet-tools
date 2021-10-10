@@ -47,8 +47,8 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
         <!-- Subproject Package Versions -->
-        <SqlProjectReferenceToolsPackageVersion>1.0.0-alpha</SqlProjectReferenceToolsPackageVersion>
-        <SqlProjectReferenceTools_ConsumerDependencyVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(SqlProjectReferenceToolsPackageVersion)', '(\d+\.\d+)\..+', '$1.0'))</SqlProjectReferenceTools_ConsumerDependencyVersion>
+        <CustomProjectReferenceToolsPackageVersion>1.0.0-alpha</CustomProjectReferenceToolsPackageVersion>
+        <CustomProjectReferenceTools_ConsumerDependencyVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(CustomProjectReferenceToolsPackageVersion)', '(\d+\.\d+)\..+', '$1.0'))</CustomProjectReferenceTools_ConsumerDependencyVersion>
 
         <!-- External Dependency Versions-->
         <!-- I'm guessing the msbuild nuget package major version needs to match the available tools version? -->

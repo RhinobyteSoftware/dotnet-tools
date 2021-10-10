@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Rhinobyte.Tools.ProjectStructureTests.Tests.Setup
+namespace Rhinobyte.Tools.CustomProjectReference.Tests.Setup
 {
 	public class MockBuildEngine : IBuildEngine
 	{

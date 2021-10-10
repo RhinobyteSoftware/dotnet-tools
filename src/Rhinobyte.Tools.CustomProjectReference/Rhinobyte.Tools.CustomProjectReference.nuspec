@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>Rhinobyte.Tools.SqlProjectReference</id>
+    <id>Rhinobyte.Tools.CustomProjectReference</id>
     <version>$packageversion$</version>
-    <title>Rhinobyte.Tools.SqlProjectReference</title>
+    <title>Rhinobyte.Tools.CustomProjectReference</title>
     <authors>Ryan Thomas</authors>
     <developmentDependency>true</developmentDependency>
     <license type="expression">MIT</license>

@@ -7,23 +7,23 @@
         <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND '$(IsMultiTargeted)' == 'true'">DispatchToInnerBuilds</_ProcessBeforeBuildRunOnlyOnce>
         <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND '$(IsMultiTargeted)' != 'true'">BeforeBuild</_ProcessBeforeBuildRunOnlyOnce>
 
-        <_ProcessSqlProjectReferencesBeforeTargets Condition=" '$(_ProcessSqlProjectReferencesBeforeTargets)' != '' ">$(_ProcessSqlProjectReferencesBeforeTargets);$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessSqlProjectReferencesBeforeTargets>
-        <_ProcessSqlProjectReferencesBeforeTargets Condition=" '$(_ProcessSqlProjectReferencesBeforeTargets)' == '' ">$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessSqlProjectReferencesBeforeTargets>
+        <_ProcessCustomProjectReferencesBeforeTargets Condition=" '$(_ProcessCustomProjectReferencesBeforeTargets)' != '' ">$(_ProcessCustomProjectReferencesBeforeTargets);$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessCustomProjectReferencesBeforeTargets>
+        <_ProcessCustomProjectReferencesBeforeTargets Condition=" '$(_ProcessCustomProjectReferencesBeforeTargets)' == '' ">$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessCustomProjectReferencesBeforeTargets>
 
         <AssignTargetPathsDependsOn Condition="'$(AssignTargetPathsDependsOn)' != ''">
             $(AssignTargetPathsDependsOn);
-            _ProcessSqlProjectReferences;
+            _ProcessCustomProjectReferences;
         </AssignTargetPathsDependsOn>
-        <AssignTargetPathsDependsOn Condition="'$(AssignTargetPathsDependsOn)' == ''">_ProcessSqlProjectReferences</AssignTargetPathsDependsOn>
+        <AssignTargetPathsDependsOn Condition="'$(AssignTargetPathsDependsOn)' == ''">_ProcessCustomProjectReferences</AssignTargetPathsDependsOn>
     </PropertyGroup>
     
-    <Target Name="_ProcessSqlProjectReferences"
-            BeforeTargets="$(_ProcessSqlProjectReferencesBeforeTargets)"
-            DependsOnTargets="$(_ProcessSqlProjectReferencesDependsOnTargets)"
+    <Target Name="_ProcessCustomProjectReferences"
+            BeforeTargets="$(_ProcessCustomProjectReferencesBeforeTargets)"
+            DependsOnTargets="$(_ProcessCustomProjectReferencesDependsOnTargets)"
             
     >
         <Message Importance="high" Text="
-  !! _ProcessSqlProjectReferences !!
+  !! _ProcessCustomProjectReferences !!
 
 MSBuildVersion:        $(MSBuildVersion)
 MSBuildToolsVersion:   $(MSBuildToolsVersion)
@@ -33,13 +33,13 @@ IsInnerBuild:     $(IsInnerBuild)
 IsCrossTargeted2: $(IsCrossTargeted2)
 
 _ProcessBeforeBuildRunOnlyOnce:                  $(_ProcessBeforeBuildRunOnlyOnce)
-_ProcessSqlProjectReferencesBeforeTargets:       $(_ProcessSqlProjectReferencesBeforeTargets)
-_ProcessSqlProjectReferencesDependsOnTargets:    $(_ProcessSqlProjectReferencesDependsOnTargets)
+_ProcessCustomProjectReferencesBeforeTargets:       $(_ProcessCustomProjectReferencesBeforeTargets)
+_ProcessCustomProjectReferencesDependsOnTargets:    $(_ProcessCustomProjectReferencesDependsOnTargets)
 
 TargetFrameworkValues:      '$(TargetFrameworkValues)'
 TargetFrameworksValues:      '$(TargetFrameworksValues)'
 
-SqlProjectReferences:
-@(SqlProjectReference, '%0a')" />
+CustomProjectReferences:
+@(CustomProjectReferences, '%0a')" />
     </Target>
 </Project>
