@@ -2,4 +2,6 @@
 
     <Import Project="..\solution.targets" Condition="'$(SolutionTargetsIsImported)' == ''" />
 
+    <Import Project="$(ImportTargetsTestFile)" Condition="'$(ImportTargetsTestFile)' != '' AND Exists('$(ImportTargetsTestFile)')" />
+
 </Project>

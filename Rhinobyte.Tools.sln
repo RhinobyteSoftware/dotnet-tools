@@ -36,9 +36,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7DE61D8
 		tests\directory.build.targets = tests\directory.build.targets
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.Tools.SqlProjectReference", "src\Rhinobyte.Tools.SqlProjectReference\Rhinobyte.Tools.SqlProjectReference.csproj", "{860A644A-6CE8-4496-9818-9488C0480A37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhinobyte.Tools.SqlProjectReference.Tests", "tests\Rhinobyte.Tools.SqlProjectReference.Tests\Rhinobyte.Tools.SqlProjectReference.Tests.csproj", "{9EC0E815-3759-4B3D-9483-88136754D473}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseTesting|Any CPU = ReleaseTesting|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{860A644A-6CE8-4496-9818-9488C0480A37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{860A644A-6CE8-4496-9818-9488C0480A37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{860A644A-6CE8-4496-9818-9488C0480A37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{860A644A-6CE8-4496-9818-9488C0480A37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{860A644A-6CE8-4496-9818-9488C0480A37}.ReleaseTesting|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{860A644A-6CE8-4496-9818-9488C0480A37}.ReleaseTesting|Any CPU.Build.0 = ReleaseTesting|Any CPU
+		{9EC0E815-3759-4B3D-9483-88136754D473}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EC0E815-3759-4B3D-9483-88136754D473}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EC0E815-3759-4B3D-9483-88136754D473}.Release|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{9EC0E815-3759-4B3D-9483-88136754D473}.Release|Any CPU.Build.0 = ReleaseTesting|Any CPU
+		{9EC0E815-3759-4B3D-9483-88136754D473}.ReleaseTesting|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{9EC0E815-3759-4B3D-9483-88136754D473}.ReleaseTesting|Any CPU.Build.0 = ReleaseTesting|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{860A644A-6CE8-4496-9818-9488C0480A37} = {2C0C7F28-E5F3-4966-BCB6-0963D7BD5FBE}
+		{9EC0E815-3759-4B3D-9483-88136754D473} = {C7DE61D8-0FD5-4E16-AD6C-C7085DA1BCF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C9D46380-968F-4E71-8DEF-6D722DD1C69D}

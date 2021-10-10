@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+    <PropertyGroup>
+        <IsMultiTargeted Condition="'$(TargetFrameworks)' != '' AND $(TargetFrameworks.IndexOf(';')) > -1 AND $(TargetFrameworks.IndexOf(';')) != $([MSBuild]::Add($(TargetFrameworks.Length), 1))">true</IsMultiTargeted>
+
+        <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND '$(IsMultiTargeted)' == 'true'">DispatchToInnerBuilds</_ProcessBeforeBuildRunOnlyOnce>
+        <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND '$(IsMultiTargeted)' != 'true'">BeforeBuild</_ProcessBeforeBuildRunOnlyOnce>
+
+        <_ProcessSqlProjectReferencesBeforeTargets Condition=" '$(_ProcessSqlProjectReferencesBeforeTargets)' != '' ">$(_ProcessSqlProjectReferencesBeforeTargets);$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessSqlProjectReferencesBeforeTargets>
+        <_ProcessSqlProjectReferencesBeforeTargets Condition=" '$(_ProcessSqlProjectReferencesBeforeTargets)' == '' ">$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessSqlProjectReferencesBeforeTargets>
+
+        <AssignTargetPathsDependsOn Condition="'$(AssignTargetPathsDependsOn)' != ''">
+            $(AssignTargetPathsDependsOn);
+            _ProcessSqlProjectReferences;
+        </AssignTargetPathsDependsOn>
+        <AssignTargetPathsDependsOn Condition="'$(AssignTargetPathsDependsOn)' == ''">_ProcessSqlProjectReferences</AssignTargetPathsDependsOn>
+    </PropertyGroup>
+    
+    <Target Name="_ProcessSqlProjectReferences"
+            BeforeTargets="$(_ProcessSqlProjectReferencesBeforeTargets)"
+            DependsOnTargets="$(_ProcessSqlProjectReferencesDependsOnTargets)"
+            
+    >
+        <Message Importance="high" Text="
+  !! _ProcessSqlProjectReferences !!
+
+MSBuildVersion:        $(MSBuildVersion)
+MSBuildToolsVersion:   $(MSBuildToolsVersion)
+
+IsMultiTargeted:  $(IsMultiTargeted)
+IsInnerBuild:     $(IsInnerBuild)
+IsCrossTargeted2: $(IsCrossTargeted2)
+
+_ProcessBeforeBuildRunOnlyOnce:                  $(_ProcessBeforeBuildRunOnlyOnce)
+_ProcessSqlProjectReferencesBeforeTargets:       $(_ProcessSqlProjectReferencesBeforeTargets)
+_ProcessSqlProjectReferencesDependsOnTargets:    $(_ProcessSqlProjectReferencesDependsOnTargets)
+
+TargetFrameworkValues:      '$(TargetFrameworkValues)'
+TargetFrameworksValues:      '$(TargetFrameworksValues)'
+
+SqlProjectReferences:
+@(SqlProjectReference, '%0a')" />
+    </Target>
+</Project>

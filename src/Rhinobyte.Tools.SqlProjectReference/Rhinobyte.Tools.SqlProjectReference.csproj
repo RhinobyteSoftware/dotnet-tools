@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.Build.NoTargets/3.1.0">
+
+    <PropertyGroup>
+        <PackageId>Rhinobyte.Tools.SqlProjectReference</PackageId>
+        
+        <!-- Have to use specific target frameworks for MSBuild extension packages -->
+        <TargetFrameworks>$(Msbuild16TargetFrameworks)</TargetFrameworks>
+        <Configurations>Debug;Release;ReleaseTesting</Configurations>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <IsClsCompliant>false</IsClsCompliant>
+
+        <!-- Have to use a .nuspec file because of the stupid NU5017 error -->
+        <!-- Msbuild won't let you pack a project that doesn't output an assembly or have any other package dependencies -->
+        <PackageVersion>$(SqlProjectReferenceToolsPackageVersion)</PackageVersion>
+        <IncludeSymbols>false</IncludeSymbols>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
+        <NuspecProperties>$(NuspecProperties);packageversion=$(PackageVersion)</NuspecProperties>
+        <PackageTags>msbuild tools sqlproject databases</PackageTags>
+
+
+        <Summary>MSBuild task/target extensions to support building/consuming SSDT project dependencies from sdk style projects</Summary>
+        <Description>$(Summary)</Description>
+        <Title>$(PackageId)</Title>
+    </PropertyGroup>
+
+</Project>
