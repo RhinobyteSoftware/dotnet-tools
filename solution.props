@@ -46,10 +46,6 @@
         <RepositoryUrl>https://github.com/RhinobyteSoftware/dotnet-tools</RepositoryUrl>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-        <!-- Subproject Package Versions -->
-        <CustomProjectReferenceToolsPackageVersion>1.0.0-alpha</CustomProjectReferenceToolsPackageVersion>
-        <CustomProjectReferenceTools_ConsumerDependencyVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(CustomProjectReferenceToolsPackageVersion)', '(\d+\.\d+)\..+', '$1.0'))</CustomProjectReferenceTools_ConsumerDependencyVersion>
-
         <!-- External Dependency Versions-->
         <!-- I'm guessing the msbuild nuget package major version needs to match the available tools version? -->
         <!-- If so I'll have to downgrade this to a 15.x version if I wan't to support VS 2017? -->
