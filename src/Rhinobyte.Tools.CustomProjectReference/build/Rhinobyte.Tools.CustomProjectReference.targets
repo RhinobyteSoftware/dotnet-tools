@@ -2,10 +2,14 @@
 <Project>
 
     <PropertyGroup>
-        <IsMultiTargeted Condition="'$(TargetFrameworks)' != '' AND $(TargetFrameworks.IndexOf(';')) > -1 AND $(TargetFrameworks.IndexOf(';')) != $([MSBuild]::Add($(TargetFrameworks.Length), 1))">true</IsMultiTargeted>
+        <!-- Explicitly set these to either true orfalse so we can use them direclty as boolean expressions below -->
+        <IsMultiTargeted Condition="'$(TargetFrameworks)' != '' AND $(TargetFrameworks.IndexOf(';')) &gt; -1 AND $(TargetFrameworks.IndexOf(';')) != $([MSBuild]::Add($(TargetFrameworks.Length), 1))">true</IsMultiTargeted>
+        <IsInnerBuild Condition="'$(IsInnerBuild)' == '' AND '$(IsMultiTargeted)' == 'true' AND '$(TargetFramework)' != ''">true</IsInnerBuild>
+    </PropertyGroup>
 
-        <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND '$(IsMultiTargeted)' == 'true'">DispatchToInnerBuilds</_ProcessBeforeBuildRunOnlyOnce>
-        <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND '$(IsMultiTargeted)' != 'true'">BeforeBuild</_ProcessBeforeBuildRunOnlyOnce>
+    <PropertyGroup Condition="'$(IsInnerBuild)' != 'true'">
+        <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND $(IsMultiTargeted)">DispatchToInnerBuilds</_ProcessBeforeBuildRunOnlyOnce>
+        <_ProcessBeforeBuildRunOnlyOnce Condition=" '$(_ProcessBeforeBuildRunOnlyOnce)' == '' AND !$(IsMultiTargeted)">BeforeBuild</_ProcessBeforeBuildRunOnlyOnce>
 
         <_ProcessCustomProjectReferencesBeforeTargets Condition=" '$(_ProcessCustomProjectReferencesBeforeTargets)' != '' ">$(_ProcessCustomProjectReferencesBeforeTargets);$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessCustomProjectReferencesBeforeTargets>
         <_ProcessCustomProjectReferencesBeforeTargets Condition=" '$(_ProcessCustomProjectReferencesBeforeTargets)' == '' ">$(_ProcessBeforeBuildRunOnlyOnce)</_ProcessCustomProjectReferencesBeforeTargets>
@@ -16,11 +20,12 @@
         </AssignTargetPathsDependsOn>
         <AssignTargetPathsDependsOn Condition="'$(AssignTargetPathsDependsOn)' == ''">_ProcessCustomProjectReferences</AssignTargetPathsDependsOn>
     </PropertyGroup>
-    
+
     <Target Name="_ProcessCustomProjectReferences"
             BeforeTargets="$(_ProcessCustomProjectReferencesBeforeTargets)"
             DependsOnTargets="$(_ProcessCustomProjectReferencesDependsOnTargets)"
-            
+            Inputs="@(CustomProjectReference)"
+            Outputs="@(CustomProjectReference->'$(IntermediateOutputPath)%(RecursiveDir)%(Identity).cache')"
     >
         <Message Importance="high" Text="
   !! _ProcessCustomProjectReferences !!
@@ -30,16 +35,17 @@ MSBuildToolsVersion:   $(MSBuildToolsVersion)
 
 IsMultiTargeted:  $(IsMultiTargeted)
 IsInnerBuild:     $(IsInnerBuild)
-IsCrossTargeted2: $(IsCrossTargeted2)
 
 _ProcessBeforeBuildRunOnlyOnce:                  $(_ProcessBeforeBuildRunOnlyOnce)
 _ProcessCustomProjectReferencesBeforeTargets:       $(_ProcessCustomProjectReferencesBeforeTargets)
 _ProcessCustomProjectReferencesDependsOnTargets:    $(_ProcessCustomProjectReferencesDependsOnTargets)
 
-TargetFrameworkValues:      '$(TargetFrameworkValues)'
-TargetFrameworksValues:      '$(TargetFrameworksValues)'
+TargetFramework:   $(TargetFramework)
+TargetFrameworks:  $(TargetFrameworks)
 
 CustomProjectReferences:
-@(CustomProjectReferences, '%0a')" />
+@(CustomProjectReference->'$(IntermediateOutputPath)%(RecursiveDir)%(Identity).cache%0a')
+
+" />
     </Target>
 </Project>

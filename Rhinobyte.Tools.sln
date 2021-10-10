@@ -38,7 +38,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7DE61D8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.Tools.CustomProjectReference", "src\Rhinobyte.Tools.CustomProjectReference\Rhinobyte.Tools.CustomProjectReference.csproj", "{860A644A-6CE8-4496-9818-9488C0480A37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhinobyte.Tools.CustomProjectReference.Tests", "tests\Rhinobyte.Tools.CustomProjectReference.Tests\Rhinobyte.Tools.CustomProjectReference.Tests.csproj", "{9EC0E815-3759-4B3D-9483-88136754D473}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.Tools.CustomProjectReference.Tests", "tests\Rhinobyte.Tools.CustomProjectReference.Tests\Rhinobyte.Tools.CustomProjectReference.Tests.csproj", "{9EC0E815-3759-4B3D-9483-88136754D473}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TestDatabaseOne", "tests\TestDatabaseOne\TestDatabaseOne.sqlproj", "{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClassLibraryOne", "tests\TestClassLibraryOne\TestClassLibraryOne.csproj", "{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,21 @@ Global
 		{9EC0E815-3759-4B3D-9483-88136754D473}.Release|Any CPU.Build.0 = ReleaseTesting|Any CPU
 		{9EC0E815-3759-4B3D-9483-88136754D473}.ReleaseTesting|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
 		{9EC0E815-3759-4B3D-9483-88136754D473}.ReleaseTesting|Any CPU.Build.0 = ReleaseTesting|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.ReleaseTesting|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.ReleaseTesting|Any CPU.Build.0 = ReleaseTesting|Any CPU
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F}.ReleaseTesting|Any CPU.Deploy.0 = ReleaseTesting|Any CPU
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}.Release|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}.Release|Any CPU.Build.0 = ReleaseTesting|Any CPU
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}.ReleaseTesting|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF}.ReleaseTesting|Any CPU.Build.0 = ReleaseTesting|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +85,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{860A644A-6CE8-4496-9818-9488C0480A37} = {2C0C7F28-E5F3-4966-BCB6-0963D7BD5FBE}
 		{9EC0E815-3759-4B3D-9483-88136754D473} = {C7DE61D8-0FD5-4E16-AD6C-C7085DA1BCF7}
+		{EC277F7C-9C70-4580-8ACE-F201D16E2C7F} = {C7DE61D8-0FD5-4E16-AD6C-C7085DA1BCF7}
+		{30BAF3F1-4234-4DCD-A850-54C9AD951FFF} = {C7DE61D8-0FD5-4E16-AD6C-C7085DA1BCF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C9D46380-968F-4E71-8DEF-6D722DD1C69D}

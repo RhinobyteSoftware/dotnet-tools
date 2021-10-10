@@ -1,32 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net5.0;net472;</TargetFrameworks>
+        <TargetFrameworks>net5.0;net472</TargetFrameworks>
+        <!--<TargetFramework>net5.0</TargetFramework>-->
         <ImportPropsTestFile>$(MSBuildProjectDirectory)\..\..\src\Rhinobyte.Tools.CustomProjectReference\build\Rhinobyte.Tools.CustomProjectReference.props</ImportPropsTestFile>
         <ImportTargetsTestFile>$(MSBuildProjectDirectory)\..\..\src\Rhinobyte.Tools.CustomProjectReference\build\Rhinobyte.Tools.CustomProjectReference.targets</ImportTargetsTestFile>
-
-
-         
-        <!--
-        <IsInnerBuild Condition="'$(TargetFramework)' != '' AND '$(TargetFrameworks)' != '' $(TargetFrameworks.IndexOf(';') > -1)">true</IsInnerBuild>
-        <IsMultiTargeted Condition="'$(TargetFrameworks)' != '' AND $(TargetFrameworks.IndexOf(';') > -1) AND $(TargetFrameworks.Indexof(';') != (TargetFrameworks.Length - 1))">true</IsMultiTargeted>
-        -->
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <IsInnerBuild Condition="'$(TargetFramework)' != '' AND '$(TargetFrameworks)' != '' AND $(TargetFrameworks.IndexOf(';')) > -1">true</IsInnerBuild>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Rhinobyte.Tools.CustomProjectReference\Rhinobyte.Tools.CustomProjectReference.csproj" />
+        <ProjectReference Include="..\TestDatabaseOne\TestDatabaseOne.sqlproj" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Build" Version="$(MicrosoftBuildVersion)" />
         <PackageReference Include="Microsoft.Build.Tasks.Core" Version="$(MicrosoftBuildTasksCoreVersion)" />
     </ItemGroup>
-    
+ 
     <ItemGroup>
         <CustomProjectReference Include="Test.sqlproj" />
     </ItemGroup>
+
 </Project>
