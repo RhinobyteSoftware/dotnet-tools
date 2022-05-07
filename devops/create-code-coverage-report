@@ -1,6 +1,6 @@
 #!/bin/sh
 
-allLibraryNames=("Rhinobyte.CodeAnalysis.CSharp.CodeStyle");
+allLibraryNames=("Rhinobyte.CodeAnalysis.NetAnalyzers");
 allLibraryNamesCount=${#allLibraryNames[@]}
 
 dotnetConfiguration=''
@@ -26,7 +26,7 @@ done;
 
 if [ $testProjectIndex -eq 0 ]; then
 	testProjectNames=(
-		"Rhinobyte.CodeAnalysis.CSharp.CodeStyle.Tests"
+		"Rhinobyte.CodeAnalysis.NetAnalyzers.Tests"
 	);
 	testProjectsCount=${#testProjectNames[@]};
 else

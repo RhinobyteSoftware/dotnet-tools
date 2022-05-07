@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+        <!-- VERSION VALUES -->
+        <PackageVersion>$(CodeAnalyzersPackageVersion)</PackageVersion>
+        <AssemblyVersion>$(PackageVersion).0</AssemblyVersion>
+        <FileVersion>$(PackageVersion).0</FileVersion>
+        <InformationalVersion>$(PackageVersion)</InformationalVersion>
+        <Version>$(PackageVersion)</Version>
+
+        <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
+        <AssemblyName>$(PackageId)</AssemblyName>
+        <RootNamespace>$(PackageId)</RootNamespace>
+        <Title>$(PackageId)</Title>
+        <PackageTags>codeanalysis codefixes</PackageTags>
+
+        <ReleaseNotesTextFilePath>$(MSBuildProjectDirectory)\RELEASE-NOTES.txt</ReleaseNotesTextFilePath>
+        <Summary>C# analyzers</Summary>
+        <Description>
+            $(Summary)
+        </Description>
+
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Rhinobyte.CodeAnalysis.NetAnalyzers\Rhinobyte.CodeAnalysis.NetAnalyzers.csproj" />
+        <ProjectReference Include="..\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+    <Target Name="_AddAnalyzersToOutput">
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="$(OutputPath)\Rhinobyte.CodeAnalysis.NetAnalyzers.dll" PackagePath="analyzers/dotnet/cs" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
+        </ItemGroup>
+    </Target>
+
+</Project>

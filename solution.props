@@ -56,6 +56,8 @@
 
         <!-- Subproject Package Versions -->
         <CodeAnalyzersPackageVersion>1.0.0-beta.1</CodeAnalyzersPackageVersion>
+        <CodeAnalysisSourceRoot>$(RepoRoot)\src\CodeAnalysis</CodeAnalysisSourceRoot>
+        <CodeAnalysisTestsRoot>$(RepoRoot)\tests\CodeAnalysis</CodeAnalysisTestsRoot>
 
         <!-- External Dependency Versions-->
         <!-- I'm guessing the msbuild nuget package major version needs to match the available tools version? -->
@@ -79,7 +81,7 @@
 
     <!-- SOLUTION WIDE CODE ANALYZER PACKAGES -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.9.60">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.10.*">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>

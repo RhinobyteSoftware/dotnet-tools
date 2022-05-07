@@ -1,0 +1,5 @@
+
+
+[*.cs]
+# Rule: (CA1014) Mark assemblies with CLSCompliant - Reason: Suppressed for code analyzer projects
+dotnet_diagnostic.CA1014.severity       = none
