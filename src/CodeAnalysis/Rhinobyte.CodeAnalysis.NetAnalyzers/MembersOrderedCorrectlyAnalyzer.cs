@@ -17,7 +17,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// <summary>
 	/// The diagnostic rule id for the analzyer
 	/// </summary>
-	public const string DiagnosticId = "RBCS0001";
+	public const string RBCS0001 = "RBCS0001";
 
 	/// <summary>
 	/// The default member group ordering for the analyzer
@@ -40,8 +40,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
 
-	private static readonly DiagnosticDescriptor Rule = DiagnosticDescriptorHelper.Create(
-		DiagnosticId,
+	internal static readonly DiagnosticDescriptor RuleRBCS0001 = DiagnosticDescriptorHelper.Create(
+		RBCS0001,
 		DiagnosticDescriptorHelper.DesignCategory,
 		new LocalizableResourceString(nameof(Resources.RBCS0001_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
 		DiagnosticSeverity.Info,
@@ -51,18 +51,70 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	);
 
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleRBCS0001);
+
+	private static void AnalyzeMultipartNamedTypeSymbol(
+		SymbolAnalysisContext context,
+		MemberGroupType[][] groupOrder,
+		INamedTypeSymbol namedTypeSymbol)
+	{
+		if (context.Symbol is null || groupOrder is null)
+			return;
+
+		Debug.Assert(namedTypeSymbol.DeclaringSyntaxReferences.Length == namedTypeSymbol.Locations.Length);
+		if (namedTypeSymbol.DeclaringSyntaxReferences.Length != namedTypeSymbol.Locations.Length)
+			return;
+
+		var locationDataLookup = new NamedTypeLocationData[namedTypeSymbol.Locations.Length];
+		for (var locationIndex = 0; locationIndex < namedTypeSymbol.Locations.Length; ++locationIndex)
+		{
+			var syntaxReference = namedTypeSymbol.DeclaringSyntaxReferences[locationIndex];
+			var positionSpan = syntaxReference.SyntaxTree.GetLineSpan(syntaxReference.Span, context.CancellationToken);
+			locationDataLookup[locationIndex] = new NamedTypeLocationData(groupOrder, namedTypeSymbol.Locations[locationIndex], positionSpan);
+		}
+
+		var memberSymbols = namedTypeSymbol.GetMembers();
+		foreach (var memberSymbol in memberSymbols)
+		{
+			if (memberSymbol.IsImplicitlyDeclared)
+				continue;
+
+			var currentMemberGroupType = GetGroupType(memberSymbol);
+			if (!memberSymbol.CanBeReferencedByName && currentMemberGroupType != MemberGroupType.Constructors && currentMemberGroupType != MemberGroupType.StaticConstructors)
+				continue;
+
+			foreach (var memberLocation in memberSymbol.Locations)
+			{
+				var memberLocationLineSpan = memberLocation.GetLineSpan();
+				var locationMatches = 0;
+				foreach (var locationData in locationDataLookup)
+				{
+					if (!SyntaxHelper.IsPositionSpanWithin(memberLocationLineSpan, locationData.PositionSpan))
+						continue;
+
+					++locationMatches;
+
+					if (locationData.CompletedGroups.Contains(currentMemberGroupType))
+					{
+						var diagnostic = Diagnostic.Create(RuleRBCS0001, memberLocation, memberSymbol.Name);
+						context.ReportDiagnostic(diagnostic);
+						continue;
+					}
+
+					var isInCurrentGroup = locationData.AdvanceCurrentGroupTo(currentMemberGroupType, groupOrder);
+					Debug.Assert(isInCurrentGroup);
+				}
+
+				Debug.Assert(locationMatches > 0);
+			}
+		}
+	}
 
 	private static void AnalyzeNamedTypeSymbol(SymbolAnalysisContext context)
 	{
 		var namedTypeSymbol = (INamedTypeSymbol)context.Symbol;
 		if (namedTypeSymbol.IsNamespace)
 			return;
-
-		if (namedTypeSymbol.Locations.Length > 1)
-			return; // Partial class support not yet implemented
-
-		var memberSymbols = namedTypeSymbol.GetMembers();
 
 		// TODO: Define and load code style configuration values somehow
 		var groupOrder = DefaultGroupOrder;
@@ -75,22 +127,29 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		Debug.Assert(allValues.All(value => flattenedGroups.Contains(value)));
 #endif
 
+		if (namedTypeSymbol.Locations.Length > 1)
+		{
+			AnalyzeMultipartNamedTypeSymbol(context, groupOrder, namedTypeSymbol);
+			return;
+		}
+
+		var memberSymbols = namedTypeSymbol.GetMembers();
 		var completedGroups = new List<MemberGroupType>();
 		var currentGroup = groupOrder[0];
 		var currentGroupIndex = 1;
 
 		foreach (var memberSymbol in memberSymbols)
 		{
-			if (memberSymbol.IsImplicitlyDeclared || !memberSymbol.CanBeReferencedByName)
+			if (memberSymbol.IsImplicitlyDeclared)
 				continue;
 
 			var currentMemberGroupType = GetGroupType(memberSymbol);
-			if (currentMemberGroupType == MemberGroupType.InstanceMethods && memberSymbol.Name == namedTypeSymbol.Name)
-				currentMemberGroupType = MemberGroupType.Constructors;
+			if (!memberSymbol.CanBeReferencedByName && currentMemberGroupType != MemberGroupType.Constructors && currentMemberGroupType != MemberGroupType.StaticConstructors)
+				continue;
 
 			if (completedGroups.Contains(currentMemberGroupType))
 			{
-				var diagnostic = Diagnostic.Create(Rule, memberSymbol.Locations[0], memberSymbol.Name);
+				var diagnostic = Diagnostic.Create(RuleRBCS0001, memberSymbol.Locations[0], memberSymbol.Name);
 				context.ReportDiagnostic(diagnostic);
 				continue;
 			}
@@ -141,7 +200,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 			case SymbolKind.Method:
 			{
-				var isConstructor = symbol.Name.Contains(".ctor");
+				var isConstructor = symbol.Name.Contains(".ctor") || symbol.Name.Contains(".cctor");
 				if (isConstructor && symbol.IsStatic)
 					return MemberGroupType.StaticConstructors;
 				else if (isConstructor)
@@ -195,6 +254,40 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			case SymbolKind.TypeParameter:
 			default:
 				return MemberGroupType.Unknown;
+		}
+	}
+
+	internal struct NamedTypeLocationData
+	{
+		public NamedTypeLocationData(
+			MemberGroupType[][] groupOrder,
+			Location location,
+			FileLinePositionSpan positionSpan)
+		{
+			CompletedGroups = new List<MemberGroupType>();
+			CurrentGroup = groupOrder[0];
+			CurrentGroupIndex = 1;
+			Location = location;
+			PositionSpan = positionSpan;
+		}
+
+		internal List<MemberGroupType> CompletedGroups { get; }
+		internal MemberGroupType[] CurrentGroup { get; private set; }
+		internal int CurrentGroupIndex { get; private set; }
+		internal Location Location { get; }
+		internal FileLinePositionSpan PositionSpan { get; }
+
+		internal bool AdvanceCurrentGroupTo(MemberGroupType groupForCurrentMemberSymbol, MemberGroupType[][] groupOrder)
+		{
+			var isInCurrentGroup = CurrentGroup.Contains(groupForCurrentMemberSymbol);
+			while (!isInCurrentGroup && CurrentGroupIndex < groupOrder.Length)
+			{
+				CompletedGroups.AddRange(CurrentGroup);
+				CurrentGroup = groupOrder[CurrentGroupIndex++];
+				isInCurrentGroup = CurrentGroup.Contains(groupForCurrentMemberSymbol);
+			}
+
+			return isInCurrentGroup;
 		}
 	}
 }

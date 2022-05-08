@@ -19,7 +19,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 {
 	/// <inheritdoc/>
-	public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AlphabeticalMemberOrderAnalyzer.DiagnosticId);
+	public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001);
 
 	/// <inheritdoc/>
 	public sealed override FixAllProvider GetFixAllProvider()

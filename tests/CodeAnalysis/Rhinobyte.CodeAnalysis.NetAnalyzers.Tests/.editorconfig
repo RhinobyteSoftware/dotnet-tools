@@ -1,0 +1,7 @@
+﻿
+
+# Suppress analyzers in test input / expectation files since they will deliberately have code that the analyzers complain about
+[TestCaseFiles/*.cs]
+
+# (Rule) IDE0005
+dotnet_diagnostic.IDE0005.severity       = none
