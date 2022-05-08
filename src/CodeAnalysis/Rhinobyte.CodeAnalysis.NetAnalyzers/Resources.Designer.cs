@@ -61,29 +61,29 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type names should be all uppercase..
+        ///   Looks up a localized string similar to Type members should be ordered correcty into their respective groups..
         /// </summary>
-        internal static string AnalyzerDescription {
+        internal static string RBCS0001_AnalyzerDescription {
             get {
-                return ResourceManager.GetString("AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("RBCS0001_AnalyzerDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name &apos;{0}&apos; contains lowercase letters.
+        ///   Looks up a localized string similar to Member &apos;{0}&apos; is not ordered correctly by group.
         /// </summary>
-        internal static string AnalyzerMessageFormat {
+        internal static string RBCS0001_AnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("RBCS0001_AnalyzerMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name contains lowercase letters.
+        ///   Looks up a localized string similar to Member is not ordered correctly by group.
         /// </summary>
-        internal static string AnalyzerTitle {
+        internal static string RBCS0001_AnalyzerTitle {
             get {
-                return ResourceManager.GetString("AnalyzerTitle", resourceCulture);
+                return ResourceManager.GetString("RBCS0001_AnalyzerTitle", resourceCulture);
             }
         }
     }

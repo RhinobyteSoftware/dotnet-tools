@@ -15,8 +15,8 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 /// <summary>
 /// Code fix provider for consistent ordering of members within a type
 /// </summary>
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AlphabeticalMemberOrderAnalyzerCodeFixProvider)), Shared]
-public class AlphabeticalMemberOrderAnalyzerCodeFixProvider : CodeFixProvider
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MembersOrderedCorrectlyAnalyzerCodeFixProvider)), Shared]
+public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 {
 	/// <inheritdoc/>
 	public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(AlphabeticalMemberOrderAnalyzer.DiagnosticId);
