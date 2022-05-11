@@ -17,6 +17,9 @@ internal static class TestHelper
 		return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "TestCaseFiles", $"{fileNamePrefix}{extension}"));
 	}
 
+	public static async Task<string> GetTestCodeFixResultFileAsync(CancellationToken cancellationToken, [CallerMemberName] string? fileNamePrefix = null)
+		=> await GetTestCaseFileAsync(cancellationToken, ".codefixresult.cs", fileNamePrefix);
+
 	public static async Task<string> GetTestInputFileAsync(CancellationToken cancellationToken, [CallerMemberName] string? fileNamePrefix = null)
 		=> await GetTestCaseFileAsync(cancellationToken, ".input.cs", fileNamePrefix);
 }

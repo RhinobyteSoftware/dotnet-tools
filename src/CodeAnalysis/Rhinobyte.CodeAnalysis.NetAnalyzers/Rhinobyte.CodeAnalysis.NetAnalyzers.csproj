@@ -19,4 +19,10 @@
         <EmbeddedResource Update="Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>$(ProjectName).CodeFixes</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
 </Project>

@@ -52,27 +52,45 @@ do
 	echo "";
 	echo "Running tests for:  $testProjectName";
 
+	isCodeAnalysis=false
+	testProjectFolder="tests/$testProjectName";
+	case "$testProjectFolder" in
+		*CodeAnalysis*)
+			isCodeAnalysis=true
+			testProjectFolder="tests/CodeAnalysis/$testProjectName"
+			;;
+	esac;
+
 	echo 'Removing Old Test Results Folders...';
-	rm -rf "tests/$testProjectName/TestResults";
+	rm -rf "$testProjectFolder/TestResults";
 	echo "";
 
 	dotnetConfigurationFlag=''
 	if [ ! -z "$dotnetConfiguration" ]; then
 		dotnetConfigurationFlag="--configuration $dotnetConfiguration"
 	fi;
-	for (( frameworkIndex=0; frameworkIndex<${targetFrameworksCount}; frameworkIndex++ ));
-	do
-		targetTestFramework="${targetFrameworkNames[$frameworkIndex]}"
-		echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
-		echo "dotnet test "$dotnetConfigurationFlag" --framework \"$targetTestFramework\" \"tests\\$testProjectName\\$testProjectName.csproj\" --collect:\"XPlat Code Coverage\" --results-directory:\"tests\\$testProjectName\\TestResults\\$targetTestFramework\"";
-		dotnet test --framework "$targetTestFramework" "tests\\$testProjectName\\$testProjectName.csproj" --collect:"XPlat Code Coverage" --results-directory:"tests\\$testProjectName\\TestResults\\$targetTestFramework"
-		echo "";
-	done;
+
+	if [ "$isCodeAnalysis" = "true" ]; then
+			targetTestFramework="netcoreapp3.1"
+			echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
+			echo "dotnet test "$dotnetConfigurationFlag" --framework \"$targetTestFramework\" \"$testProjectFolder\\$testProjectName.csproj\" --collect:\"XPlat Code Coverage\" --results-directory:\"$testProjectFolder\\TestResults\\$targetTestFramework\"";
+			dotnet test --framework "$targetTestFramework" "$testProjectFolder\\$testProjectName.csproj" --collect:"XPlat Code Coverage" --results-directory:"$testProjectFolder\\TestResults\\$targetTestFramework"
+			echo "";
+	else
+		for (( frameworkIndex=0; frameworkIndex<${targetFrameworksCount}; frameworkIndex++ ));
+		do
+			targetTestFramework="${targetFrameworkNames[$frameworkIndex]}"
+			echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
+			echo "dotnet test "$dotnetConfigurationFlag" --framework \"$targetTestFramework\" \"$testProjectFolder\\$testProjectName.csproj\" --collect:\"XPlat Code Coverage\" --results-directory:\"tests\\$testProjectName\\TestResults\\$targetTestFramework\"";
+			dotnet test --framework "$targetTestFramework" "$testProjectFolder\\$testProjectName.csproj" --collect:"XPlat Code Coverage" --results-directory:"tests\\$testProjectName\\TestResults\\$targetTestFramework"
+			echo "";
+		done;
+	fi
 	echo "";
 
 	echo 'Generating the coverage reports...';
 	echo '';
-	for targetFrameworkFolder in "tests/$testProjectName/TestResults/"*/ ; do
+	for targetFrameworkFolder in "$testProjectFolder/TestResults/"*/ ; do
 		targetFramework=$(basename $targetFrameworkFolder)
 		echo "Checking TargetFramwork:  $targetFramework"
 		for guidFolder in "$targetFrameworkFolder"*/ ; do

@@ -61,11 +61,11 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Make uppercase.
+        ///   Looks up a localized string similar to Reorder the members.
         /// </summary>
-        internal static string CodeFixTitle {
+        internal static string MemberOrderCodeFixTitle {
             get {
-                return ResourceManager.GetString("CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("MemberOrderCodeFixTitle", resourceCulture);
             }
         }
     }

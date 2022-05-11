@@ -27,6 +27,9 @@
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+
+        <!-- Disabling this for now since it causes the pack command to fail with NU5017 -->
+        <IncludeSymbols>false</IncludeSymbols>
     </PropertyGroup>
 
     <ItemGroup>
