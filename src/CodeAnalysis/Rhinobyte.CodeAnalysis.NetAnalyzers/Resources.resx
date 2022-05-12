@@ -129,4 +129,13 @@
     <value>Member is not ordered correctly by group</value>
     <comment>The title of the diagnostic.</comment>
   </data>
+  <data name="RBCS0002_AnalyzerDescription" xml:space="preserve">
+    <value>Type members within the same group should be ordered alphabetically.</value>
+  </data>
+  <data name="RBCS0002_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Member '{0}' is not ordered alphabetically</value>
+  </data>
+  <data name="RBCS0002_AnalyzerTitle" xml:space="preserve">
+    <value>Member is not ordered alphabetically within group</value>
+  </data>
 </root>

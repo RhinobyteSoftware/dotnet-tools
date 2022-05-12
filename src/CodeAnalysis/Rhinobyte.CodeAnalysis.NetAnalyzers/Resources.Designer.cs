@@ -86,5 +86,32 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
                 return ResourceManager.GetString("RBCS0001_AnalyzerTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type members within the same group should be ordered alphabetically..
+        /// </summary>
+        internal static string RBCS0002_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RBCS0002_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member &apos;{0}&apos; is not ordered alphabetically.
+        /// </summary>
+        internal static string RBCS0002_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RBCS0002_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member is not ordered alphabetically within group.
+        /// </summary>
+        internal static string RBCS0002_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RBCS0002_AnalyzerTitle", resourceCulture);
+            }
+        }
     }
 }

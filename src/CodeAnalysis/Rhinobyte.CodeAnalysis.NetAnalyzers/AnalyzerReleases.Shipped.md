@@ -7,4 +7,5 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-RBCS0001|  Design  |  Info    | RBCS0001_AnalyzerName
+RBCS0001|  Design  |  Info    | MembersOrderedCorrectlyAnalyzer
+RBCS0002|  Design  |  Info    | MembersOrderedCorrectlyAnalyzer

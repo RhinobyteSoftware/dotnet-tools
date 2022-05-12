@@ -24,7 +24,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 	/// <inheritdoc/>
 	public sealed override ImmutableArray<string> FixableDiagnosticIds
 	{
-		get { return ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001); }
+		get { return ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001, MembersOrderedCorrectlyAnalyzer.RBCS0002); }
 	}
 #pragma warning restore IDE0025 // Use expression body for properties
 

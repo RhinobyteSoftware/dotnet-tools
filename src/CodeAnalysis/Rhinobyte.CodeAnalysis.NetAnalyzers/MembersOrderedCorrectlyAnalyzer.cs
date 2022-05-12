@@ -15,9 +15,14 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 {
 	/// <summary>
-	/// The diagnostic rule id for the analzyer
+	/// The diagnostic rule id for members being ordered correctly by group
 	/// </summary>
 	public const string RBCS0001 = "RBCS0001";
+
+	/// <summary>
+	/// The diagnostic rule id for members being ordered alphabetically within their respective groups
+	/// </summary>
+	public const string RBCS0002 = "RBCS0002";
 
 	/// <summary>
 	/// The default member group ordering for the analyzer
@@ -50,9 +55,19 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
+	internal static readonly DiagnosticDescriptor RuleRBCS0002 = DiagnosticDescriptorHelper.Create(
+		RBCS0002,
+		DiagnosticDescriptorHelper.DesignCategory,
+		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
+		DiagnosticSeverity.Info,
+		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerTitle), Resources.ResourceManager, typeof(Resources)),
+		isEnabledByDefault: true
+	);
+
 #pragma warning disable IDE0025 // Use expression body for properties
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(RuleRBCS0001); } }
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(RuleRBCS0001, RuleRBCS0002); } }
 #pragma warning restore IDE0025 // Use expression body for properties
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
@@ -103,7 +118,26 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 						continue;
 					}
 
-					var isInCurrentGroup = locationData.AdvanceCurrentGroupTo(currentMemberGroupType, groupOrder);
+					var isInCurrentGroup = locationData.CurrentGroup.Contains(currentMemberGroupType);
+					if (isInCurrentGroup)
+					{
+						if (memberSymbol.CanBeReferencedByName
+							&& locationData.PreviousMemberNameForCurrentGroup is not null
+							&& string.Compare(locationData.PreviousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0)
+						{
+							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, memberSymbol.Name);
+							context.ReportDiagnostic(diagnostic);
+							continue;
+						}
+
+						locationData.PreviousMemberNameForCurrentGroup = memberSymbol.Name;
+						continue;
+					}
+
+					// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
+					locationData.PreviousMemberNameForCurrentGroup = memberSymbol.Name;
+
+					isInCurrentGroup = locationData.AdvanceCurrentGroupTo(currentMemberGroupType, groupOrder);
 					Debug.Assert(isInCurrentGroup);
 				}
 
@@ -139,6 +173,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		var completedGroups = new List<MemberGroupType>();
 		var currentGroup = groupOrder[0];
 		var currentGroupIndex = 1;
+		string? previousMemberNameForCurrentGroup = null;
 
 		foreach (var memberSymbol in memberSymbols)
 		{
@@ -157,6 +192,24 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			}
 
 			var isInCurrentGroup = currentGroup.Contains(currentMemberGroupType);
+			if (isInCurrentGroup)
+			{
+				if (memberSymbol.CanBeReferencedByName
+					&& previousMemberNameForCurrentGroup is not null
+					&& string.Compare(previousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0)
+				{
+					var diagnostic = Diagnostic.Create(RuleRBCS0002, memberSymbol.Locations[0], memberSymbol.Name);
+					context.ReportDiagnostic(diagnostic);
+					continue;
+				}
+
+				previousMemberNameForCurrentGroup = memberSymbol.Name;
+				continue;
+			}
+
+			// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
+			previousMemberNameForCurrentGroup = memberSymbol.Name;
+
 			while (!isInCurrentGroup && currentGroupIndex < groupOrder.Length)
 			{
 				completedGroups.AddRange(currentGroup);
@@ -259,7 +312,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		}
 	}
 
-	internal struct NamedTypeLocationData
+	internal class NamedTypeLocationData
 	{
 		public NamedTypeLocationData(
 			MemberGroupType[][] groupOrder,
@@ -271,6 +324,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			CurrentGroupIndex = 1;
 			Location = location;
 			PositionSpan = positionSpan;
+			PreviousMemberNameForCurrentGroup = null;
 		}
 
 		internal List<MemberGroupType> CompletedGroups { get; }
@@ -278,6 +332,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		internal int CurrentGroupIndex { get; private set; }
 		internal Location Location { get; }
 		internal FileLinePositionSpan PositionSpan { get; }
+		internal string? PreviousMemberNameForCurrentGroup { get; set; }
 
 		internal bool AdvanceCurrentGroupTo(MemberGroupType groupForCurrentMemberSymbol, MemberGroupType[][] groupOrder)
 		{
