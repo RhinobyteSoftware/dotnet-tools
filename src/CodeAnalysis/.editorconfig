@@ -3,3 +3,10 @@
 [*.cs]
 # Rule: (CA1014) Mark assemblies with CLSCompliant - Reason: Suppressed for code analyzer projects
 dotnet_diagnostic.CA1014.severity       = none
+
+# Rule: (CA1824) Mark assemblies with NeutralResourcesLanguageAttribute - Reason: Dunno
+dotnet_diagnostic.CA1824.severity       = none
+
+
+dotnet_diagnostic.CS7034.severity       = none
+dotnet_diagnostic.CS7035.severity       = none

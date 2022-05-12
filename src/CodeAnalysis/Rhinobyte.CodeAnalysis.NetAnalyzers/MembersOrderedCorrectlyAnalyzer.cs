@@ -50,8 +50,10 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
+#pragma warning disable IDE0025 // Use expression body for properties
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleRBCS0001);
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(RuleRBCS0001); } }
+#pragma warning restore IDE0025 // Use expression body for properties
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
 		SymbolAnalysisContext context,

@@ -20,8 +20,13 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MembersOrderedCorrectlyAnalyzerCodeFixProvider)), Shared]
 public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 {
+#pragma warning disable IDE0025 // Use expression body for properties
 	/// <inheritdoc/>
-	public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001);
+	public sealed override ImmutableArray<string> FixableDiagnosticIds
+	{
+		get { return ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001); }
+	}
+#pragma warning restore IDE0025 // Use expression body for properties
 
 	/// <inheritdoc/>
 	public sealed override FixAllProvider GetFixAllProvider()

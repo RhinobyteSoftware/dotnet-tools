@@ -2,8 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <IsClsCompliant>false</IsClsCompliant>
+        <DontAdjustVersionValues>true</DontAdjustVersionValues>
         <IsPackable>false</IsPackable>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
         <RootNamespace>Rhinobyte.CodeAnalysis.NetAnalyzers</RootNamespace>
     </PropertyGroup>
 

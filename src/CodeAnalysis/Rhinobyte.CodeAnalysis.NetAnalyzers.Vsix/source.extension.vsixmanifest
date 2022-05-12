@@ -3,7 +3,7 @@
   <Metadata>
     <Identity Id="Rhinobyte.CodeAnalysis.NetAnalyzers.8070a128-bdff-4590-8efb-65e39d4572b9" Version="1.0" Language="en-US" Publisher="Rhino"/>
     <DisplayName>Rhinobyte.CodeAnalysis.NetAnalyzers</DisplayName>
-    <Description xml:space="preserve">This is a sample diagnostic extension for the .NET Compiler Platform ("Roslyn").</Description>
+    <Description xml:space="preserve">Diagnostic extension for the .NET Compiler Platform ("Roslyn") with some custom analzyer and code fix support</Description>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />

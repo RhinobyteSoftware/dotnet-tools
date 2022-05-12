@@ -1,0 +1,3 @@
+<Project>
+    <!-- Blank for the /src/CodeAnalysis subfolder because my standard solution.props / solution.targets seem to be causing something in the output .nupkg to not work correctly -->
+</Project>

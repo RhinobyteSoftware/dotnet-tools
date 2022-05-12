@@ -39,6 +39,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{4885358A-622A-4312-8A92-AB3C160018FB}"
 	ProjectSection(SolutionItems) = preProject
 		src\CodeAnalysis\.editorconfig = src\CodeAnalysis\.editorconfig
+		src\CodeAnalysis\directory.build.props = src\CodeAnalysis\directory.build.props
+		src\CodeAnalysis\directory.build.targets = src\CodeAnalysis\directory.build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{D946C8A5-BC7F-4BAC-95C9-5E9F3C15F7F8}"

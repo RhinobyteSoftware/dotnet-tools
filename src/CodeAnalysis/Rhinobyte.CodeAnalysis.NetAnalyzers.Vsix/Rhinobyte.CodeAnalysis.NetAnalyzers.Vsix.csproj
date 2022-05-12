@@ -4,7 +4,6 @@
 
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
-
         <RootNamespace>Rhinobyte.CodeAnalysis.NetAnalyzers.Vsix</RootNamespace>
         <AssemblyName>Rhinobyte.CodeAnalysis.NetAnalyzers.Vsix</AssemblyName>
 

@@ -4,32 +4,37 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <RepoRoot>$(MSBuildThisFileDirectory)..\..\..\</RepoRoot>
+        <IsPackable>true</IsPackable>
 
         <!-- VERSION VALUES -->
-        <PackageVersion>$(CodeAnalyzersPackageVersion)</PackageVersion>
-        <AssemblyVersion>$(PackageVersion).0</AssemblyVersion>
-        <FileVersion>$(PackageVersion).0</FileVersion>
-        <InformationalVersion>$(PackageVersion)</InformationalVersion>
-        <Version>$(PackageVersion)</Version>
-
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
-        <AssemblyName>$(PackageId)</AssemblyName>
-        <RootNamespace>$(PackageId)</RootNamespace>
-        <Title>$(PackageId)</Title>
-        <PackageTags>codeanalysis codefixes</PackageTags>
+        <PackageVersion>1.0.0.0-beta.1</PackageVersion>
+        <Authors>Ryan Thomas</Authors>
+        <Company>Rhinobyte Software</Company>
+        <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeSymbols>false</IncludeSymbols>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <PackageIcon>Icon.png</PackageIcon>
+        <PackageIconFullPath>$(RepoRoot)RhinobytePackageIcon.png</PackageIconFullPath>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <PackageLicenseFullPath>$(RepoRoot)LICENSE.txt</PackageLicenseFullPath>
+        <PackageOutputPath>$(RepoRoot)build\$(Configuration)\</PackageOutputPath>
+        <PackageProjectUrl>https://github.com/RhinobyteSoftware/dotnet-tools</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/RhinobyteSoftware/dotnet-tools</RepositoryUrl>
 
-        <ReleaseNotesTextFilePath>$(MSBuildProjectDirectory)\RELEASE-NOTES.txt</ReleaseNotesTextFilePath>
-        <Summary>C# analyzers</Summary>
-        <Description>
-            $(Summary)
-        </Description>
-
+        <Description>Rhinobyte.CodeAnalysis.NetAnalyzers</Description>
+        <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+        <PackageTags>Rhinobyte.CodeAnalysis.NetAnalyzers, analyzers</PackageTags>
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
-        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
 
-        <!-- Disabling this for now since it causes the pack command to fail with NU5017 -->
-        <IncludeSymbols>false</IncludeSymbols>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
     </PropertyGroup>
 
     <ItemGroup>
@@ -38,6 +43,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="$(RepoRoot)\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+        <None Include="$(RepoRoot)\RhinobytePackageIcon.png" Pack="true" PackagePath="Icon.png" />
+        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="README.md" />
+
         <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
     </ItemGroup>
 

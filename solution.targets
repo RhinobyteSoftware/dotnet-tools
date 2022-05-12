@@ -20,7 +20,7 @@
         <Optimize>false</Optimize>
     </PropertyGroup>
 
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(DontAdjustVersionValues)' != 'true'">
         <AssemblyVersion Condition=" '$(AssemblyVersion)' != '' AND $([System.Text.RegularExpressions.Regex]::IsMatch('$(AssemblyVersion)', '^\d+\.\d+\.\d+-[a-zA-Z].*'))">$([System.Text.RegularExpressions.Regex]::Replace('$(AssemblyVersion)', '(^\d+\.\d+\.\d+)-[a-zA-Z].*', '$1.0'))</AssemblyVersion>
         <FileVersion Condition=" '$(FileVersion)' != '' AND $([System.Text.RegularExpressions.Regex]::IsMatch('$(FileVersion)', '^\d+\.\d+\.\d+-[a-zA-Z].*'))">$([System.Text.RegularExpressions.Regex]::Replace('$(FileVersion)', '(^\d+\.\d+\.\d+)-[a-zA-Z].*', '$1.0'))</FileVersion>
     </PropertyGroup>
@@ -33,16 +33,24 @@
         <Message Text="Creating DevelopmentPackagesDirectory: $(DevelopmentPackagesDirectory)" Condition="!Exists('$(DevelopmentPackagesDirectory)')" Importance="$(InternalMsbuildMessageImportance)" />
         <MakeDir Directories="$(DevelopmentPackagesDirectory)" Condition="!Exists('$(DevelopmentPackagesDirectory)')" />
 
+        <PropertyGroup>
+            <PackageFileNameVersion>$(PackageVersion)</PackageFileNameVersion>
+            <PackageFileNameVersion Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(PackageVersion)', '^\d+\.\d+\.\d+\.\d+'))">$([System.Text.RegularExpressions.Regex]::Replace('$(PackageVersion)', '(^\d+\.\d+\.\d+).*', '$1'))</PackageFileNameVersion>
+        </PropertyGroup>
+
+
         <Message Importance="$(InternalMsbuildMessageImportance)"
                  Text="
 DevelopmentPackagesDirectory: $(DevelopmentPackagesDirectory)
 PackageOutputPath: $(PackageOutputAbsolutePath)
 PackageId: $(PackageId)
-PackageVersion: $(PackageVersion)"  />
+PackageVersion: $(PackageVersion)
+PackageFileNameVersion: $(PackageFileNameVersion)
+PackageFileName: $(PackageId).$(PackageFileNameVersion).nupkg" />
 
-        <Exec Command="del $(PackageId).$(PackageVersion).*" WorkingDirectory="$(DevelopmentPackagesDirectory)" />
+        <Exec Command="del $(PackageId).$(PackageFileNameVersion).*" WorkingDirectory="$(DevelopmentPackagesDirectory)" />
 
-        <Copy SourceFiles="$(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(DevelopmentPackagesDirectory)" />
+        <Copy SourceFiles="$(PackageOutputAbsolutePath)$(PackageId).$(PackageFileNameVersion).nupkg" DestinationFolder="$(DevelopmentPackagesDirectory)" />
     </Target>
 
 
