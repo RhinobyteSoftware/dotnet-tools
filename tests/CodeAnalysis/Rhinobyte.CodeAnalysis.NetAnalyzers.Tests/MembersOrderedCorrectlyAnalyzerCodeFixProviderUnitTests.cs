@@ -111,6 +111,8 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProviderUnitTests
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(65, 23, 65, 30).WithArguments("MethodB"),
 		};
 
+		// TODO: Figure out why their test runner is also adding spaces, only to the lines where I adjust the whitespace, on the output when applying the fixes
+
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
 		//await VerifyCS.VerifyCodeFixAsync(testContent, codeFixResult);
 	}

@@ -28,11 +28,88 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 	}
 #pragma warning restore IDE0025 // Use expression body for properties
 
+	public static (int NewLineCount, int NonWhitespaceTriviaCount) CountTriviaTypes(SyntaxTriviaList triviaList)
+	{
+		var newlineCount = 0;
+		var nonWhitespaceTriviaCount = 0;
+		foreach (var trivia in triviaList)
+		{
+			if (trivia.IsKind(SyntaxKind.EndOfLineTrivia))
+			{
+				++newlineCount;
+				continue;
+			}
+
+			if (!trivia.IsKind(SyntaxKind.WhitespaceTrivia))
+			{
+				++nonWhitespaceTriviaCount;
+			}
+		}
+
+		return (newlineCount, nonWhitespaceTriviaCount);
+	}
+
 	/// <inheritdoc/>
 	public sealed override FixAllProvider GetFixAllProvider()
 	{
 		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
 		return WellKnownFixAllProviders.BatchFixer;
+	}
+
+	internal static bool IsNewlineNeeded(
+		MemberGroupType? groupType,
+		bool isStartOfGroup,
+		int newlineCount,
+		int nonWhitespaceTriviaCount)
+	{
+		if (newlineCount > 0)
+			return false;
+
+		if (isStartOfGroup || nonWhitespaceTriviaCount > 0)
+			return true;
+
+		return groupType == MemberGroupType.NestedEnumType
+			|| groupType == MemberGroupType.NestedOtherType
+			|| groupType == MemberGroupType.NestedRecordType
+			|| groupType == MemberGroupType.Constructors
+			|| groupType == MemberGroupType.StaticConstructors
+			|| groupType == MemberGroupType.InstanceMethods
+			|| groupType == MemberGroupType.StaticMethods;
+	}
+
+	internal static (int PreviousStartOfGroupIndex, int NewlineCount) LookForPreviousStartOfGroupValues(
+		int currentGroupIndex,
+		int currentItemIndex,
+		SortedList<SortedMemberDeclaration, MemberDeclarationSyntax> sortedMembers)
+	{
+		var previousStartOfNewGroupIndex = -1;
+		var newlineCount = -1;
+		for (var nextItemIndex = currentItemIndex + 1; nextItemIndex < sortedMembers.Count; ++nextItemIndex)
+		{
+			var nextSortedPair = sortedMembers.ElementAt(nextItemIndex);
+			if (nextSortedPair.Key.GroupIndex == SortedMemberDeclaration.ImplicitGroupIndex)
+				continue;
+
+			if (nextSortedPair.Key.GroupIndex != currentGroupIndex)
+				return (previousStartOfNewGroupIndex, newlineCount);
+
+			var nextLeadingTrivia = nextSortedPair.Value.GetLeadingTrivia();
+			var (nextNelineCount, nextNonWhitespaceCount) = CountTriviaTypes(nextLeadingTrivia);
+
+			if (nextNelineCount < 1 || nextNonWhitespaceCount > 0)
+				continue;
+
+			if (previousStartOfNewGroupIndex != -1)
+			{
+				// If more than one item in the same group has newlines then don't treat it like a group that does not have newlines between items
+				return (-1, -1);
+			}
+
+			previousStartOfNewGroupIndex = nextItemIndex;
+			newlineCount = nextNelineCount;
+		}
+
+		return (previousStartOfNewGroupIndex, newlineCount);
 	}
 
 	/// <inheritdoc/>
@@ -97,14 +174,14 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 
 			if (memberSymbol is null)
 			{
-				sortedMembers.Add(new SortedMemberDeclaration(memberCount++), memberSyntax);
+				sortedMembers.Add(new SortedMemberDeclaration(null, memberCount++), memberSyntax);
 				continue;
 			}
 
 			var groupType = MembersOrderedCorrectlyAnalyzer.GetGroupType(memberSymbol);
 			if (!memberSymbol.CanBeReferencedByName && groupType != MemberGroupType.Constructors && groupType != MemberGroupType.StaticConstructors)
 			{
-				sortedMembers.Add(new SortedMemberDeclaration(memberCount++), memberSyntax);
+				sortedMembers.Add(new SortedMemberDeclaration(groupType, memberCount++), memberSyntax);
 				continue;
 			}
 
@@ -120,16 +197,69 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 
 			Debug.Assert(matchedGroupIndex > -1);
 			var sortKey = matchedGroupIndex > -1
-				? new SortedMemberDeclaration(matchedGroupIndex, memberCount++, memberSymbol.Name)
-				: new SortedMemberDeclaration(memberCount++);
+				? new SortedMemberDeclaration(matchedGroupIndex, groupType, memberCount++, memberSymbol.Name)
+				: new SortedMemberDeclaration(groupType, memberCount++);
 
 			sortedMembers.Add(sortKey, memberSyntax);
 		}
 
 		var reorderedMembers = new List<MemberDeclarationSyntax>();
+		var currentGroupIndex = -1;
+		var currentItemIndex = -1;
+		var lastMemberIndex = sortedMembers.Count - 1;
+		var removeNewlineItemIndex = -1;
+
 		foreach (var sortedPair in sortedMembers)
 		{
-			reorderedMembers.Add(sortedPair.Value);
+			++currentItemIndex;
+
+			if (sortedPair.Key.GroupIndex == SortedMemberDeclaration.ImplicitGroupIndex)
+			{
+				reorderedMembers.Add(sortedPair.Value);
+				continue;
+			}
+
+			var isStartOfNewGroup = (currentGroupIndex > -1) && sortedPair.Key.GroupIndex != currentGroupIndex;
+			currentGroupIndex = sortedPair.Key.GroupIndex;
+
+			var leadingTrivia = sortedPair.Value.GetLeadingTrivia();
+			if (currentItemIndex == removeNewlineItemIndex)
+			{
+				var newlineTrivia = leadingTrivia.Where(trivia => trivia.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
+				foreach (var triviaToRemove in newlineTrivia)
+					leadingTrivia = leadingTrivia.Remove(triviaToRemove);
+
+				var syntaxWithNewlineRemoved = sortedPair.Value.WithLeadingTrivia(leadingTrivia);
+				reorderedMembers.Add(syntaxWithNewlineRemoved);
+				continue;
+			}
+
+			var (newlineCount, nonWhitespaceTriviaCount) = CountTriviaTypes(leadingTrivia);
+			var needsNewlineAdded = IsNewlineNeeded(sortedPair.Key.GroupType, isStartOfNewGroup, newlineCount, nonWhitespaceTriviaCount);
+
+			if (!needsNewlineAdded)
+			{
+				reorderedMembers.Add(sortedPair.Value);
+				continue;
+			}
+
+			var newlinesToAdd = 1;
+			if (isStartOfNewGroup)
+			{
+				var (previousStartOfGroupIndex, previousStartOfGroupNewlines) = LookForPreviousStartOfGroupValues(currentGroupIndex, currentItemIndex, sortedMembers);
+				if (previousStartOfGroupIndex > -1)
+					removeNewlineItemIndex = previousStartOfGroupIndex;
+
+				if (previousStartOfGroupNewlines > 0)
+					newlinesToAdd = previousStartOfGroupNewlines;
+			}
+
+			// Prepend the necessary number of newlines
+			for (var newlineIndex = 0; newlineIndex < newlinesToAdd; ++newlineIndex)
+				leadingTrivia = leadingTrivia.Insert(0, SyntaxFactory.ElasticCarriageReturnLineFeed);
+
+			var syntaxWithNewlineAdded = sortedPair.Value.WithLeadingTrivia(leadingTrivia);
+			reorderedMembers.Add(syntaxWithNewlineAdded);
 		}
 
 		var reorderedSyntaxList = new SyntaxList<MemberDeclarationSyntax>(reorderedMembers);
@@ -151,21 +281,31 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 	{
 		internal const int ImplicitGroupIndex = -1;
 
-		public SortedMemberDeclaration(int implicitMemberIndex)
+		public SortedMemberDeclaration(
+			MemberGroupType? groupType,
+			int implicitMemberIndex)
 		{
 			GroupIndex = ImplicitGroupIndex;
+			GroupType = groupType;
 			ImplicitMemberIndex = implicitMemberIndex;
 			Name = null;
 		}
 
-		public SortedMemberDeclaration(int groupIndex, int memberIndex, string name)
+		public SortedMemberDeclaration(
+			int groupIndex,
+			MemberGroupType groupType,
+			int memberIndex,
+			string name)
 		{
 			GroupIndex = groupIndex;
+			GroupType = groupType;
 			ImplicitMemberIndex = memberIndex;
 			Name = name;
 		}
 
 		public int GroupIndex { get; }
+
+		public MemberGroupType? GroupType { get; }
 
 		public int ImplicitMemberIndex { get; }
 

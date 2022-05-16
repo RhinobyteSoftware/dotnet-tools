@@ -33,8 +33,8 @@ public abstract partial class ExampleClassWithIncorrectGroupOrdering
 	public const string ConstantD = nameof(ConstantD);
 	public const string ConstantE = nameof(ConstantE);
 	public const string ConstantZ = nameof(ConstantZ);
-	public static bool StaticPropertyB { get; } = true;
 
+    public static bool StaticPropertyB { get; } = true;
 	public static bool StaticPropertyC { get; } = true;
 	public static bool StaticPropertyD { get; } = true;
 	public static bool StaticPropertyE { get; } = true;
@@ -44,8 +44,8 @@ public abstract partial class ExampleClassWithIncorrectGroupOrdering
 	{
 
 	}
-	public int PropertyB { get; set; }
 
+    public int PropertyB { get; set; }
 	public int PropertyC { get; set; }
 	public int PropertyD { get; set; }
 	public int PropertyE { get; set; }
