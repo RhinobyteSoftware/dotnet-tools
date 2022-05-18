@@ -8,5 +8,18 @@ dotnet_diagnostic.CA1014.severity       = none
 dotnet_diagnostic.CA1824.severity       = none
 
 
-dotnet_diagnostic.CS7034.severity       = none
-dotnet_diagnostic.CS7035.severity       = none
+# Suppress various analyzer warnings in polyfill files copied from opensource microsoft github repos
+[*/Polyfills/*.cs]
+dotnet_diagnostic.IDE0005.severity       = none
+dotnet_diagnostic.IDE0007.severity       = none
+dotnet_diagnostic.IDE0010.severity       = none
+dotnet_diagnostic.IDE0024.severity       = none
+dotnet_diagnostic.IDE0045.severity       = none
+dotnet_diagnostic.IDE0048.severity       = none
+dotnet_diagnostic.IDE0051.severity       = none
+dotnet_diagnostic.IDE0055.severity       = none
+dotnet_diagnostic.IDE0058.severity       = none
+dotnet_diagnostic.IDE0061.severity       = none
+dotnet_diagnostic.IDE0065.severity       = none
+dotnet_diagnostic.IDE0161.severity       = none
+dotnet_diagnostic.RS1024.severity        = none

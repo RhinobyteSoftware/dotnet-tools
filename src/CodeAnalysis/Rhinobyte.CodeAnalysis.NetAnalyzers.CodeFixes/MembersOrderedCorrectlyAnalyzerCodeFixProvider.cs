@@ -124,6 +124,8 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		{
 			var diagnosticSpan = diagnosticToFix.Location.SourceSpan;
 
+			_ = diagnosticToFix.Properties.TryGetValue("GroupOrderLookup", out var groupOrderLookupString);
+
 			var typeDeclarationSyntaxNode = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
 			if (typeDeclarationSyntaxNode is null)
 				continue;
@@ -132,7 +134,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			{
 				codeFixAction = CodeAction.Create(
 					title: CodeFixResources.MemberOrderCodeFixTitle,
-					createChangedDocument: (cancellationToken) => ReorderTypeMembersAsync(context.Document, typeDeclarationSyntaxNode, cancellationToken),
+					createChangedDocument: (cancellationToken) => ReorderTypeMembersAsync(context.Document, groupOrderLookupString, typeDeclarationSyntaxNode, cancellationToken),
 					equivalenceKey: nameof(CodeFixResources.MemberOrderCodeFixTitle)
 				);
 				reorderCodeFixes[typeDeclarationSyntaxNode] = codeFixAction;
@@ -143,7 +145,11 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		}
 	}
 
-	private static async Task<Document> ReorderTypeMembersAsync(Document document, TypeDeclarationSyntax typeDeclaration, CancellationToken cancellationToken)
+	private static async Task<Document> ReorderTypeMembersAsync(
+		Document document,
+		string? groupOrderLookupString,
+		TypeDeclarationSyntax typeDeclaration,
+		CancellationToken cancellationToken)
 	{
 		var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 		if (oldRoot is null)
@@ -158,10 +164,8 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		if (typeDeclarationSymbol is null)
 			return document;
 
+		var groupOrder = MembersOrderedCorrectlyAnalyzer.ConvertStringToGroupOrderLookup(groupOrderLookupString) ?? MembersOrderedCorrectlyAnalyzer.DefaultGroupOrder;
 		var memberSymbols = typeDeclarationSymbol.GetMembers();
-
-		// TODO: Define and load code style configuration values somehow
-		var groupOrder = MembersOrderedCorrectlyAnalyzer.DefaultGroupOrder;
 		var members = typeDeclaration.Members;
 
 		var sortedMembers = new SortedList<SortedMemberDeclaration, MemberDeclarationSyntax>();

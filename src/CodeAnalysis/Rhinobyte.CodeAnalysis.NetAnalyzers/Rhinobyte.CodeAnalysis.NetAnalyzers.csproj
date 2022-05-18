@@ -16,6 +16,8 @@
         <PackageId>*$(MSBuildProjectFile)*</PackageId>
 
         <RoslynAnalyzersRepoRoot Condition="'$(RoslynAnalyzersRepoRoot)' == ''">$(MSBuildThisFileDirectory)\..\..\..\..\dotnet-roslyn-analyzers</RoslynAnalyzersRepoRoot>
+
+        <DefineConstants>$(DefineConstants);CODEANALYSIS_V3_OR_BETTER</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

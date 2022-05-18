@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Testing;
+﻿using FluentAssertions;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,15 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 	public CancellationToken CancellationTokenForTest => TestContext?.CancellationTokenSource?.Token ?? default;
 
 	public TestContext TestContext { get; set; }
+
+	[TestMethod]
+	public void ConvertStringToGroupOrderLookup_returns_the_expected_result()
+	{
+		MembersOrderedCorrectlyAnalyzer.ConvertStringToGroupOrderLookup(null).Should().BeNull();
+		MembersOrderedCorrectlyAnalyzer.ConvertStringToGroupOrderLookup(string.Empty).Should().BeNull();
+
+		// TODO: Add more use cases
+	}
 
 
 	[TestMethod]

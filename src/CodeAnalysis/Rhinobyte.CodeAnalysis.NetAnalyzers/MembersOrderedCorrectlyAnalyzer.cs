@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Analyzer.Utilities;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 using System;
@@ -41,8 +42,6 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		new MemberGroupType[] { MemberGroupType.NestedEnumType, MemberGroupType.NestedOtherType },
 	};
 
-
-
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
 
@@ -73,6 +72,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
 		SymbolAnalysisContext context,
+		ImmutableDictionary<string, string?> diagnosticProperties,
 		MemberGroupType[][] groupOrder,
 		INamedTypeSymbol namedTypeSymbol)
 	{
@@ -114,7 +114,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 					if (locationData.CompletedGroups.Contains(currentMemberGroupType))
 					{
-						var diagnostic = Diagnostic.Create(RuleRBCS0001, memberLocation, memberSymbol.Name);
+						var diagnostic = Diagnostic.Create(RuleRBCS0001, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 						context.ReportDiagnostic(diagnostic);
 						continue;
 					}
@@ -126,7 +126,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 							&& locationData.PreviousMemberNameForCurrentGroup is not null
 							&& string.Compare(locationData.PreviousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0)
 						{
-							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, memberSymbol.Name);
+							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 							context.ReportDiagnostic(diagnostic);
 							continue;
 						}
@@ -153,19 +153,18 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		if (namedTypeSymbol.IsNamespace)
 			return;
 
-		var groupOrder = GetGroupOrderLookup(context);
+		var (groupOrder, groupOrderLookupString) = GetGroupOrderLookup(context);
 
-#if DEBUG
-		var flattenedGroups = groupOrder.SelectMany(group => group.ToList()).ToArray();
-		var allValues = System.Enum.GetValues(typeof(MemberGroupType)).Cast<MemberGroupType>().Where(value => value != MemberGroupType.Unknown).ToArray();
-		Debug.Assert(flattenedGroups.Length == allValues.Length);
-		Debug.Assert(flattenedGroups.All(value => allValues.Contains(value)));
-		Debug.Assert(allValues.All(value => flattenedGroups.Contains(value)));
-#endif
+
+		var diagnosticProperties = new Dictionary<string, string?>()
+		{
+			{ "GroupOrderLookup", groupOrderLookupString }
+		}
+		.ToImmutableDictionary<string, string?>();
 
 		if (namedTypeSymbol.Locations.Length > 1)
 		{
-			AnalyzeMultipartNamedTypeSymbol(context, groupOrder, namedTypeSymbol);
+			AnalyzeMultipartNamedTypeSymbol(context, diagnosticProperties, groupOrder, namedTypeSymbol);
 			return;
 		}
 
@@ -186,7 +185,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 			if (completedGroups.Contains(currentMemberGroupType))
 			{
-				var diagnostic = Diagnostic.Create(RuleRBCS0001, memberSymbol.Locations[0], memberSymbol.Name);
+				var diagnostic = Diagnostic.Create(RuleRBCS0001, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 				context.ReportDiagnostic(diagnostic);
 				continue;
 			}
@@ -198,7 +197,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 					&& previousMemberNameForCurrentGroup is not null
 					&& string.Compare(previousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0)
 				{
-					var diagnostic = Diagnostic.Create(RuleRBCS0002, memberSymbol.Locations[0], memberSymbol.Name);
+					var diagnostic = Diagnostic.Create(RuleRBCS0002, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 					context.ReportDiagnostic(diagnostic);
 					continue;
 				}
@@ -221,27 +220,44 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		}
 	}
 
-	/// <inheritdoc />
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Unnecessary in code analyzer extension")]
-	public override void Initialize(AnalysisContext context)
-	{
-		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-		context.EnableConcurrentExecution();
+	internal static string ConvertGroupOrderLookupToString(MemberGroupType[][] groupOrder)
+		=> string.Join("; ", groupOrder.Select(grouping => string.Join(",", grouping)));
 
-		// TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
-		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
-		context.RegisterSymbolAction(AnalyzeNamedTypeSymbol, SymbolKind.NamedType);
+	internal static MemberGroupType[][]? ConvertStringToGroupOrderLookup(string? groupOrderLookupString)
+	{
+		if (string.IsNullOrEmpty(groupOrderLookupString))
+			return null;
+
+		var groupOrderLookup = groupOrderLookupString!
+			.Split(';')
+			.Select(grouping => grouping.Split(',').Select(memberGroupTypeStringValue => Enum.TryParse<MemberGroupType>(memberGroupTypeStringValue.Trim(), out var parsedValue) ? parsedValue : MemberGroupType.Unknown).ToArray())
+			.ToArray();
+
+		return groupOrderLookup;
 	}
 
-	internal static MemberGroupType[][] GetGroupOrderLookup(SymbolAnalysisContext context)
+	internal static (MemberGroupType[][] GroupOrderLookup, string? GroupOrderLookupString) GetGroupOrderLookup(SymbolAnalysisContext context)
 	{
 		try
 		{
-			var groupOrderStringValue = context.Options.GetStringOptionValue("type_members_group_order", context.Compilation, RuleRBCS0001, null, string.Empty);
-			if (!string.IsNullOrEmpty(groupOrderStringValue))
+			var groupOrderStringValue = context.Options.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.RuleRBCS0001, null, context.Compilation);
+			var groupOrderLookup = ConvertStringToGroupOrderLookup(groupOrderStringValue);
+
+			if (groupOrderLookup is null)
+				return (DefaultGroupOrder, null);
+
+			var flattenedGroups = groupOrderLookup.SelectMany(group => group.ToList()).ToArray();
+			var allValues = System.Enum.GetValues(typeof(MemberGroupType)).Cast<MemberGroupType>().Where(value => value != MemberGroupType.Unknown).ToArray();
+
+			if (flattenedGroups.Length != allValues.Length
+				|| flattenedGroups.Any(value => !allValues.Contains(value))
+				|| allValues.Any(value => !flattenedGroups.Contains(value)))
 			{
-				// TODO: Parse option value string and generate the group order lookup from it if possible...
+				// If the parsed values aren't valid fallback to the defaults
+				return (DefaultGroupOrder, null);
 			}
+
+			return (groupOrderLookup, groupOrderStringValue);
 		}
 #pragma warning disable CA1031 // Do not catch general exception types
 #pragma warning disable CS0168 // Variable is declared but never used
@@ -254,8 +270,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 #endif
 		}
 
-		return DefaultGroupOrder;
-
+		return (DefaultGroupOrder, null);
 	}
 
 	internal static MemberGroupType GetGroupType(ISymbol symbol)
@@ -335,6 +350,18 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			default:
 				return MemberGroupType.Unknown;
 		}
+	}
+
+	/// <inheritdoc />
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Unnecessary in code analyzer extension")]
+	public override void Initialize(AnalysisContext context)
+	{
+		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+		context.EnableConcurrentExecution();
+
+		// TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
+		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
+		context.RegisterSymbolAction(AnalyzeNamedTypeSymbol, SymbolKind.NamedType);
 	}
 
 	internal class NamedTypeLocationData
