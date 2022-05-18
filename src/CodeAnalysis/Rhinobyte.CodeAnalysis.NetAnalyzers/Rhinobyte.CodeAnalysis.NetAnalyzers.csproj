@@ -14,6 +14,8 @@
 
         <!-- Avoid ID conflicts with the package project. -->
         <PackageId>*$(MSBuildProjectFile)*</PackageId>
+
+        <RoslynAnalyzersRepoRoot Condition="'$(RoslynAnalyzersRepoRoot)' == ''">$(MSBuildThisFileDirectory)\..\..\..\..\dotnet-roslyn-analyzers</RoslynAnalyzersRepoRoot>
     </PropertyGroup>
 
     <ItemGroup>

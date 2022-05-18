@@ -2,9 +2,9 @@
 using System;
 using System.Linq;
 
-namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
+namespace Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 
-internal static class DiagnosticDescriptorHelper
+public static class DiagnosticDescriptorHelper
 {
 	internal const string DesignCategory = "Design";
 
@@ -19,6 +19,8 @@ internal static class DiagnosticDescriptorHelper
 			bool isReportedAtCompilationEnd = false,
 			params string[] additionalCustomTags)
 	{
+		_ = id ?? throw new ArgumentNullException(nameof(id));
+
 #pragma warning disable CA1308 // Normalize strings to uppercase - use lower case ID in help link
 		var helpLink = $"https://github.com/RhinobyteSoftware/dotnet-tools/docs/rules/{id.ToLowerInvariant()}.md";
 #pragma warning restore CA1308 // Normalize strings to uppercase
@@ -27,8 +29,10 @@ internal static class DiagnosticDescriptorHelper
 		if (isReportedAtCompilationEnd)
 			customTags = new string[] { WellKnownDiagnosticTags.CompilationEnd };
 
+#pragma warning disable CA1062 // Validate arguments of public methods
 		if (additionalCustomTags.Length > 0)
 			customTags = customTags is null ? additionalCustomTags : customTags.Concat(additionalCustomTags).ToArray();
+#pragma warning restore CA1062 // Validate arguments of public methods
 
 		return new DiagnosticDescriptor(id, title, messageFormat, category, diagnosticSeverity, isEnabledByDefault, description, helpLink, customTags ?? Array.Empty<string>());
 	}

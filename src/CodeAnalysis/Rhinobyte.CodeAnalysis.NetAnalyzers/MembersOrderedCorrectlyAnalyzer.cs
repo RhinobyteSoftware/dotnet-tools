@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -152,8 +153,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		if (namedTypeSymbol.IsNamespace)
 			return;
 
-		// TODO: Define and load code style configuration values somehow
-		var groupOrder = DefaultGroupOrder;
+		var groupOrder = GetGroupOrderLookup(context);
 
 #if DEBUG
 		var flattenedGroups = groupOrder.SelectMany(group => group.ToList()).ToArray();
@@ -231,6 +231,31 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		// TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
 		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
 		context.RegisterSymbolAction(AnalyzeNamedTypeSymbol, SymbolKind.NamedType);
+	}
+
+	internal static MemberGroupType[][] GetGroupOrderLookup(SymbolAnalysisContext context)
+	{
+		try
+		{
+			var groupOrderStringValue = context.Options.GetStringOptionValue("type_members_group_order", context.Compilation, RuleRBCS0001, null, string.Empty);
+			if (!string.IsNullOrEmpty(groupOrderStringValue))
+			{
+				// TODO: Parse option value string and generate the group order lookup from it if possible...
+			}
+		}
+#pragma warning disable CA1031 // Do not catch general exception types
+#pragma warning disable CS0168 // Variable is declared but never used
+		catch (Exception parseOptionsException)
+#pragma warning restore CS0168 // Variable is declared but never used
+#pragma warning restore CA1031 // Do not catch general exception types
+		{
+#if DEBUG
+			System.Diagnostics.Debugger.Break();
+#endif
+		}
+
+		return DefaultGroupOrder;
+
 	}
 
 	internal static MemberGroupType GetGroupType(ISymbol symbol)
