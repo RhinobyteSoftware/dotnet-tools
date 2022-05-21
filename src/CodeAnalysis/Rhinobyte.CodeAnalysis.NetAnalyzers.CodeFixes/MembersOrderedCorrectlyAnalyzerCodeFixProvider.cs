@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -20,13 +21,9 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MembersOrderedCorrectlyAnalyzerCodeFixProvider)), Shared]
 public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 {
-#pragma warning disable IDE0025 // Use expression body for properties
 	/// <inheritdoc/>
 	public sealed override ImmutableArray<string> FixableDiagnosticIds
-	{
-		get { return ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001, MembersOrderedCorrectlyAnalyzer.RBCS0002); }
-	}
-#pragma warning restore IDE0025 // Use expression body for properties
+		=> ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001, MembersOrderedCorrectlyAnalyzer.RBCS0002, MembersOrderedCorrectlyAnalyzer.RBCS0003);
 
 	public static (int NewLineCount, int NonWhitespaceTriviaCount) CountTriviaTypes(SyntaxTriviaList triviaList)
 	{
@@ -80,14 +77,14 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 	internal static (int PreviousStartOfGroupIndex, int NewlineCount) LookForPreviousStartOfGroupValues(
 		int currentGroupIndex,
 		int currentItemIndex,
-		SortedList<SortedMemberDeclaration, MemberDeclarationSyntax> sortedMembers)
+		SortedList<SortedMemberKey, MemberDeclarationSyntax> sortedMembers)
 	{
 		var previousStartOfNewGroupIndex = -1;
 		var newlineCount = -1;
 		for (var nextItemIndex = currentItemIndex + 1; nextItemIndex < sortedMembers.Count; ++nextItemIndex)
 		{
 			var nextSortedPair = sortedMembers.ElementAt(nextItemIndex);
-			if (nextSortedPair.Key.GroupIndex == SortedMemberDeclaration.ImplicitGroupIndex)
+			if (nextSortedPair.Key.GroupIndex == SortedMemberKey.ImplicitGroupIndex)
 				continue;
 
 			if (nextSortedPair.Key.GroupIndex != currentGroupIndex)
@@ -119,157 +116,169 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		if (root is null)
 			return;
 
-		var reorderCodeFixes = new Dictionary<TypeDeclarationSyntax, CodeAction>();
+		List<Diagnostic>? typeMemberDiagnosticsToFix = null;
+		List<TypeDeclarationSyntax>? typeDeclarationsToFix = null;
+
 		foreach (var diagnosticToFix in context.Diagnostics)
 		{
 			var diagnosticSpan = diagnosticToFix.Location.SourceSpan;
 
-			_ = diagnosticToFix.Properties.TryGetValue("GroupOrderLookup", out var groupOrderLookupString);
+			if (diagnosticToFix.Id == MembersOrderedCorrectlyAnalyzer.RBCS0003)
+			{
+				var initializerExpressionSyntax = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<InitializerExpressionSyntax>().First();
+				if (initializerExpressionSyntax is null)
+					continue;
+
+				_ = diagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.ArePropertyNamesToOrderFirstCaseSensitive), out var arePropertyNamesToOrderFirstCaseSensitiveRaw);
+				_ = bool.TryParse(arePropertyNamesToOrderFirstCaseSensitiveRaw, out var propertyNamesToOrderFirstAreCaseSensitive);
+
+				_ = diagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.GroupOrderSettings), out var groupOrderLookupString);
+				_ = diagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.PropertyNamesToOrderFirst), out var propertyNamesToOrderFirst);
+
+				var objectInitializerCodeFixAction = CodeAction.Create(
+					title: CodeFixResources.MemberAssignmentOrderCodeFixTitle,
+					createChangedDocument: (cancellationToken) => ReorderObjectInitializerMemberAssignmentsAsync(
+						context.Document,
+						groupOrderLookupString,
+						initializerExpressionSyntax,
+						propertyNamesToOrderFirst,
+						propertyNamesToOrderFirstAreCaseSensitive,
+						cancellationToken
+					),
+					equivalenceKey: nameof(CodeFixResources.MemberAssignmentOrderCodeFixTitle)
+				);
+
+				// Register the object initializer fixes individually so they can be applied individually, if desired
+				context.RegisterCodeFix(objectInitializerCodeFixAction, diagnosticToFix);
+
+				continue;
+			}
 
 			var typeDeclarationSyntaxNode = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
 			if (typeDeclarationSyntaxNode is null)
 				continue;
 
-			if (!reorderCodeFixes.TryGetValue(typeDeclarationSyntaxNode, out var codeFixAction))
-			{
-				codeFixAction = CodeAction.Create(
-					title: CodeFixResources.MemberOrderCodeFixTitle,
-					createChangedDocument: (cancellationToken) => ReorderTypeMembersAsync(context.Document, groupOrderLookupString, typeDeclarationSyntaxNode, cancellationToken),
-					equivalenceKey: nameof(CodeFixResources.MemberOrderCodeFixTitle)
-				);
-				reorderCodeFixes[typeDeclarationSyntaxNode] = codeFixAction;
-			}
+			typeMemberDiagnosticsToFix ??= new List<Diagnostic>();
+			typeMemberDiagnosticsToFix.Add(diagnosticToFix);
+			typeDeclarationsToFix ??= new List<TypeDeclarationSyntax>();
+			typeDeclarationsToFix.Add(typeDeclarationSyntaxNode);
+		}
 
-			// Register a code action that will invoke the fix.
-			context.RegisterCodeFix(codeFixAction, diagnosticToFix);
+		if (typeMemberDiagnosticsToFix is not null && typeDeclarationsToFix is not null)
+		{
+			var firstDiagnosticToFix = typeMemberDiagnosticsToFix.First();
+
+			_ = firstDiagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.ArePropertyNamesToOrderFirstCaseSensitive), out var arePropertyNamesToOrderFirstCaseSensitiveRaw);
+			_ = bool.TryParse(arePropertyNamesToOrderFirstCaseSensitiveRaw, out var propertyNamesToOrderFirstAreCaseSensitive);
+
+			_ = firstDiagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.GroupOrderSettings), out var groupOrderLookupString);
+			_ = firstDiagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.PropertyNamesToOrderFirst), out var propertyNamesToOrderFirst);
+
+			var codeFixAction = CodeAction.Create(
+				title: CodeFixResources.MemberOrderCodeFixTitle,
+				createChangedDocument: (cancellationToken) => ReorderTypeMembersAsync(
+					context.Document,
+					groupOrderLookupString,
+					propertyNamesToOrderFirst,
+					propertyNamesToOrderFirstAreCaseSensitive,
+					typeDeclarationsToFix,
+					cancellationToken
+				),
+				equivalenceKey: nameof(CodeFixResources.MemberOrderCodeFixTitle)
+			);
+
+			// Only need to register one document fix for the type member re-order pass it all the individual member diagnostics that are being fixed
+			context.RegisterCodeFix(codeFixAction, typeMemberDiagnosticsToFix);
 		}
 	}
 
-	private static async Task<Document> ReorderTypeMembersAsync(
+	private static async Task<Document> ReorderObjectInitializerMemberAssignmentsAsync(
 		Document document,
 		string? groupOrderLookupString,
-		TypeDeclarationSyntax typeDeclaration,
+		InitializerExpressionSyntax initializerExpressionSyntax,
+		string? propertyNamesToOrderFirstRawValue,
+		bool propertyNamesToOrderFirstAreCaseSensitive,
 		CancellationToken cancellationToken)
 	{
 		var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 		if (oldRoot is null)
 			return document;
 
-		// Compute new member order
-		var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-		if (semanticModel is null)
-			return document;
+		var childExpressions = initializerExpressionSyntax.Expressions;
+		var childSeparatorCount = childExpressions.SeparatorCount;
 
-		var typeDeclarationSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
-		if (typeDeclarationSymbol is null)
-			return document;
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
+		var propertyNameOrderComparison = propertyNamesToOrderFirstAreCaseSensitive
+			? StringComparison.Ordinal
+			: StringComparison.OrdinalIgnoreCase;
 
-		var groupOrder = MembersOrderedCorrectlyAnalyzer.ConvertStringToGroupOrderLookup(groupOrderLookupString) ?? MembersOrderedCorrectlyAnalyzer.DefaultGroupOrder;
-		var memberSymbols = typeDeclarationSymbol.GetMembers();
-		var members = typeDeclaration.Members;
-
-		var sortedMembers = new SortedList<SortedMemberDeclaration, MemberDeclarationSyntax>();
+		var isAlphabetizing = propertyNamesToOrderFirst is null;
 		var memberCount = 0;
-		foreach (var memberSyntax in members)
+		var sortedChildExpressions = new SortedList<SortedMemberKey, (ExpressionSyntax, SyntaxToken?)>();
+
+		var childIndex = -1;
+		foreach (var child in childExpressions)
 		{
-			var memberSymbol = memberSymbols.FirstOrDefault(symbol =>
-				!symbol.IsImplicitlyDeclared
-				&& symbol.Locations.Any(symbolLocation => memberSyntax.Span.Contains(symbolLocation.SourceSpan)));
+			++childIndex;
+			var childSeparatorToken = childIndex < childSeparatorCount
+				? childExpressions.GetSeparator(childIndex)
+				: (SyntaxToken?)null;
 
-			if (memberSymbol is null)
+			var assignmentExpressionSyntax = child as AssignmentExpressionSyntax;
+			var binaryExpressionSyntax = child as BinaryExpressionSyntax;
+			if (assignmentExpressionSyntax is null && binaryExpressionSyntax is null)
 			{
-				sortedMembers.Add(new SortedMemberDeclaration(null, memberCount++), memberSyntax);
+				sortedChildExpressions.Add(new SortedMemberKey(null, memberCount++), (child, childSeparatorToken));
 				continue;
 			}
 
-			var groupType = MembersOrderedCorrectlyAnalyzer.GetGroupType(memberSymbol);
-			if (!memberSymbol.CanBeReferencedByName && groupType != MemberGroupType.Constructors && groupType != MemberGroupType.StaticConstructors)
+			var leftNode = assignmentExpressionSyntax?.Left ?? binaryExpressionSyntax?.Left;
+			if (leftNode is null || leftNode is not IdentifierNameSyntax identifierNameSyntax)
 			{
-				sortedMembers.Add(new SortedMemberDeclaration(groupType, memberCount++), memberSyntax);
+				sortedChildExpressions.Add(new SortedMemberKey(null, memberCount++), (child, childSeparatorToken));
 				continue;
 			}
 
-			var matchedGroupIndex = -1;
-			for (var groupIndex = 0; groupIndex < groupOrder.Length; ++groupIndex)
+			var identifierName = identifierNameSyntax.Identifier.ValueText ?? identifierNameSyntax.Identifier.Text;
+			if (string.IsNullOrEmpty(identifierName))
 			{
-				if (groupOrder[groupIndex].Contains(groupType))
+				sortedChildExpressions.Add(new SortedMemberKey(null, memberCount++), (child, childSeparatorToken));
+				continue;
+			}
+
+			var nameOrderedFirstIndex = propertyNamesToOrderFirst is null
+				? SortedMemberKey.NameShouldBeAlphabetized
+				: Array.FindIndex(propertyNamesToOrderFirst, propertyName => propertyName.Equals(identifierName, propertyNameOrderComparison));
+
+			sortedChildExpressions.Add(new SortedMemberKey(memberCount++, identifierName, nameOrderedFirstIndex), (child, childSeparatorToken));
+		}
+
+		var reorderedExpessionsAndSeparators = new List<SyntaxNodeOrToken>();
+		foreach (var sortedKVP in sortedChildExpressions)
+		{
+			var (syntax, separatorToken) = sortedKVP.Value;
+			if (separatorToken is null)
+			{
+				if (syntax.HasTrailingTrivia)
 				{
-					matchedGroupIndex = groupIndex;
-					break;
+					var trailingTrivia = syntax.GetTrailingTrivia();
+					syntax = syntax.WithoutTrailingTrivia();
+					separatorToken = SyntaxFactory.Token(SyntaxTriviaList.Empty, SyntaxKind.CommaToken, trailingTrivia);
+				}
+				else
+				{
+					separatorToken = SyntaxFactory.Token(SyntaxTriviaList.Empty, SyntaxKind.CommaToken, new SyntaxTriviaList(SyntaxFactory.ElasticMarker));
 				}
 			}
 
-			Debug.Assert(matchedGroupIndex > -1);
-			var sortKey = matchedGroupIndex > -1
-				? new SortedMemberDeclaration(matchedGroupIndex, groupType, memberCount++, memberSymbol.Name)
-				: new SortedMemberDeclaration(groupType, memberCount++);
-
-			sortedMembers.Add(sortKey, memberSyntax);
+			reorderedExpessionsAndSeparators.Add(syntax);
+			reorderedExpessionsAndSeparators.Add(separatorToken.Value);
 		}
 
-		var reorderedMembers = new List<MemberDeclarationSyntax>();
-		var currentGroupIndex = -1;
-		var currentItemIndex = -1;
-		var lastMemberIndex = sortedMembers.Count - 1;
-		var removeNewlineItemIndex = -1;
+		var reorderedSeparatedList = SyntaxFactory.SeparatedList<ExpressionSyntax>(reorderedExpessionsAndSeparators);
+		var newInitializerExpressionSyntax = initializerExpressionSyntax.WithExpressions(reorderedSeparatedList);
 
-		foreach (var sortedPair in sortedMembers)
-		{
-			++currentItemIndex;
-
-			if (sortedPair.Key.GroupIndex == SortedMemberDeclaration.ImplicitGroupIndex)
-			{
-				reorderedMembers.Add(sortedPair.Value);
-				continue;
-			}
-
-			var isStartOfNewGroup = (currentGroupIndex > -1) && sortedPair.Key.GroupIndex != currentGroupIndex;
-			currentGroupIndex = sortedPair.Key.GroupIndex;
-
-			var leadingTrivia = sortedPair.Value.GetLeadingTrivia();
-			if (currentItemIndex == removeNewlineItemIndex)
-			{
-				var newlineTrivia = leadingTrivia.Where(trivia => trivia.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
-				foreach (var triviaToRemove in newlineTrivia)
-					leadingTrivia = leadingTrivia.Remove(triviaToRemove);
-
-				var syntaxWithNewlineRemoved = sortedPair.Value.WithLeadingTrivia(leadingTrivia);
-				reorderedMembers.Add(syntaxWithNewlineRemoved);
-				continue;
-			}
-
-			var (newlineCount, nonWhitespaceTriviaCount) = CountTriviaTypes(leadingTrivia);
-			var needsNewlineAdded = IsNewlineNeeded(sortedPair.Key.GroupType, isStartOfNewGroup, newlineCount, nonWhitespaceTriviaCount);
-
-			if (!needsNewlineAdded)
-			{
-				reorderedMembers.Add(sortedPair.Value);
-				continue;
-			}
-
-			var newlinesToAdd = 1;
-			if (isStartOfNewGroup)
-			{
-				var (previousStartOfGroupIndex, previousStartOfGroupNewlines) = LookForPreviousStartOfGroupValues(currentGroupIndex, currentItemIndex, sortedMembers);
-				if (previousStartOfGroupIndex > -1)
-					removeNewlineItemIndex = previousStartOfGroupIndex;
-
-				if (previousStartOfGroupNewlines > 0)
-					newlinesToAdd = previousStartOfGroupNewlines;
-			}
-
-			// Prepend the necessary number of newlines
-			for (var newlineIndex = 0; newlineIndex < newlinesToAdd; ++newlineIndex)
-				leadingTrivia = leadingTrivia.Insert(0, SyntaxFactory.ElasticCarriageReturnLineFeed);
-
-			var syntaxWithNewlineAdded = sortedPair.Value.WithLeadingTrivia(leadingTrivia);
-			reorderedMembers.Add(syntaxWithNewlineAdded);
-		}
-
-		var reorderedSyntaxList = new SyntaxList<MemberDeclarationSyntax>(reorderedMembers);
-		var newTypeDeclaration = typeDeclaration.WithMembers(reorderedSyntaxList);
-
-		var newRoot = oldRoot.ReplaceNode(typeDeclaration, newTypeDeclaration);
+		var newRoot = oldRoot.ReplaceNode(initializerExpressionSyntax, newInitializerExpressionSyntax);
 
 #if DEBUG
 		var newDocument = document.WithSyntaxRoot(newRoot);
@@ -281,11 +290,166 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 #endif
 	}
 
-	internal struct SortedMemberDeclaration : IComparable<SortedMemberDeclaration>
+	private static async Task<Document> ReorderTypeMembersAsync(
+		Document document,
+		string? groupOrderLookupString,
+		string? propertyNamesToOrderFirstRawValue,
+		bool propertyNamesToOrderFirstAreCaseSensitive,
+		ICollection<TypeDeclarationSyntax> typeDeclarationsToFix,
+		CancellationToken cancellationToken)
+	{
+		var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+		if (oldRoot is null)
+			return document;
+
+		// Compute new member order
+		var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+		if (semanticModel is null)
+			return document;
+
+		var newRoot = oldRoot;
+		foreach (var typeDeclaration in typeDeclarationsToFix)
+		{
+			var typeDeclarationSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
+			if (typeDeclarationSymbol is null)
+				continue;
+
+			var groupOrder = MemberOrderingOptions.ConvertStringToGroupOrderLookup(groupOrderLookupString) ?? MemberOrderingOptions.DefaultGroupOrder;
+			var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
+			var propertyNameOrderComparison = propertyNamesToOrderFirstAreCaseSensitive
+				? StringComparison.Ordinal
+				: StringComparison.OrdinalIgnoreCase;
+
+			var memberSymbols = typeDeclarationSymbol.GetMembers();
+			var members = typeDeclaration.Members;
+
+			var sortedMembers = new SortedList<SortedMemberKey, MemberDeclarationSyntax>();
+			var memberCount = 0;
+			foreach (var memberSyntax in members)
+			{
+				var memberSymbol = memberSymbols.FirstOrDefault(symbol =>
+					!symbol.IsImplicitlyDeclared
+					&& symbol.Locations.Any(symbolLocation => memberSyntax.Span.Contains(symbolLocation.SourceSpan)));
+
+				if (memberSymbol is null)
+				{
+					sortedMembers.Add(new SortedMemberKey(null, memberCount++), memberSyntax);
+					continue;
+				}
+
+				var groupType = MembersOrderedCorrectlyAnalyzer.GetGroupType(memberSymbol);
+				if (!memberSymbol.CanBeReferencedByName && groupType != MemberGroupType.Constructors && groupType != MemberGroupType.StaticConstructors)
+				{
+					sortedMembers.Add(new SortedMemberKey(groupType, memberCount++), memberSyntax);
+					continue;
+				}
+
+				var matchedGroupIndex = -1;
+				for (var groupIndex = 0; groupIndex < groupOrder.Length; ++groupIndex)
+				{
+					if (groupOrder[groupIndex].Contains(groupType))
+					{
+						matchedGroupIndex = groupIndex;
+						break;
+					}
+				}
+
+				Debug.Assert(matchedGroupIndex > -1);
+				var nameOrderedFirstIndex = propertyNamesToOrderFirst is null
+					? SortedMemberKey.NameShouldBeAlphabetized
+					: Array.FindIndex(propertyNamesToOrderFirst, propertyName => propertyName.Equals(memberSymbol.Name, propertyNameOrderComparison));
+
+				var sortKey = matchedGroupIndex > -1
+					? new SortedMemberKey(matchedGroupIndex, groupType, memberCount++, memberSymbol.Name, nameOrderedFirstIndex)
+					: new SortedMemberKey(groupType, memberCount++);
+
+				sortedMembers.Add(sortKey, memberSyntax);
+			}
+
+			var reorderedMembers = new List<MemberDeclarationSyntax>();
+			var currentGroupIndex = -1;
+			var currentItemIndex = -1;
+			var lastMemberIndex = sortedMembers.Count - 1;
+			var removeNewlineItemIndex = -1;
+
+			foreach (var sortedPair in sortedMembers)
+			{
+				++currentItemIndex;
+
+				if (sortedPair.Key.GroupIndex == SortedMemberKey.ImplicitGroupIndex)
+				{
+					reorderedMembers.Add(sortedPair.Value);
+					continue;
+				}
+
+				var isStartOfNewGroup = (currentGroupIndex > -1) && sortedPair.Key.GroupIndex != currentGroupIndex;
+				currentGroupIndex = sortedPair.Key.GroupIndex;
+
+				var leadingTrivia = sortedPair.Value.GetLeadingTrivia();
+				if (currentItemIndex == removeNewlineItemIndex)
+				{
+					var newlineTrivia = leadingTrivia.Where(trivia => trivia.IsKind(SyntaxKind.EndOfLineTrivia)).ToArray();
+					foreach (var triviaToRemove in newlineTrivia)
+						leadingTrivia = leadingTrivia.Remove(triviaToRemove);
+
+					var syntaxWithNewlineRemoved = sortedPair.Value.WithLeadingTrivia(leadingTrivia);
+					reorderedMembers.Add(syntaxWithNewlineRemoved);
+					continue;
+				}
+
+				var (newlineCount, nonWhitespaceTriviaCount) = CountTriviaTypes(leadingTrivia);
+				var needsNewlineAdded = IsNewlineNeeded(sortedPair.Key.GroupType, isStartOfNewGroup, newlineCount, nonWhitespaceTriviaCount);
+
+				if (!needsNewlineAdded)
+				{
+					reorderedMembers.Add(sortedPair.Value);
+					continue;
+				}
+
+				var newlinesToAdd = 1;
+				if (isStartOfNewGroup)
+				{
+					var (previousStartOfGroupIndex, previousStartOfGroupNewlines) = LookForPreviousStartOfGroupValues(currentGroupIndex, currentItemIndex, sortedMembers);
+					if (previousStartOfGroupIndex > -1)
+						removeNewlineItemIndex = previousStartOfGroupIndex;
+
+					if (previousStartOfGroupNewlines > 0)
+						newlinesToAdd = previousStartOfGroupNewlines;
+				}
+
+				// Prepend the necessary number of newlines
+				for (var newlineIndex = 0; newlineIndex < newlinesToAdd; ++newlineIndex)
+					leadingTrivia = leadingTrivia.Insert(0, SyntaxFactory.ElasticCarriageReturnLineFeed);
+
+				var syntaxWithNewlineAdded = sortedPair.Value.WithLeadingTrivia(leadingTrivia);
+				reorderedMembers.Add(syntaxWithNewlineAdded);
+			}
+
+			var reorderedSyntaxList = new SyntaxList<MemberDeclarationSyntax>(reorderedMembers);
+			var newTypeDeclaration = typeDeclaration.WithMembers(reorderedSyntaxList);
+
+			newRoot = newRoot.ReplaceNode(typeDeclaration, newTypeDeclaration);
+		}
+
+		if (newRoot == oldRoot)
+			return document;
+
+#if DEBUG
+		var newDocument = document.WithSyntaxRoot(newRoot);
+		var newSyntaxTree = await newDocument.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
+		var newSyntaxTreeContent = newSyntaxTree?.ToString();
+		return newDocument;
+#else
+		return document.WithSyntaxRoot(newRoot);
+#endif
+	}
+
+	internal struct SortedMemberKey : IComparable<SortedMemberKey>
 	{
 		internal const int ImplicitGroupIndex = -1;
+		internal const int NameShouldBeAlphabetized = -1;
 
-		public SortedMemberDeclaration(
+		public SortedMemberKey(
 			MemberGroupType? groupType,
 			int implicitMemberIndex)
 		{
@@ -293,18 +457,34 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			GroupType = groupType;
 			ImplicitMemberIndex = implicitMemberIndex;
 			Name = null;
+			NameOrderFirstIndex = NameShouldBeAlphabetized;
 		}
 
-		public SortedMemberDeclaration(
+		// Used for object initializer member assignment sorting
+		public SortedMemberKey(
+			int memberIndex,
+			string name,
+			int nameOrderedFirstIndex)
+		{
+			GroupIndex = ImplicitGroupIndex;
+			GroupType = null;
+			ImplicitMemberIndex = memberIndex;
+			Name = name;
+			NameOrderFirstIndex = nameOrderedFirstIndex;
+		}
+
+		public SortedMemberKey(
 			int groupIndex,
 			MemberGroupType groupType,
 			int memberIndex,
-			string name)
+			string name,
+			int nameOrderedFirstIndex)
 		{
 			GroupIndex = groupIndex;
 			GroupType = groupType;
 			ImplicitMemberIndex = memberIndex;
 			Name = name;
+			NameOrderFirstIndex = nameOrderedFirstIndex;
 		}
 
 		public int GroupIndex { get; }
@@ -315,9 +495,21 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 
 		public string? Name { get; }
 
-		public static int Compare(SortedMemberDeclaration x, SortedMemberDeclaration y)
+		public int NameOrderFirstIndex { get; }
+
+		public static int Compare(SortedMemberKey x, SortedMemberKey y)
 		{
 			var comparison = x.GroupIndex.CompareTo(y.GroupIndex);
+
+			if (comparison == 0 && x.NameOrderFirstIndex != y.NameOrderFirstIndex)
+			{
+				if (y.NameOrderFirstIndex == NameShouldBeAlphabetized)
+					return -1; // X has a non-negative name ordered first index so it comes before y which should be alphabetized
+				else if (x.NameOrderFirstIndex == NameShouldBeAlphabetized)
+					return 1;
+				else
+					return x.NameOrderFirstIndex.CompareTo(y.NameOrderFirstIndex);
+			}
 
 			if (comparison == 0)
 				comparison = string.CompareOrdinal(x.Name, y.Name);
@@ -328,6 +520,6 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			return comparison;
 		}
 
-		public int CompareTo(SortedMemberDeclaration other) => Compare(this, other);
+		public int CompareTo(SortedMemberKey other) => Compare(this, other);
 	}
 }

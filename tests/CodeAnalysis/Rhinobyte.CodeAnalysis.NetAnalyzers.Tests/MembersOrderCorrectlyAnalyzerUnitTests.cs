@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 using System.Threading;
 using System.Threading.Tasks;
 using VerifyCS = Rhinobyte.CodeAnalysis.NetAnalyzers.Tests.CSharpCodeFixVerifier<
@@ -19,8 +20,8 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 	[TestMethod]
 	public void ConvertStringToGroupOrderLookup_returns_the_expected_result()
 	{
-		MembersOrderedCorrectlyAnalyzer.ConvertStringToGroupOrderLookup(null).Should().BeNull();
-		MembersOrderedCorrectlyAnalyzer.ConvertStringToGroupOrderLookup(string.Empty).Should().BeNull();
+		MemberOrderingOptions.ConvertStringToGroupOrderLookup(null).Should().BeNull();
+		MemberOrderingOptions.ConvertStringToGroupOrderLookup(string.Empty).Should().BeNull();
 
 		// TODO: Add more use cases
 	}

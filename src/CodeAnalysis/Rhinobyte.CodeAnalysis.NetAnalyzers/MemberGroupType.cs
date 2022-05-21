@@ -3,7 +3,7 @@
 /// <summary>
 /// Member group type values used to specify expected member ordering
 /// </summary>
-internal enum MemberGroupType
+public enum MemberGroupType
 {
 	Unknown = 0,
 	Constants = 1,

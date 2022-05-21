@@ -89,8 +89,6 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProviderUnitTests
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
 		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
 
-		// TODO: Update the code fixer to be better handle/correct whitespace when re-ordering the members
-
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
 			// /0/Test0.cs(33,22): info RBCS0002: Member 'ConstantD' is not ordered alphabetically

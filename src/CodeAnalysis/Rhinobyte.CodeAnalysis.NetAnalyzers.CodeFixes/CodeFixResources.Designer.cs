@@ -61,6 +61,15 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reorder the member assignments.
+        /// </summary>
+        internal static string MemberAssignmentOrderCodeFixTitle {
+            get {
+                return ResourceManager.GetString("MemberAssignmentOrderCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reorder the members.
         /// </summary>
         internal static string MemberOrderCodeFixTitle {

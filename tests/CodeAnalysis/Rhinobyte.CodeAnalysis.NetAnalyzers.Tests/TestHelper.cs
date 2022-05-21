@@ -12,14 +12,19 @@ internal static class TestHelper
 	public static async Task<string> GetTestCaseFileAsync(
 		CancellationToken cancellationToken,
 		string extension,
+		string? subdirectoryName = null,
 		[CallerMemberName] string? fileNamePrefix = null)
 	{
-		return await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), "TestCaseFiles", $"{fileNamePrefix}{extension}"));
+		var filePath = subdirectoryName is null
+			? Path.Combine(Directory.GetCurrentDirectory(), "TestCaseFiles", $"{fileNamePrefix}{extension}")
+			: Path.Combine(Directory.GetCurrentDirectory(), "TestCaseFiles", subdirectoryName, $"{fileNamePrefix}{extension}");
+
+		return await File.ReadAllTextAsync(filePath);
 	}
 
-	public static async Task<string> GetTestCodeFixResultFileAsync(CancellationToken cancellationToken, [CallerMemberName] string? fileNamePrefix = null)
-		=> await GetTestCaseFileAsync(cancellationToken, ".codefixresult.cs", fileNamePrefix);
+	public static async Task<string> GetTestCodeFixResultFileAsync(CancellationToken cancellationToken, string? subdirectoryName = null, [CallerMemberName] string? fileNamePrefix = null)
+		=> await GetTestCaseFileAsync(cancellationToken, ".codefixresult.cs", subdirectoryName, fileNamePrefix);
 
-	public static async Task<string> GetTestInputFileAsync(CancellationToken cancellationToken, [CallerMemberName] string? fileNamePrefix = null)
-		=> await GetTestCaseFileAsync(cancellationToken, ".input.cs", fileNamePrefix);
+	public static async Task<string> GetTestInputFileAsync(CancellationToken cancellationToken, string? subdirectoryName = null, [CallerMemberName] string? fileNamePrefix = null)
+		=> await GetTestCaseFileAsync(cancellationToken, ".input.cs", subdirectoryName, fileNamePrefix);
 }

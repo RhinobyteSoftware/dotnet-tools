@@ -17,7 +17,7 @@
 
         <RoslynAnalyzersRepoRoot Condition="'$(RoslynAnalyzersRepoRoot)' == ''">$(MSBuildThisFileDirectory)\..\..\..\..\dotnet-roslyn-analyzers</RoslynAnalyzersRepoRoot>
 
-        <DefineConstants>$(DefineConstants);CODEANALYSIS_V3_OR_BETTER</DefineConstants>
+        <DefineConstants>$(DefineConstants);CODEANALYSIS_V3_OR_BETTER;CODEANALYSIS_V3_7_OR_BETTER</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

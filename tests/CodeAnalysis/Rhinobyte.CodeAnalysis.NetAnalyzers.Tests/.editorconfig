@@ -1,7 +1,13 @@
 ﻿
 
+[*Tests.cs]
+# (Rule) CA1825 - Use Array.Empty    - Reason: Frequently want to temporarily set the expectedDiagnosticResult[] to empty for one test run to get better failure outpu
+dotnet_diagnostic.CA1825.severity       = none
+
+
 # Suppress analyzers in test input / expectation files since they will deliberately have code that the analyzers complain about
 [TestCaseFiles/*.cs]
 
 # (Rule) IDE0005
 dotnet_diagnostic.IDE0005.severity       = none
+

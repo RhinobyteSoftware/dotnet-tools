@@ -1,5 +1,5 @@
-﻿using Analyzer.Utilities;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 using System;
@@ -19,28 +19,17 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// <summary>
 	/// The diagnostic rule id for members being ordered correctly by group
 	/// </summary>
-	public const string RBCS0001 = "RBCS0001";
+	public const string RBCS0001 = nameof(RBCS0001);
 
 	/// <summary>
 	/// The diagnostic rule id for members being ordered alphabetically within their respective groups
 	/// </summary>
-	public const string RBCS0002 = "RBCS0002";
+	public const string RBCS0002 = nameof(RBCS0002);
 
 	/// <summary>
-	/// The default member group ordering for the analyzer
+	/// The diagnostic rule id for member names in an object initializer being ordered alphabetically
 	/// </summary>
-	internal static readonly MemberGroupType[][] DefaultGroupOrder = new[]
-	{
-		new MemberGroupType[] { MemberGroupType.NestedRecordType },
-		new MemberGroupType[] { MemberGroupType.Constants, MemberGroupType.StaticReadonlyFields },
-		new MemberGroupType[] { MemberGroupType.StaticMutableFields, MemberGroupType.StaticProperties },
-		new MemberGroupType[] { MemberGroupType.StaticConstructors },
-		new MemberGroupType[] { MemberGroupType.ReadonlyInstanceFields, MemberGroupType.MutableInstanceFields },
-		new MemberGroupType[] { MemberGroupType.Constructors },
-		new MemberGroupType[] { MemberGroupType.InstanceProperties },
-		new MemberGroupType[] { MemberGroupType.InstanceMethods, MemberGroupType.StaticMethods },
-		new MemberGroupType[] { MemberGroupType.NestedEnumType, MemberGroupType.NestedOtherType },
-	};
+	public const string RBCS0003 = nameof(RBCS0003);
 
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
@@ -65,23 +54,35 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
-#pragma warning disable IDE0025 // Use expression body for properties
+	internal static readonly DiagnosticDescriptor RuleRBCS0003 = DiagnosticDescriptorHelper.Create(
+		RBCS0003,
+		DiagnosticDescriptorHelper.DesignCategory,
+		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
+		DiagnosticSeverity.Info,
+		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerTitle), Resources.ResourceManager, typeof(Resources)),
+		isEnabledByDefault: true
+	);
+
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(RuleRBCS0001, RuleRBCS0002); } }
-#pragma warning restore IDE0025 // Use expression body for properties
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleRBCS0001, RuleRBCS0002, RuleRBCS0003);
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
-		SymbolAnalysisContext context,
-		ImmutableDictionary<string, string?> diagnosticProperties,
-		MemberGroupType[][] groupOrder,
+		in SymbolAnalysisContext context,
 		INamedTypeSymbol namedTypeSymbol)
 	{
-		if (context.Symbol is null || groupOrder is null)
-			return;
-
 		Debug.Assert(namedTypeSymbol.DeclaringSyntaxReferences.Length == namedTypeSymbol.Locations.Length);
 		if (namedTypeSymbol.DeclaringSyntaxReferences.Length != namedTypeSymbol.Locations.Length)
 			return;
+
+		var orderingOptions = MemberOrderingOptions.ParseOptions(context);
+		var groupOrder = MemberOrderingOptions.GetGroupOrderLookupOrDefault(orderingOptions.GroupOrderSettings);
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+		var propertyNameOrderComparer = orderingOptions.ArePropertyNamesToOrderFirstCaseSensitive
+			? StringComparer.Ordinal
+			: StringComparer.OrdinalIgnoreCase;
+
+		ImmutableDictionary<string, string?>? diagnosticProperties = null;
 
 		var locationDataLookup = new NamedTypeLocationData[namedTypeSymbol.Locations.Length];
 		for (var locationIndex = 0; locationIndex < namedTypeSymbol.Locations.Length; ++locationIndex)
@@ -114,6 +115,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 					if (locationData.CompletedGroups.Contains(currentMemberGroupType))
 					{
+						diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
 						var diagnostic = Diagnostic.Create(RuleRBCS0001, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 						context.ReportDiagnostic(diagnostic);
 						continue;
@@ -122,20 +124,33 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 					var isInCurrentGroup = locationData.CurrentGroup.Contains(currentMemberGroupType);
 					if (isInCurrentGroup)
 					{
-						if (memberSymbol.CanBeReferencedByName
-							&& locationData.PreviousMemberNameForCurrentGroup is not null
-							&& string.Compare(locationData.PreviousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0)
+						if (!memberSymbol.CanBeReferencedByName)
+							continue;
+
+						var shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
+							&& propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+
+						if (shouldBeOrderedFirst && !locationData.IsAlphabetizingGroup)
+							continue;
+
+						if (shouldBeOrderedFirst
+							|| (locationData.PreviousMemberNameForCurrentGroup is not null
+								&& locationData.IsAlphabetizingGroup
+								&& string.Compare(locationData.PreviousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0))
 						{
+							diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
 							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 							context.ReportDiagnostic(diagnostic);
 							continue;
 						}
 
+						locationData.IsAlphabetizingGroup = true;
 						locationData.PreviousMemberNameForCurrentGroup = memberSymbol.Name;
 						continue;
 					}
 
 					// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
+					locationData.IsAlphabetizingGroup = propertyNamesToOrderFirst is null || !propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
 					locationData.PreviousMemberNameForCurrentGroup = memberSymbol.Name;
 
 					isInCurrentGroup = locationData.AdvanceCurrentGroupTo(currentMemberGroupType, groupOrder);
@@ -153,26 +168,27 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		if (namedTypeSymbol.IsNamespace)
 			return;
 
-		var (groupOrder, groupOrderLookupString) = GetGroupOrderLookup(context);
-
-
-		var diagnosticProperties = new Dictionary<string, string?>()
-		{
-			{ "GroupOrderLookup", groupOrderLookupString }
-		}
-		.ToImmutableDictionary<string, string?>();
-
 		if (namedTypeSymbol.Locations.Length > 1)
 		{
-			AnalyzeMultipartNamedTypeSymbol(context, diagnosticProperties, groupOrder, namedTypeSymbol);
+			AnalyzeMultipartNamedTypeSymbol(context, namedTypeSymbol);
 			return;
 		}
+
+		var orderingOptions = MemberOrderingOptions.ParseOptions(context);
+		var groupOrder = MemberOrderingOptions.GetGroupOrderLookupOrDefault(orderingOptions.GroupOrderSettings);
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+		var propertyNameOrderComparer = orderingOptions.ArePropertyNamesToOrderFirstCaseSensitive
+			? StringComparer.Ordinal
+			: StringComparer.OrdinalIgnoreCase;
+
+		ImmutableDictionary<string, string?>? diagnosticProperties = null;
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
 		var completedGroups = new List<MemberGroupType>();
 		var currentGroup = groupOrder[0];
 		var currentGroupIndex = 1;
 		string? previousMemberNameForCurrentGroup = null;
+		var isAlphabetizingGroup = false;
 
 		foreach (var memberSymbol in memberSymbols)
 		{
@@ -185,6 +201,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 			if (completedGroups.Contains(currentMemberGroupType))
 			{
+				diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
 				var diagnostic = Diagnostic.Create(RuleRBCS0001, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 				context.ReportDiagnostic(diagnostic);
 				continue;
@@ -193,20 +210,33 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			var isInCurrentGroup = currentGroup.Contains(currentMemberGroupType);
 			if (isInCurrentGroup)
 			{
-				if (memberSymbol.CanBeReferencedByName
-					&& previousMemberNameForCurrentGroup is not null
-					&& string.Compare(previousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0)
+				if (!memberSymbol.CanBeReferencedByName)
+					continue;
+
+				var shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
+					&& propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+
+				if (shouldBeOrderedFirst && !isAlphabetizingGroup)
+					continue;
+
+				if (shouldBeOrderedFirst
+					|| (previousMemberNameForCurrentGroup is not null
+						&& isAlphabetizingGroup
+						&& string.Compare(previousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0))
 				{
+					diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
 					var diagnostic = Diagnostic.Create(RuleRBCS0002, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 					context.ReportDiagnostic(diagnostic);
 					continue;
 				}
 
+				isAlphabetizingGroup = true;
 				previousMemberNameForCurrentGroup = memberSymbol.Name;
 				continue;
 			}
 
 			// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
+			isAlphabetizingGroup = propertyNamesToOrderFirst is null || !propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
 			previousMemberNameForCurrentGroup = memberSymbol.Name;
 
 			while (!isInCurrentGroup && currentGroupIndex < groupOrder.Length)
@@ -220,57 +250,60 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		}
 	}
 
-	internal static string ConvertGroupOrderLookupToString(MemberGroupType[][] groupOrder)
-		=> string.Join("; ", groupOrder.Select(grouping => string.Join(",", grouping)));
-
-	internal static MemberGroupType[][]? ConvertStringToGroupOrderLookup(string? groupOrderLookupString)
+	private static void AnalyzeObjectInitializerSyntax(SyntaxNodeAnalysisContext context)
 	{
-		if (string.IsNullOrEmpty(groupOrderLookupString))
-			return null;
+		if (context.Node is not InitializerExpressionSyntax initializerExpressionSyntax)
+			return;
 
-		var groupOrderLookup = groupOrderLookupString!
-			.Split(';')
-			.Select(grouping => grouping.Split(',').Select(memberGroupTypeStringValue => Enum.TryParse<MemberGroupType>(memberGroupTypeStringValue.Trim(), out var parsedValue) ? parsedValue : MemberGroupType.Unknown).ToArray())
-			.ToArray();
+		var orderingOptions = MemberOrderingOptions.ParseOptions(context);
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+		var propertyNameOrderComparer = orderingOptions.ArePropertyNamesToOrderFirstCaseSensitive
+			? StringComparer.Ordinal
+			: StringComparer.OrdinalIgnoreCase;
 
-		return groupOrderLookup;
-	}
+		var isAlphabetizing = propertyNamesToOrderFirst is null;
+		string? previousIdentifierName = null;
 
-	internal static (MemberGroupType[][] GroupOrderLookup, string? GroupOrderLookupString) GetGroupOrderLookup(SymbolAnalysisContext context)
-	{
-		try
+		var childNodes = initializerExpressionSyntax.ChildNodes();
+		var outOfOrderMemberAssignments = new List<string>();
+		foreach (var childNode in childNodes)
 		{
-			var groupOrderStringValue = context.Options.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.RuleRBCS0001, null, context.Compilation);
-			var groupOrderLookup = ConvertStringToGroupOrderLookup(groupOrderStringValue);
+			if (childNode is not AssignmentExpressionSyntax assignmentExpressionSyntax)
+				continue;
 
-			if (groupOrderLookup is null)
-				return (DefaultGroupOrder, null);
+			var leftNode = assignmentExpressionSyntax.Left;
+			if (leftNode is not IdentifierNameSyntax identifierNameSyntax)
+				continue;
 
-			var flattenedGroups = groupOrderLookup.SelectMany(group => group.ToList()).ToArray();
-			var allValues = System.Enum.GetValues(typeof(MemberGroupType)).Cast<MemberGroupType>().Where(value => value != MemberGroupType.Unknown).ToArray();
+			var identifierName = identifierNameSyntax.Identifier.ValueText ?? identifierNameSyntax.Identifier.Text;
+			if (string.IsNullOrEmpty(identifierName))
+				continue;
 
-			if (flattenedGroups.Length != allValues.Length
-				|| flattenedGroups.Any(value => !allValues.Contains(value))
-				|| allValues.Any(value => !flattenedGroups.Contains(value)))
+			var shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
+				&& propertyNamesToOrderFirst.Contains(identifierName, propertyNameOrderComparer);
+
+			if (shouldBeOrderedFirst && !isAlphabetizing)
+				continue;
+
+			if (shouldBeOrderedFirst
+				|| (previousIdentifierName is not null
+					&& isAlphabetizing
+					&& string.Compare(previousIdentifierName, identifierName, StringComparison.OrdinalIgnoreCase) > 0))
 			{
-				// If the parsed values aren't valid fallback to the defaults
-				return (DefaultGroupOrder, null);
+				outOfOrderMemberAssignments.Add(identifierName);
+				continue;
 			}
 
-			return (groupOrderLookup, groupOrderStringValue);
-		}
-#pragma warning disable CA1031 // Do not catch general exception types
-#pragma warning disable CS0168 // Variable is declared but never used
-		catch (Exception parseOptionsException)
-#pragma warning restore CS0168 // Variable is declared but never used
-#pragma warning restore CA1031 // Do not catch general exception types
-		{
-#if DEBUG
-			System.Diagnostics.Debugger.Break();
-#endif
+			isAlphabetizing = true;
+			previousIdentifierName = identifierName;
 		}
 
-		return (DefaultGroupOrder, null);
+		if (outOfOrderMemberAssignments.Count > 0)
+		{
+			var diagnosticProperties = MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
+			var diagnostic = Diagnostic.Create(RuleRBCS0003, initializerExpressionSyntax.GetLocation(), properties: diagnosticProperties, string.Join(", ", outOfOrderMemberAssignments));
+			context.ReportDiagnostic(diagnostic);
+		}
 	}
 
 	internal static MemberGroupType GetGroupType(ISymbol symbol)
@@ -362,6 +395,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		// TODO: Consider registering other actions that act on syntax instead of or in addition to symbols
 		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Analyzer%20Actions%20Semantics.md for more information
 		context.RegisterSymbolAction(AnalyzeNamedTypeSymbol, SymbolKind.NamedType);
+
+		context.RegisterSyntaxNodeAction<Microsoft.CodeAnalysis.CSharp.SyntaxKind>(
+			AnalyzeObjectInitializerSyntax,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ObjectInitializerExpression
+		);
 	}
 
 	internal class NamedTypeLocationData
@@ -383,10 +421,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		internal MemberGroupType[] CurrentGroup { get; private set; }
 		internal int CurrentGroupIndex { get; private set; }
 		internal Location Location { get; }
+		internal bool IsAlphabetizingGroup { get; set; }
 		internal FileLinePositionSpan PositionSpan { get; }
 		internal string? PreviousMemberNameForCurrentGroup { get; set; }
 
-		internal bool AdvanceCurrentGroupTo(MemberGroupType groupForCurrentMemberSymbol, MemberGroupType[][] groupOrder)
+		internal bool AdvanceCurrentGroupTo(in MemberGroupType groupForCurrentMemberSymbol, MemberGroupType[][] groupOrder)
 		{
 			var isInCurrentGroup = CurrentGroup.Contains(groupForCurrentMemberSymbol);
 			while (!isInCurrentGroup && CurrentGroupIndex < groupOrder.Length)

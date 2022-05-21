@@ -138,4 +138,13 @@
   <data name="RBCS0002_AnalyzerTitle" xml:space="preserve">
     <value>Member is not ordered alphabetically within group</value>
   </data>
+  <data name="RBCS0003_AnalyzerDescription" xml:space="preserve">
+    <value>Member assignments in the object initializer are not ordered correctly.</value>
+  </data>
+  <data name="RBCS0003_AnalyzerMessageFormat" xml:space="preserve">
+    <value>The member assignments '{0}' are out of order</value>
+  </data>
+  <data name="RBCS0003_AnalyzerTitle" xml:space="preserve">
+    <value>Member assignments are not ordered correctly</value>
+  </data>
 </root>

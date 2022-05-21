@@ -113,5 +113,32 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
                 return ResourceManager.GetString("RBCS0002_AnalyzerTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member assignments in the object initializer are not ordered correctly..
+        /// </summary>
+        internal static string RBCS0003_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RBCS0003_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The member assignments &apos;{0}&apos; are out of order.
+        /// </summary>
+        internal static string RBCS0003_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RBCS0003_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member assignments are not ordered correctly.
+        /// </summary>
+        internal static string RBCS0003_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RBCS0003_AnalyzerTitle", resourceCulture);
+            }
+        }
     }
 }

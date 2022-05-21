@@ -1,9 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#nullable enable
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,13 +49,23 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 		=> await VerifyCodeFixAsync(source, new[] { expected }, fixedSource);
 
 	/// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
-	public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)
+	public static async Task VerifyCodeFixAsync(
+		string source,
+		DiagnosticResult[] expected,
+		string fixedSource,
+		ICollection<(string filename, string fileContent)>? analyzerConfigFiles = null)
 	{
 		var test = new Test
 		{
 			TestCode = source,
 			FixedCode = fixedSource,
 		};
+
+		if (analyzerConfigFiles is not null)
+		{
+			foreach (var (filename, fileContent) in analyzerConfigFiles)
+				test.TestState.AnalyzerConfigFiles.Add((filename, fileContent));
+		}
 
 		test.ExpectedDiagnostics.AddRange(expected);
 		await test.RunAsync(CancellationToken.None);
