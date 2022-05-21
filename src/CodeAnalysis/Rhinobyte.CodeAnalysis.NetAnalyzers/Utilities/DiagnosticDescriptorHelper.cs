@@ -7,6 +7,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 public static class DiagnosticDescriptorHelper
 {
 	internal const string DesignCategory = "Design";
+	internal const string MaintainabilityCategory = "Maintainability";
 
 	public static DiagnosticDescriptor Create(
 			string id,
@@ -22,7 +23,7 @@ public static class DiagnosticDescriptorHelper
 		_ = id ?? throw new ArgumentNullException(nameof(id));
 
 #pragma warning disable CA1308 // Normalize strings to uppercase - use lower case ID in help link
-		var helpLink = $"https://github.com/RhinobyteSoftware/dotnet-tools/docs/rules/{id.ToLowerInvariant()}.md";
+		var helpLink = $"https://github.com/RhinobyteSoftware/dotnet-tools/docs/codeanalysis/rules/{id.ToLowerInvariant()}.md";
 #pragma warning restore CA1308 // Normalize strings to uppercase
 
 		string[]? customTags = null;

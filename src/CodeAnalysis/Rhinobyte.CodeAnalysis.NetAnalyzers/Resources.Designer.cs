@@ -88,7 +88,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type members within the same group should be ordered alphabetically..
+        ///   Looks up a localized string similar to Type members within the same group should be ordered correctly..
         /// </summary>
         internal static string RBCS0002_AnalyzerDescription {
             get {
@@ -97,7 +97,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member &apos;{0}&apos; is not ordered alphabetically.
+        ///   Looks up a localized string similar to Member &apos;{0}&apos; is not ordered alphabetically or by configured priority.
         /// </summary>
         internal static string RBCS0002_AnalyzerMessageFormat {
             get {
@@ -106,7 +106,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member is not ordered alphabetically within group.
+        ///   Looks up a localized string similar to Member is not ordered correctly within group.
         /// </summary>
         internal static string RBCS0002_AnalyzerTitle {
             get {

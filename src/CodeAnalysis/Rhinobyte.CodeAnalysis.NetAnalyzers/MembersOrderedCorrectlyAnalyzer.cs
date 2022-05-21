@@ -36,7 +36,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 	internal static readonly DiagnosticDescriptor RuleRBCS0001 = DiagnosticDescriptorHelper.Create(
 		RBCS0001,
-		DiagnosticDescriptorHelper.DesignCategory,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
 		new LocalizableResourceString(nameof(Resources.RBCS0001_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
 		DiagnosticSeverity.Info,
 		new LocalizableResourceString(nameof(Resources.RBCS0001_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
@@ -46,7 +46,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 	internal static readonly DiagnosticDescriptor RuleRBCS0002 = DiagnosticDescriptorHelper.Create(
 		RBCS0002,
-		DiagnosticDescriptorHelper.DesignCategory,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
 		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
 		DiagnosticSeverity.Info,
 		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
@@ -56,7 +56,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 	internal static readonly DiagnosticDescriptor RuleRBCS0003 = DiagnosticDescriptorHelper.Create(
 		RBCS0003,
-		DiagnosticDescriptorHelper.DesignCategory,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
 		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
 		DiagnosticSeverity.Info,
 		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),

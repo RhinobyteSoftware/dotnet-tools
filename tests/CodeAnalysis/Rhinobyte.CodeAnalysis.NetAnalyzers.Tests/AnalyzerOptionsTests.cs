@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis.Testing;
+﻿using FluentAssertions;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +17,16 @@ public class AnalyzerOptionsTests
 	public CancellationToken CancellationTokenForTest => TestContext?.CancellationTokenSource?.Token ?? default;
 
 	public TestContext TestContext { get; set; }
+
+	[TestMethod]
+	public void MemberOrderingOptions_ConvertGroupOrderLookupToString_returns_the_expected_result_for_the_default_ordering()
+	{
+		var defaultGroupOrderConfigString = MemberOrderingOptions.ConvertGroupOrderLookupToString(MemberOrderingOptions.DefaultGroupOrder);
+		// Note: Test that the default ordering matches the expected result. If this is changed then it also needs to be changed in the
+		// corresponding docs/codeanalysis/rules/xxxx.md documentation files
+
+		defaultGroupOrderConfigString.Should().Be("NestedRecordType:Constants,StaticReadonlyFields:StaticMutableFields,StaticProperties:StaticConstructors:ReadonlyInstanceFields,MutableInstanceFields:Constructors:InstanceProperties:InstanceMethods,StaticMethods:NestedEnumType,NestedOtherType");
+	}
 
 	//Diagnostic and CodeFix both triggered and checked for
 	[TestMethod]

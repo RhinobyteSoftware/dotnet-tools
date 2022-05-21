@@ -130,13 +130,13 @@
     <comment>The title of the diagnostic.</comment>
   </data>
   <data name="RBCS0002_AnalyzerDescription" xml:space="preserve">
-    <value>Type members within the same group should be ordered alphabetically.</value>
+    <value>Type members within the same group should be ordered correctly.</value>
   </data>
   <data name="RBCS0002_AnalyzerMessageFormat" xml:space="preserve">
-    <value>Member '{0}' is not ordered alphabetically</value>
+    <value>Member '{0}' is not ordered alphabetically or by configured priority</value>
   </data>
   <data name="RBCS0002_AnalyzerTitle" xml:space="preserve">
-    <value>Member is not ordered alphabetically within group</value>
+    <value>Member is not ordered correctly within group</value>
   </data>
   <data name="RBCS0003_AnalyzerDescription" xml:space="preserve">
     <value>Member assignments in the object initializer are not ordered correctly.</value>

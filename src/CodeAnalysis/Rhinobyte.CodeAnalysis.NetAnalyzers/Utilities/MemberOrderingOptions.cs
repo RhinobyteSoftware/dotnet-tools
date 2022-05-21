@@ -67,7 +67,7 @@ internal struct MemberOrderingOptions
 	}
 
 	internal static string ConvertGroupOrderLookupToString(MemberGroupType[][] groupOrder)
-		=> string.Join("; ", groupOrder.Select(grouping => string.Join(",", grouping)));
+		=> string.Join(":", groupOrder.Select(grouping => string.Join(",", grouping)));
 
 	internal static MemberGroupType[][]? ConvertStringToGroupOrderLookup(string? groupOrderLookupString)
 	{

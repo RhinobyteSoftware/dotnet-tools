@@ -7,6 +7,6 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-RBCS0001|  Design  |  Info    | MembersOrderedCorrectlyAnalyzer
-RBCS0002|  Design  |  Info    | MembersOrderedCorrectlyAnalyzer
-RBCS0003|  Design  |  Info    | MembersOrderedCorrectlyAnalyzer
+RBCS0001|  Maintainability  |  Info    | MembersOrderedCorrectlyAnalyzer, [RBCS0001 Documentation](../../../docs/CodeAnalysis/rules/RBCS0001.md)
+RBCS0002|  Maintainability  |  Info    | MembersOrderedCorrectlyAnalyzer, [RBCS0002 Documentation](../../../docs/CodeAnalysis/rules/RBCS0002.md)
+RBCS0003|  Maintainability  |  Info    | MembersOrderedCorrectlyAnalyzer, [RBCS0003 Documentation](../../../docs/CodeAnalysis/rules/RBCS0003.md)

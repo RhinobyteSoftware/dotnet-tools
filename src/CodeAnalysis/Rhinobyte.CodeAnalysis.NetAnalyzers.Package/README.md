@@ -4,3 +4,4 @@
 
 This library contains some custom static code analzyer and code fix providers for .NET
 
+[Shipped Analyzer Rules](../Rhinobyte.CodeAnalysis.NetAnalyzers/AnalyzerReleases.Shipped.md)
