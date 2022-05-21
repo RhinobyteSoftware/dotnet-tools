@@ -10,7 +10,7 @@
 
         <!-- VERSION VALUES -->
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
-        <PackageVersion>1.0.0.0-beta.1</PackageVersion>
+        <PackageVersion>1.0.0.0-beta.2</PackageVersion>
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
         <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
