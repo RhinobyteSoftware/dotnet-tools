@@ -2,6 +2,11 @@
 
     <PropertyGroup>
         <SolutionTargetsIsImported>true</SolutionTargetsIsImported>
+
+        <!-- Set RunOnlyOnceBeforeBuildTarget to 'BeforeBuild' for single target projects and 'DispatchToInnerBuilds' for cross taretting projects -->
+        <!-- Need to set these in the .targets file in order to be able to check the value of $(TargetFrameworks) and $(TargetFramework) -->
+        <RunOnlyOnceBeforeBuildTarget Condition=" '$(TargetFrameworks)' == '' AND '$(TargetFramework)' != '' ">BeforeBuild</RunOnlyOnceBeforeBuildTarget>
+        <RunOnlyOnceBeforeBuildTarget Condition=" '$(TargetFrameworks)' != '' AND '$(TargetFramework)' == '' ">DispatchToInnerBuilds</RunOnlyOnceBeforeBuildTarget>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'ReleaseTesting' ">
@@ -15,7 +20,7 @@
         <Optimize>false</Optimize>
     </PropertyGroup>
 
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(DontAdjustVersionValues)' != 'true'">
         <AssemblyVersion Condition=" '$(AssemblyVersion)' != '' AND $([System.Text.RegularExpressions.Regex]::IsMatch('$(AssemblyVersion)', '^\d+\.\d+\.\d+-[a-zA-Z].*'))">$([System.Text.RegularExpressions.Regex]::Replace('$(AssemblyVersion)', '(^\d+\.\d+\.\d+)-[a-zA-Z].*', '$1.0'))</AssemblyVersion>
         <FileVersion Condition=" '$(FileVersion)' != '' AND $([System.Text.RegularExpressions.Regex]::IsMatch('$(FileVersion)', '^\d+\.\d+\.\d+-[a-zA-Z].*'))">$([System.Text.RegularExpressions.Regex]::Replace('$(FileVersion)', '(^\d+\.\d+\.\d+)-[a-zA-Z].*', '$1.0'))</FileVersion>
     </PropertyGroup>
@@ -28,16 +33,24 @@
         <Message Text="Creating DevelopmentPackagesDirectory: $(DevelopmentPackagesDirectory)" Condition="!Exists('$(DevelopmentPackagesDirectory)')" Importance="$(InternalMsbuildMessageImportance)" />
         <MakeDir Directories="$(DevelopmentPackagesDirectory)" Condition="!Exists('$(DevelopmentPackagesDirectory)')" />
 
+        <PropertyGroup>
+            <PackageFileNameVersion>$(PackageVersion)</PackageFileNameVersion>
+            <PackageFileNameVersion Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(PackageVersion)', '^\d+\.\d+\.\d+\.\d+'))">$([System.Text.RegularExpressions.Regex]::Replace('$(PackageVersion)', '(^\d+\.\d+\.\d+).*', '$1'))</PackageFileNameVersion>
+        </PropertyGroup>
+
+
         <Message Importance="$(InternalMsbuildMessageImportance)"
                  Text="
 DevelopmentPackagesDirectory: $(DevelopmentPackagesDirectory)
 PackageOutputPath: $(PackageOutputAbsolutePath)
 PackageId: $(PackageId)
-PackageVersion: $(PackageVersion)"  />
+PackageVersion: $(PackageVersion)
+PackageFileNameVersion: $(PackageFileNameVersion)
+PackageFileName: $(PackageId).$(PackageFileNameVersion).nupkg" />
 
-        <Exec Command="del $(PackageId).$(PackageVersion).*" WorkingDirectory="$(DevelopmentPackagesDirectory)" />
+        <Exec Command="del $(PackageId).$(PackageFileNameVersion).*" WorkingDirectory="$(DevelopmentPackagesDirectory)" />
 
-        <Copy SourceFiles="$(PackageOutputAbsolutePath)$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(DevelopmentPackagesDirectory)" />
+        <Copy SourceFiles="$(PackageOutputAbsolutePath)$(PackageId).$(PackageFileNameVersion).nupkg" DestinationFolder="$(DevelopmentPackagesDirectory)" />
     </Target>
 
 
@@ -47,15 +60,15 @@ PackageVersion: $(PackageVersion)"  />
             <RepoRootParent>$([System.IO.Path]::GetFullPath('$([System.IO.Path]::Combine('$(RepoRoot)', '..'))'))</RepoRootParent>
             <LocalPackagesPath Condition="'$(LocalPackagesPath)' == ''">$(RepoRootParent)\localPackages</LocalPackagesPath>
             <DevelopmentPropsFileLines>
-                &lt;Project&gt;
-                &lt;PropertyGroup&gt;
-                &lt;DevelopmentPackagesDirectory&gt;$(LocalPackagesPath)&lt;/DevelopmentPackagesDirectory&gt;
-                &lt;!--  low, normal, or high --&gt;
-                &lt;InternalMsbuildMessageImportance&gt;high&lt;/InternalMsbuildMessageImportance&gt;
-                &lt;OutputToDevelopmentPackages&gt;false&lt;/OutputToDevelopmentPackages&gt;
-                &lt;UseProjectReferences&gt;true&lt;/UseProjectReferences&gt;
-                &lt;/PropertyGroup&gt;
-                &lt;/Project&gt;
+&lt;Project&gt;
+  &lt;PropertyGroup&gt;
+    &lt;DevelopmentPackagesDirectory&gt;$(LocalPackagesPath)&lt;/DevelopmentPackagesDirectory&gt;
+    &lt;!--  low, normal, or high --&gt;
+    &lt;InternalMsbuildMessageImportance&gt;high&lt;/InternalMsbuildMessageImportance&gt;
+    &lt;OutputToDevelopmentPackages&gt;false&lt;/OutputToDevelopmentPackages&gt;
+    &lt;UseProjectReferences&gt;true&lt;/UseProjectReferences&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;
             </DevelopmentPropsFileLines>
         </PropertyGroup>
 
@@ -78,14 +91,14 @@ LocalPackagesPath: '$(LocalPackagesPath)'
     <Target Name="CreateDevelopmentTargetsFile" BeforeTargets="$(RunOnlyOnceBeforeBuildTarget)" Condition="'$(Configuration)' != 'Release' AND Exists('$(RepoRoot)') AND !Exists('$(RepoRoot)\development.local.targets')">
         <PropertyGroup>
             <DevelopmentTargetsFileLines>
-                &lt;Project&gt;
-                &lt;PropertyGroup&gt;
-                <!-- Projects to temporarily disable optimization on to make debugging in the ReleaseTesting configuration easier -->
-                <!-- Each project name must end with a semicolon, even if there is only a single entry -->
-                &lt;ProjectsThatShouldNotBeOptimized&gt;
-                &lt;/ProjectsThatShouldNotBeOptimized&gt;
-                &lt;/PropertyGroup&gt;
-                &lt;/Project&gt;
+&lt;Project&gt;
+  &lt;PropertyGroup&gt;
+    <!-- Projects to temporarily disable optimization on to make debugging in the ReleaseTesting configuration easier -->
+    <!-- Each project name must end with a semicolon, even if there is only a single entry -->
+    &lt;ProjectsThatShouldNotBeOptimized&gt;
+    &lt;/ProjectsThatShouldNotBeOptimized&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;
             </DevelopmentTargetsFileLines>
         </PropertyGroup>
 

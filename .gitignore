@@ -231,3 +231,5 @@ Dependencies
 /development.local.props
 /development.local.targets
 /nuget.config
+
+README.package.md

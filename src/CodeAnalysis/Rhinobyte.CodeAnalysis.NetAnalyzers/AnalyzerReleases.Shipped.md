@@ -1,0 +1,12 @@
+﻿; Shipped analyzer releases
+; https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+
+## Release 1.0.0
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+RBCS0001|  Maintainability  |  Info    | MembersOrderedCorrectlyAnalyzer, [RBCS0001 Documentation](../../../docs/CodeAnalysis/rules/RBCS0001.md)
+RBCS0002|  Maintainability  |  Info    | MembersOrderedCorrectlyAnalyzer, [RBCS0002 Documentation](../../../docs/CodeAnalysis/rules/RBCS0002.md)
+RBCS0003|  Maintainability  |  Info    | MembersOrderedCorrectlyAnalyzer, [RBCS0003 Documentation](../../../docs/CodeAnalysis/rules/RBCS0003.md)

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="Rhinobyte.CodeAnalysis.NetAnalyzers.8070a128-bdff-4590-8efb-65e39d4572b9" Version="1.0" Language="en-US" Publisher="Rhino"/>
+    <DisplayName>Rhinobyte.CodeAnalysis.NetAnalyzers</DisplayName>
+    <Description xml:space="preserve">Diagnostic extension for the .NET Compiler Platform ("Roslyn") with some custom analzyer and code fix support</Description>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Rhinobyte.CodeAnalysis.NetAnalyzers" Path="|Rhinobyte.CodeAnalysis.NetAnalyzers|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Rhinobyte.CodeAnalysis.NetAnalyzers" Path="|Rhinobyte.CodeAnalysis.NetAnalyzers|"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes" Path="|Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes" Path="|Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes|"/>
+  </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.LanguageServices" Version="[15.0,)" DisplayName="Roslyn Language Services" />
+  </Prerequisites>
+</PackageManifest>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31624.102
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{753E6246-64FC-44F5-BB43-39AFB2734B06}"
 	ProjectSection(SolutionItems) = preProject
@@ -36,9 +36,87 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7DE61D8
 		tests\directory.build.targets = tests\directory.build.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{4885358A-622A-4312-8A92-AB3C160018FB}"
+	ProjectSection(SolutionItems) = preProject
+		src\CodeAnalysis\.editorconfig = src\CodeAnalysis\.editorconfig
+		src\CodeAnalysis\directory.build.props = src\CodeAnalysis\directory.build.props
+		src\CodeAnalysis\directory.build.targets = src\CodeAnalysis\directory.build.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{D946C8A5-BC7F-4BAC-95C9-5E9F3C15F7F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.CodeAnalysis.NetAnalyzers", "src\CodeAnalysis\Rhinobyte.CodeAnalysis.NetAnalyzers\Rhinobyte.CodeAnalysis.NetAnalyzers.csproj", "{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes", "src\CodeAnalysis\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes.csproj", "{6BBEFDEE-C419-426B-B971-F05A4262F590}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.CodeAnalysis.NetAnalyzers.Package", "src\CodeAnalysis\Rhinobyte.CodeAnalysis.NetAnalyzers.Package\Rhinobyte.CodeAnalysis.NetAnalyzers.Package.csproj", "{68464258-DCD9-4561-B619-AD898E3B3318}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.CodeAnalysis.NetAnalyzers.Vsix", "src\CodeAnalysis\Rhinobyte.CodeAnalysis.NetAnalyzers.Vsix\Rhinobyte.CodeAnalysis.NetAnalyzers.Vsix.csproj", "{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhinobyte.CodeAnalysis.NetAnalyzers.Tests", "tests\CodeAnalysis\Rhinobyte.CodeAnalysis.NetAnalyzers.Tests\Rhinobyte.CodeAnalysis.NetAnalyzers.Tests.csproj", "{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{52449E6A-0661-480A-80BD-E580222EE119}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rules", "rules", "{9DDDF270-B0E9-49E8-98D2-888BFE29F6BD}"
+	ProjectSection(SolutionItems) = preProject
+		docs\codeanalysis\rules\RBCS0001.md = docs\codeanalysis\rules\RBCS0001.md
+		docs\codeanalysis\rules\RBCS0002.md = docs\codeanalysis\rules\RBCS0002.md
+		docs\codeanalysis\rules\RBCS0003.md = docs\codeanalysis\rules\RBCS0003.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{046E0E5B-98C9-429C-A27A-DB84654E9A62}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseTesting|Any CPU = ReleaseTesting|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}.ReleaseTesting|Any CPU.ActiveCfg = Release|Any CPU
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0}.ReleaseTesting|Any CPU.Build.0 = Release|Any CPU
+		{6BBEFDEE-C419-426B-B971-F05A4262F590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BBEFDEE-C419-426B-B971-F05A4262F590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BBEFDEE-C419-426B-B971-F05A4262F590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BBEFDEE-C419-426B-B971-F05A4262F590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BBEFDEE-C419-426B-B971-F05A4262F590}.ReleaseTesting|Any CPU.ActiveCfg = Release|Any CPU
+		{6BBEFDEE-C419-426B-B971-F05A4262F590}.ReleaseTesting|Any CPU.Build.0 = Release|Any CPU
+		{68464258-DCD9-4561-B619-AD898E3B3318}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68464258-DCD9-4561-B619-AD898E3B3318}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68464258-DCD9-4561-B619-AD898E3B3318}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68464258-DCD9-4561-B619-AD898E3B3318}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68464258-DCD9-4561-B619-AD898E3B3318}.ReleaseTesting|Any CPU.ActiveCfg = Release|Any CPU
+		{68464258-DCD9-4561-B619-AD898E3B3318}.ReleaseTesting|Any CPU.Build.0 = Release|Any CPU
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}.ReleaseTesting|Any CPU.ActiveCfg = Release|Any CPU
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6}.ReleaseTesting|Any CPU.Build.0 = Release|Any CPU
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}.Release|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}.Release|Any CPU.Build.0 = ReleaseTesting|Any CPU
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}.ReleaseTesting|Any CPU.ActiveCfg = ReleaseTesting|Any CPU
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E}.ReleaseTesting|Any CPU.Build.0 = ReleaseTesting|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4885358A-622A-4312-8A92-AB3C160018FB} = {2C0C7F28-E5F3-4966-BCB6-0963D7BD5FBE}
+		{D946C8A5-BC7F-4BAC-95C9-5E9F3C15F7F8} = {C7DE61D8-0FD5-4E16-AD6C-C7085DA1BCF7}
+		{5F4DA7DD-F61D-468D-86C6-AA0AFCB912A0} = {4885358A-622A-4312-8A92-AB3C160018FB}
+		{6BBEFDEE-C419-426B-B971-F05A4262F590} = {4885358A-622A-4312-8A92-AB3C160018FB}
+		{68464258-DCD9-4561-B619-AD898E3B3318} = {4885358A-622A-4312-8A92-AB3C160018FB}
+		{69818D7D-F000-4365-BD5A-E9BA3E86B7C6} = {4885358A-622A-4312-8A92-AB3C160018FB}
+		{0DD86417-7833-4AD8-BF94-C276FD1C1A5E} = {D946C8A5-BC7F-4BAC-95C9-5E9F3C15F7F8}
+		{9DDDF270-B0E9-49E8-98D2-888BFE29F6BD} = {046E0E5B-98C9-429C-A27A-DB84654E9A62}
+		{046E0E5B-98C9-429C-A27A-DB84654E9A62} = {52449E6A-0661-480A-80BD-E580222EE119}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C9D46380-968F-4E71-8DEF-6D722DD1C69D}

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-allLibraryNames=("Rhinobyte.Tools.CustomProjectReference");
+allLibraryNames=("Rhinobyte.CodeAnalysis.NetAnalyzers");
 allLibraryNamesCount=${#allLibraryNames[@]}
 
 dotnetConfiguration=''
@@ -25,7 +25,9 @@ for (( paramIndex=1; paramIndex<=$#; paramIndex++ )); do
 done;
 
 if [ $testProjectIndex -eq 0 ]; then
-	testProjectNames=("Rhinobyte.Tools.CustomProjectReference.Tests");
+	testProjectNames=(
+		"Rhinobyte.CodeAnalysis.NetAnalyzers.Tests"
+	);
 	testProjectsCount=${#testProjectNames[@]};
 else
 	testProjectsCount=$testProjectIndex
@@ -34,13 +36,12 @@ fi;
 echo "Test Project Names:  ${testProjectNames[@]}  ($testProjectsCount)"
 
 # Switch commented line to run coverage for all 3 target frameworks
-#targetFrameworkNames=("net48", "netcoreapp3.1", "net5.0");
-targetFrameworkNames=("net5.0")
+#targetFrameworkNames=("net48", "netcoreapp3.1", "net5.0", "net6.0");
+targetFrameworkNames=("net6.0")
 targetFrameworksCount=${#targetFrameworkNames[@]}
 echo "Target Frameworks:  ${targetFrameworkNames[@]}"
 
 # Change this to false to generate the report for all of the assemblies imported by a given test project
-# e.g. Rhinobyte.Extensions.DependencyInjection.Tests consumes both Rhinobyte.Extensions.DependencyInjection and Rhinobyte.Extensions.Reflection
 reportForIndividualProjectOnly=true
 echo "Report For Individual Project Only:  $reportForIndividualProjectOnly"
 
@@ -51,27 +52,53 @@ do
 	echo "";
 	echo "Running tests for:  $testProjectName";
 
+	isCodeAnalysis=false
+	runSettingsFilePath='';
+	testProjectFolder="tests/$testProjectName";
+	case "$testProjectFolder" in
+		*CodeAnalysis*)
+			isCodeAnalysis=true
+			testProjectFolder="tests/CodeAnalysis/$testProjectName"
+			runSettingsFilePath="$testProjectFolder/code-coverage.runsettings"
+			;;
+	esac;
+
 	echo 'Removing Old Test Results Folders...';
-	rm -rf "tests/$testProjectName/TestResults";
+	rm -rf "$testProjectFolder/TestResults";
 	echo "";
 
 	dotnetConfigurationFlag=''
 	if [ ! -z "$dotnetConfiguration" ]; then
 		dotnetConfigurationFlag="--configuration $dotnetConfiguration"
 	fi;
-	for (( frameworkIndex=0; frameworkIndex<${targetFrameworksCount}; frameworkIndex++ ));
-	do
-		targetTestFramework="${targetFrameworkNames[$frameworkIndex]}"
-		echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
-		echo "dotnet test "$dotnetConfigurationFlag" --framework \"$targetTestFramework\" \"tests\\$testProjectName\\$testProjectName.csproj\" --collect:\"XPlat Code Coverage\" --results-directory:\"tests\\$testProjectName\\TestResults\\$targetTestFramework\"";
-		dotnet test --framework "$targetTestFramework" "tests\\$testProjectName\\$testProjectName.csproj" --collect:"XPlat Code Coverage" --results-directory:"tests\\$testProjectName\\TestResults\\$targetTestFramework"
-		echo "";
-	done;
+
+	# Note: An individual project or a runsettings file can be specified but not both
+	projectOrSettingsFile="$testProjectFolder\\$testProjectName.csproj"
+	if [ ! -z "$runSettingsFilePath" ]; then
+		projectOrSettingsFile="--settings $runSettingsFilePath"
+	fi;
+
+	if [ "$isCodeAnalysis" = "true" ]; then
+			targetTestFramework="netcoreapp3.1"
+			echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
+			echo "dotnet test --framework \"$targetTestFramework\" \"$projectOrSettingsFile\" \"$dotnetConfigurationFlag\" --collect:\"XPlat Code Coverage\" --results-directory:\"$testProjectFolder\\TestResults\\$targetTestFramework\"";
+			dotnet test --framework "$targetTestFramework" $projectOrSettingsFile "$dotnetConfigurationFlag" --collect:"XPlat Code Coverage" --results-directory:"$testProjectFolder\\TestResults\\$targetTestFramework"
+			echo "";
+	else
+		for (( frameworkIndex=0; frameworkIndex<${targetFrameworksCount}; frameworkIndex++ ));
+		do
+			targetTestFramework="${targetFrameworkNames[$frameworkIndex]}"
+			echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
+			echo "dotnet test --framework \"$targetTestFramework\" \"$projectOrSettingsFile\" "$dotnetConfigurationFlag" --collect:\"XPlat Code Coverage\" --results-directory:\"tests\\$testProjectName\\TestResults\\$targetTestFramework\"";
+			dotnet test --framework "$targetTestFramework" $projectOrSettingsFile "$dotnetConfigurationFlag" --collect:"XPlat Code Coverage" --results-directory:"tests\\$testProjectName\\TestResults\\$targetTestFramework"
+			echo "";
+		done;
+	fi
 	echo "";
 
 	echo 'Generating the coverage reports...';
 	echo '';
-	for targetFrameworkFolder in "tests/$testProjectName/TestResults/"*/ ; do
+	for targetFrameworkFolder in "$testProjectFolder/TestResults/"*/ ; do
 		targetFramework=$(basename $targetFrameworkFolder)
 		echo "Checking TargetFramwork:  $targetFramework"
 		for guidFolder in "$targetFrameworkFolder"*/ ; do
