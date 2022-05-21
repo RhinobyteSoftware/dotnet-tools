@@ -10,7 +10,7 @@
 
         <!-- VERSION VALUES -->
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
-        <PackageVersion>1.0.0.0-beta.2</PackageVersion>
+        <PackageVersion>1.0.0.0-beta.3</PackageVersion>
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
         <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
@@ -35,6 +35,7 @@
         <NoPackageAnalysis>true</NoPackageAnalysis>
 
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+        <GenerateNuspecDependsOn>_PrepareReadmeForNugetPackage; $(GenerateNuspecDependsOn)</GenerateNuspecDependsOn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -45,7 +46,7 @@
     <ItemGroup>
         <None Include="$(RepoRoot)\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
         <None Include="$(RepoRoot)\RhinobytePackageIcon.png" Pack="true" PackagePath="Icon.png" />
-        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="README.md" />
+        <None Include="$(MSBuildProjectDirectory)\README.package.md" Pack="true" PackagePath="README.md" />
 
         <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
     </ItemGroup>
@@ -55,6 +56,37 @@
             <TfmSpecificPackageFile Include="$(OutputPath)\Rhinobyte.CodeAnalysis.NetAnalyzers.dll" PackagePath="analyzers/dotnet/cs" />
             <TfmSpecificPackageFile Include="$(OutputPath)\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes.dll" PackagePath="analyzers/dotnet/cs" />
         </ItemGroup>
+    </Target>
+
+    <Target Name="_PrepareReadmeForNugetPackage">
+        <PropertyGroup>
+            <ReadmeInputFile>$(MSBuildProjectDirectory)\README.md</ReadmeInputFile>
+            <PackageReadmeContent>$([System.IO.File]::ReadAllText(`$(ReadmeInputFile)`))</PackageReadmeContent>
+
+            <ShippedAnalyzersFilePath>$(MSBuildProjectDirectory)\..\Rhinobyte.CodeAnalysis.NetAnalyzers\AnalyzerReleases.Shipped.md</ShippedAnalyzersFilePath>
+            <AnalyzersContent>$([System.IO.File]::ReadAllText(`$(ShippedAnalyzersFilePath)`))</AnalyzersContent>
+            <AnalyzersContent>$(AnalyzersContent.Substring($(AnalyzersContent.IndexOf('## Release'))).Replace('## Release 1.0.0', `## Release $(PackageVersion)`).Replace('../../../docs', 'https://github.com/RhinobyteSoftware/dotnet-tools/blob/main/docs'))</AnalyzersContent>
+
+            <PackageReadmeContent>$(PackageReadmeContent.Replace('[Shipped Analyzer Rules](../Rhinobyte.CodeAnalysis.NetAnalyzers/AnalyzerReleases.Shipped.md)', `$(AnalyzersContent)`))</PackageReadmeContent>
+            <PackageReadmeOutputFile>$(MSBuildProjectDirectory)\README.package.md</PackageReadmeOutputFile>
+        </PropertyGroup>
+
+        <Message Importance="high"
+                 Text="
+Writing transformed readme content to: $(PackageReadmeOutputFile)
+
+PackageReadmeContent:
+
+$(PackageReadmeContent)"
+        />
+
+        <WriteLinesToFile
+            File="$(PackageReadmeOutputFile)"
+            Lines="$(PackageReadmeContent)"
+            Overwrite="true"
+            Encoding="UTF-8"
+        />
+
     </Target>
 
 </Project>
