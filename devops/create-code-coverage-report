@@ -53,11 +53,13 @@ do
 	echo "Running tests for:  $testProjectName";
 
 	isCodeAnalysis=false
+	runSettingsFilePath='';
 	testProjectFolder="tests/$testProjectName";
 	case "$testProjectFolder" in
 		*CodeAnalysis*)
 			isCodeAnalysis=true
 			testProjectFolder="tests/CodeAnalysis/$testProjectName"
+			runSettingsFilePath="$testProjectFolder/code-coverage.runsettings"
 			;;
 	esac;
 
@@ -70,19 +72,25 @@ do
 		dotnetConfigurationFlag="--configuration $dotnetConfiguration"
 	fi;
 
+	# Note: An individual project or a runsettings file can be specified but not both
+	projectOrSettingsFile="$testProjectFolder\\$testProjectName.csproj"
+	if [ ! -z "$runSettingsFilePath" ]; then
+		projectOrSettingsFile="--settings $runSettingsFilePath"
+	fi;
+
 	if [ "$isCodeAnalysis" = "true" ]; then
 			targetTestFramework="netcoreapp3.1"
 			echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
-			echo "dotnet test "$dotnetConfigurationFlag" --framework \"$targetTestFramework\" \"$testProjectFolder\\$testProjectName.csproj\" --collect:\"XPlat Code Coverage\" --results-directory:\"$testProjectFolder\\TestResults\\$targetTestFramework\"";
-			dotnet test --framework "$targetTestFramework" "$testProjectFolder\\$testProjectName.csproj" --collect:"XPlat Code Coverage" --results-directory:"$testProjectFolder\\TestResults\\$targetTestFramework"
+			echo "dotnet test --framework \"$targetTestFramework\" \"$projectOrSettingsFile\" \"$dotnetConfigurationFlag\" --collect:\"XPlat Code Coverage\" --results-directory:\"$testProjectFolder\\TestResults\\$targetTestFramework\"";
+			dotnet test --framework "$targetTestFramework" $projectOrSettingsFile "$dotnetConfigurationFlag" --collect:"XPlat Code Coverage" --results-directory:"$testProjectFolder\\TestResults\\$targetTestFramework"
 			echo "";
 	else
 		for (( frameworkIndex=0; frameworkIndex<${targetFrameworksCount}; frameworkIndex++ ));
 		do
 			targetTestFramework="${targetFrameworkNames[$frameworkIndex]}"
 			echo "Running dotnet test for target framework:  $targetTestFramework  ($frameworkIndex)"
-			echo "dotnet test "$dotnetConfigurationFlag" --framework \"$targetTestFramework\" \"$testProjectFolder\\$testProjectName.csproj\" --collect:\"XPlat Code Coverage\" --results-directory:\"tests\\$testProjectName\\TestResults\\$targetTestFramework\"";
-			dotnet test --framework "$targetTestFramework" "$testProjectFolder\\$testProjectName.csproj" --collect:"XPlat Code Coverage" --results-directory:"tests\\$testProjectName\\TestResults\\$targetTestFramework"
+			echo "dotnet test --framework \"$targetTestFramework\" \"$projectOrSettingsFile\" "$dotnetConfigurationFlag" --collect:\"XPlat Code Coverage\" --results-directory:\"tests\\$testProjectName\\TestResults\\$targetTestFramework\"";
+			dotnet test --framework "$targetTestFramework" $projectOrSettingsFile "$dotnetConfigurationFlag" --collect:"XPlat Code Coverage" --results-directory:"tests\\$testProjectName\\TestResults\\$targetTestFramework"
 			echo "";
 		done;
 	fi

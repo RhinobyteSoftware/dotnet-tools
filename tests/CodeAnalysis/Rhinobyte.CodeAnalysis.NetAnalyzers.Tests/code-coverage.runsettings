@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+	<!-- SEE: https://docs.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2022#example-runsettings-file -->
+	<!-- See Also:  https://docs.microsoft.com/en-us/visualstudio/test/customizing-code-coverage-analysis?view=vs-2022 -->
+
+
+	<RunConfiguration>
+		<TreatNoTestsAsError>true</TreatNoTestsAsError>
+	</RunConfiguration>
+
+	<DataCollectionRunSettings>
+		<DataCollectors>
+
+			<!-- See https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md#advanced-options-supported-via-runsettings -->
+			<DataCollector friendlyName="XPlat code coverage">
+				<Configuration>
+					<ExcludeByFile>**/Polyfills/*.cs,**/*Resources.Designer.cs</ExcludeByFile> <!-- Globbing filter -->
+				</Configuration>
+			</DataCollector>
+
+			<!-- Configuration for blame data collector -->
+			<!--
+			<DataCollector friendlyName="blame" enabled="True">
+			</DataCollector>
+			-->
+
+		</DataCollectors>
+	</DataCollectionRunSettings>
+
+	<!-- Parameters used by tests at run time -->
+	<TestRunParameters>
+		<Parameter name="webAppUrl" value="http://localhost" />
+		<Parameter name="webAppUserName" value="Admin" />
+		<Parameter name="webAppPassword" value="Password" />
+	</TestRunParameters>
+
+	<!-- Configuration for loggers -->
+	<!--
+	<LoggerRunSettings>
+		<Loggers>
+			<Logger friendlyName="console" enabled="True">
+				<Configuration>
+					<Verbosity>quiet</Verbosity>
+				</Configuration>
+			</Logger>
+			<Logger friendlyName="trx" enabled="True">
+				<Configuration>
+					<LogFileName>foo.trx</LogFileName>
+				</Configuration>
+			</Logger>
+			<Logger friendlyName="html" enabled="True">
+				<Configuration>
+					<LogFileName>foo.html</LogFileName>
+				</Configuration>
+			</Logger>
+			<Logger friendlyName="blame" enabled="True" />
+		</Loggers>
+	</LoggerRunSettings>
+	-->
+
+	<!-- Adapter Specific sections -->
+
+	<!-- MSTest adapter -->
+	<MSTest>
+		<MapInconclusiveToFailed>True</MapInconclusiveToFailed>
+	</MSTest>
+
+</RunSettings>
