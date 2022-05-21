@@ -79,7 +79,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member is not ordered correctly by group.
+        ///   Looks up a localized string similar to Type members should be ordered by group.
         /// </summary>
         internal static string RBCS0001_AnalyzerTitle {
             get {
@@ -106,7 +106,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member is not ordered correctly within group.
+        ///   Looks up a localized string similar to Type members within the same group should be ordered correctly.
         /// </summary>
         internal static string RBCS0002_AnalyzerTitle {
             get {
@@ -133,7 +133,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member assignments are not ordered correctly.
+        ///   Looks up a localized string similar to Member assignments in an object initializer are ordered correctly.
         /// </summary>
         internal static string RBCS0003_AnalyzerTitle {
             get {

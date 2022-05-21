@@ -126,7 +126,7 @@
     <comment>The format-able message the diagnostic displays.</comment>
   </data>
   <data name="RBCS0001_AnalyzerTitle" xml:space="preserve">
-    <value>Member is not ordered correctly by group</value>
+    <value>Type members should be ordered by group</value>
     <comment>The title of the diagnostic.</comment>
   </data>
   <data name="RBCS0002_AnalyzerDescription" xml:space="preserve">
@@ -136,7 +136,7 @@
     <value>Member '{0}' is not ordered alphabetically or by configured priority</value>
   </data>
   <data name="RBCS0002_AnalyzerTitle" xml:space="preserve">
-    <value>Member is not ordered correctly within group</value>
+    <value>Type members within the same group should be ordered correctly</value>
   </data>
   <data name="RBCS0003_AnalyzerDescription" xml:space="preserve">
     <value>Member assignments in the object initializer are not ordered correctly.</value>
@@ -145,6 +145,6 @@
     <value>The member assignments '{0}' are out of order</value>
   </data>
   <data name="RBCS0003_AnalyzerTitle" xml:space="preserve">
-    <value>Member assignments are not ordered correctly</value>
+    <value>Member assignments in an object initializer are ordered correctly</value>
   </data>
 </root>

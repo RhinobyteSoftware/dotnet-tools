@@ -29,7 +29,19 @@
         <RepositoryUrl>https://github.com/RhinobyteSoftware/dotnet-tools</RepositoryUrl>
 
         <Description>Rhinobyte.CodeAnalysis.NetAnalyzers</Description>
-        <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+        <PackageReleaseNotes>
+            v1.0.0-beta.3
+            - Fixed the url used in the analzyer rule help links to point to the https://github.com/RhinobyteSoftware/dotnet-tools/blob/main/docs/codeanalysis/rules/ folder
+            - Updated the README.md that is included in the package to include the list of rules from the AnalyzerReleases.Shipped.md file and to use absolute urls for the rule docs pointed at the github repo 
+
+            v1.0.0-beta.2
+            - Updated the MembersOrderedCorrectly analyzer and code fix provider to support configuration via .editorconfig properties
+            - Added new rule RBCS0003: Member assignments in an object initializer are ordered correctly
+
+            v1.0.0-beta.1
+            - Added new MembersOrderedCorrectlyAnalyzer and MembersOrderedCorrectlyAnalyzerCodeFixProvider
+              with rules RBCS0001: Type members should be ordered by group and RBCS0002: Type members within the same group should be ordered correctly
+        </PackageReleaseNotes>
         <PackageTags>Rhinobyte.CodeAnalysis.NetAnalyzers, analyzers</PackageTags>
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
