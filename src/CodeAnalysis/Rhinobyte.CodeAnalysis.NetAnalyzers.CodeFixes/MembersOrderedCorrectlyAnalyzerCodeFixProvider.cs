@@ -23,8 +23,14 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 {
 	/// <inheritdoc/>
 	public sealed override ImmutableArray<string> FixableDiagnosticIds
-		=> ImmutableArray.Create(MembersOrderedCorrectlyAnalyzer.RBCS0001, MembersOrderedCorrectlyAnalyzer.RBCS0002, MembersOrderedCorrectlyAnalyzer.RBCS0003);
+		=> [MembersOrderedCorrectlyAnalyzer.RBCS0001, MembersOrderedCorrectlyAnalyzer.RBCS0002, MembersOrderedCorrectlyAnalyzer.RBCS0003];
 
+	/// <summary>
+	/// Count the number of newlines and non-whitespace trivia in the provided trivia list.
+	/// </summary>
+	/// <remarks>
+	/// Our code fix provider uses this to determine if newlines need to be added or removed when automatically re-ordering members.
+	/// </remarks>
 	public static (int NewLineCount, int NonWhitespaceTriviaCount) CountTriviaTypes(SyntaxTriviaList triviaList)
 	{
 		var newlineCount = 0;
@@ -47,11 +53,9 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 	}
 
 	/// <inheritdoc/>
-	public sealed override FixAllProvider GetFixAllProvider()
-	{
+	public sealed override FixAllProvider GetFixAllProvider() =>
 		// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
-		return WellKnownFixAllProviders.BatchFixer;
-	}
+		WellKnownFixAllProviders.BatchFixer;
 
 	internal static bool IsNewlineNeeded(
 		MemberGroupType? groupType,
@@ -158,9 +162,9 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			if (typeDeclarationSyntaxNode is null)
 				continue;
 
-			typeMemberDiagnosticsToFix ??= new List<Diagnostic>();
+			typeMemberDiagnosticsToFix ??= [];
 			typeMemberDiagnosticsToFix.Add(diagnosticToFix);
-			typeDeclarationsToFix ??= new List<TypeDeclarationSyntax>();
+			typeDeclarationsToFix ??= [];
 			typeDeclarationsToFix.Add(typeDeclarationSyntaxNode);
 		}
 
@@ -444,7 +448,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 #endif
 	}
 
-	internal struct SortedMemberKey : IComparable<SortedMemberKey>
+	internal class SortedMemberKey : IComparable<SortedMemberKey>
 	{
 		internal const int ImplicitGroupIndex = -1;
 		internal const int NameShouldBeAlphabetized = -1;

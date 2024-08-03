@@ -10,7 +10,7 @@ namespace Analyzer.Utilities
 	/// <summary>
 	/// Analyzer configuration options that are parsed into general and specific configuration options.
 	///
-	/// <para><strong>.editorconfig</strong> format:</para>
+	/// <para><strong>.EditorConfig</strong> format:</para>
 	/// <list type="number">
 	/// <item><description>General configuration option:
 	/// <list type="number">
@@ -25,7 +25,7 @@ namespace Analyzer.Utilities
 	/// </description></item>
 	/// </list>
 	///
-	/// <para><strong>.editorconfig</strong> examples to configure API surface analyzed by analyzers:</para>
+	/// <para><strong>.EditorConfig</strong> examples to configure API surface analyzed by analyzers:</para>
 	/// <list type="number">
 	/// <item><description>General configuration option:
 	/// <list type="number">
@@ -40,7 +40,7 @@ namespace Analyzer.Utilities
 	/// </description></item>
 	/// </list>
 	///
-	/// <para>See <see cref="SymbolVisibilityGroup"/> for allowed symbol visibility value combinations.</para>
+	/// <para>See SymbolVisibilityGroup for allowed symbol visibility value combinations.</para>
 	/// </summary>
 	internal interface ICategorizedAnalyzerConfigOptions
 	{

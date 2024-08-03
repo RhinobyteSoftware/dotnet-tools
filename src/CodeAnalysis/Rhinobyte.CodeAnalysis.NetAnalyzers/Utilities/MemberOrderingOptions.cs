@@ -13,24 +13,24 @@ internal struct MemberOrderingOptions
 	/// <summary>
 	/// The default member group ordering for the analyzer
 	/// </summary>
-	internal static readonly MemberGroupType[][] DefaultGroupOrder = new[]
-	{
-		new MemberGroupType[] { MemberGroupType.NestedRecordType },
-		new MemberGroupType[] { MemberGroupType.Constants, MemberGroupType.StaticReadonlyFields },
-		new MemberGroupType[] { MemberGroupType.StaticMutableFields, MemberGroupType.StaticProperties },
-		new MemberGroupType[] { MemberGroupType.StaticConstructors },
-		new MemberGroupType[] { MemberGroupType.ReadonlyInstanceFields, MemberGroupType.MutableInstanceFields },
-		new MemberGroupType[] { MemberGroupType.Constructors },
-		new MemberGroupType[] { MemberGroupType.InstanceProperties },
-		new MemberGroupType[] { MemberGroupType.InstanceMethods, MemberGroupType.StaticMethods },
-		new MemberGroupType[] { MemberGroupType.NestedEnumType, MemberGroupType.NestedOtherType },
-	};
+	internal static readonly MemberGroupType[][] DefaultGroupOrder =
+	[
+		[MemberGroupType.NestedRecordType],
+		[MemberGroupType.Constants, MemberGroupType.StaticReadonlyFields],
+		[MemberGroupType.StaticMutableFields, MemberGroupType.StaticProperties],
+		[MemberGroupType.StaticConstructors],
+		[MemberGroupType.ReadonlyInstanceFields, MemberGroupType.MutableInstanceFields],
+		[MemberGroupType.Constructors],
+		[MemberGroupType.InstanceProperties],
+		[MemberGroupType.InstanceMethods, MemberGroupType.StaticMethods],
+		[MemberGroupType.NestedEnumType, MemberGroupType.NestedOtherType],
+	];
 
 	/// <summary>
 	/// Whether or not the <see cref="PropertyNamesToOrderFirst"/> comparison should be case sensitive.
 	/// False (case-insensitive) by default.
 	/// <para>
-	/// Can be specified from the .editorconfig via:
+	/// Can be specified from the .EditorConfig via:
 	/// <code>dotnet_code_quality.RBCS0002.property_names_to_order_first_are_case_sensitive</code>
 	/// </para>
 	/// </summary>
@@ -39,7 +39,7 @@ internal struct MemberOrderingOptions
 	/// <summary>
 	/// The raw value for the group order.
 	/// <para>
-	/// Can be specified from the .editorconfig via:
+	/// Can be specified from the .EditorConfig via:
 	/// <code>dotnet_code_quality.RBCS0001.type_members_group_order</code>
 	/// </para>
 	/// </summary>
@@ -48,7 +48,7 @@ internal struct MemberOrderingOptions
 	/// <summary>
 	/// The optional set of property names to order first before alphabetizing.
 	/// <para>
-	/// Can be specified from the .editorconfig via:
+	/// Can be specified from the .EditorConfig via:
 	/// <code>dotnet_code_quality.RBCS0002.property_names_to_order_first</code>
 	/// </para>
 	/// </summary>

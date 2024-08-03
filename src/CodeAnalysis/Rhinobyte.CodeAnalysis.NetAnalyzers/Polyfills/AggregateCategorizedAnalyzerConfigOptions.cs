@@ -19,7 +19,7 @@ namespace Analyzer.Utilities
     ///
     /// <list type="number">
     /// <item><description>Per syntax tree options from <see cref="AnalyzerConfigOptionsProvider"/>.</description></item>
-    /// <item><description>Options from an <strong>.editorconfig</strong> file passed in as an additional file (back compat).</description></item>
+    /// <item><description>Options from an <strong>.EditorConfig</strong> file passed in as an additional file (back compat).</description></item>
     /// </list>
     ///
     /// <inheritdoc cref="ICategorizedAnalyzerConfigOptions"/>

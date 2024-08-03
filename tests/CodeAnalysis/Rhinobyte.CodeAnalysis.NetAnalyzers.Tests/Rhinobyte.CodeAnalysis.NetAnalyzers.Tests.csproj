@@ -1,24 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
 
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
         <!-- Not worth enabling globally. Can enable in individual files as appropriate -->
         <Nullable>disable</Nullable>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.MSTest" Version="1.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.MSTest" Version="1.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing.MSTest" Version="1.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Analyzer.Testing.MSTest" Version="1.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing.MSTest" Version="1.1.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeRefactoring.Testing.MSTest" Version="1.1.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.2" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="1.1.2" />
+        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Analyzer.Testing" Version="1.1.2" />
+        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing" Version="1.1.2" />
+        <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeRefactoring.Testing" Version="1.1.2" />
         <PackageReference Include="System.Collections" Version="4.3.0" />
+        <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,12 +32,19 @@
     <ItemGroup>
         <Compile Remove="TestCaseFiles\**\*.cs" />
         <None Include="TestCaseFiles\**\*.cs">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Utilities\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
 </Project>

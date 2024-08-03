@@ -18,7 +18,10 @@ namespace Analyzer.Utilities
         private static readonly ImmutableHashSet<OutputKind> s_defaultOutputKinds =
             ImmutableHashSet.CreateRange(Enum.GetValues(typeof(OutputKind)).Cast<OutputKind>());
 
-        private static bool TryGetSyntaxTreeForOption(ISymbol symbol, [NotNullWhen(returnValue: true)] out SyntaxTree? tree)
+		internal static readonly char[] NamePartSplitDelimiter = ['-', '>'];
+		internal static readonly char[] OptionValueSplitDelimiter = ['|'];
+
+		private static bool TryGetSyntaxTreeForOption(ISymbol symbol, [NotNullWhen(returnValue: true)] out SyntaxTree? tree)
         {
             switch (symbol.Kind)
             {
@@ -326,7 +329,7 @@ namespace Analyzer.Utilities
 
             static SymbolNamesWithValueOption<string?>.NameParts GetParts(string name)
             {
-                var split = name.Split(new[] { "->" }, StringSplitOptions.RemoveEmptyEntries);
+                var split = name.Split(NamePartSplitDelimiter, StringSplitOptions.RemoveEmptyEntries);
 
                 // If we don't find exactly one '->', we assume that there is no given suffix.
                 if (split.Length != 2)
@@ -375,7 +378,7 @@ namespace Analyzer.Utilities
 
             static SymbolNamesWithValueOption<INamedTypeSymbol?>.NameParts GetParts(string name, Compilation compilation)
             {
-                var split = name.Split(new[] { "->" }, StringSplitOptions.RemoveEmptyEntries);
+                var split = name.Split(NamePartSplitDelimiter, StringSplitOptions.RemoveEmptyEntries);
 
                 // If we don't find exactly one '->', we assume that there is no given suffix.
                 if (split.Length != 2)
@@ -464,7 +467,7 @@ namespace Analyzer.Utilities
                     return false;
                 }
 
-                var names = optionValue.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).ToImmutableArray();
+                var names = optionValue.Split(OptionValueSplitDelimiter, StringSplitOptions.RemoveEmptyEntries).ToImmutableArray();
                 option = SymbolNamesWithValueOption<TValue>.Create(names, compilation, namePrefix, getTypeAndSuffixFunc);
                 return true;
             }
@@ -524,7 +527,7 @@ namespace Analyzer.Utilities
             // So, we default to first syntax tree.
             if (compilation.SyntaxTrees.FirstOrDefault() is not { } tree)
             {
-                return ImmutableArray<string>.Empty;
+                return [];
             }
 
             var propertyOptionName = MSBuildItemOptionNamesHelpers.GetPropertyNameForItemOptionName(itemOptionName);
@@ -572,7 +575,7 @@ namespace Analyzer.Utilities
 
         /// <summary>
         /// Returns true if the given symbol has required symbol modifiers based on options:
-        ///   1. If user has explicitly configured candidate <see cref="SymbolModifiers"/> in editor config options and
+        ///   1. If user has explicitly configured candidate SymbolModifiers in editor config options and
         ///      given symbol has all the required modifiers.
         ///   2. Otherwise, if user has not configured modifiers.
         /// </summary>

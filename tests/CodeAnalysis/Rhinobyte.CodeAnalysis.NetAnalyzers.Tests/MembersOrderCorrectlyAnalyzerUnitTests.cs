@@ -26,27 +26,8 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 		// TODO: Add more use cases
 	}
 
-
 	[TestMethod]
-	public async Task MembersOrderedCorrectlyAnalyzer_correctly_flags_symbols_that_arent_ordered_alphabetically_within_the_group()
-	{
-		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
-
-		var expectedDiagnosticResults = new DiagnosticResult[]
-		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(12, 23, 12, 34).WithArguments("ConstantOne"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(16, 24, 16, 31).WithArguments("_fieldB"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(31, 15, 31, 24).WithArguments("IsEnabled"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(38, 28, 38, 44).WithArguments("DoSomethingAsync"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(43, 17, 43, 35).WithArguments("OutOfOrderProperty"),
-		};
-
-		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
-		//await VerifyCS.VerifyAnalyzerAsync(testContent);
-	}
-
-	[TestMethod]
-	public async Task MembersOrderedCorrectlyAnalyzer_correctly_flags_symbols_that_arent_ordered_alphabetically_within_the_group_in_a_partial_class()
+	public async Task MembersOrderedCorrectlyAnalyzer_correctly_flags_symbols_not_alphabetical_by_group_partial_class()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
 
@@ -63,6 +44,24 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(70, 22, 70, 35).WithArguments("ConstantThree"),
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(84, 16, 84, 25).WithArguments("AProperty"),
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(87, 16, 87, 23).WithArguments("AMethod"),
+		};
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
+		//await VerifyCS.VerifyAnalyzerAsync(testContent);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_correctly_flags_symbols_that_arent_ordered_alphabetically_within_the_group()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(12, 23, 12, 34).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(16, 24, 16, 31).WithArguments("_fieldB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(31, 15, 31, 24).WithArguments("IsEnabled"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(38, 28, 38, 44).WithArguments("DoSomethingAsync"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(43, 17, 43, 35).WithArguments("OutOfOrderProperty"),
 		};
 
 		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);

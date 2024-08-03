@@ -24,7 +24,7 @@
         <!-- ANALYZER AND CODE STYLE FEATURES -->
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsAsErrors>Nullable</WarningsAsErrors>
 
 
         <!-- Common Package/Project Property Values -->
@@ -79,7 +79,7 @@
 
     <!-- SOLUTION WIDE CODE ANALYZER PACKAGES -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.10.*">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.*">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>

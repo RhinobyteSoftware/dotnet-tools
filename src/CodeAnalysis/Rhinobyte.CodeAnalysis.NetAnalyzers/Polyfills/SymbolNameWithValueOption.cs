@@ -136,11 +136,13 @@ namespace Analyzer.Utilities
 
 				if (parts.SymbolName[1] != ':')
 				{
-					if (!wildcardNamesBuilder.ContainsKey(AllKinds))
+					if (!wildcardNamesBuilder.TryGetValue(AllKinds, out var value))
 					{
-						wildcardNamesBuilder.Add(AllKinds, PooledDictionary<string, TValue>.GetInstance());
+						value=PooledDictionary<string, TValue>.GetInstance();
+						wildcardNamesBuilder.Add(AllKinds, value);
 					}
-					wildcardNamesBuilder[AllKinds].Add(parts.SymbolName[0..^1], parts.AssociatedValue);
+
+					value.Add(parts.SymbolName[0..^1], parts.AssociatedValue);
 					return;
 				}
 
@@ -157,11 +159,13 @@ namespace Analyzer.Utilities
 
 				if (symbolKind != null)
 				{
-					if (!wildcardNamesBuilder.ContainsKey(symbolKind.Value))
+					if (!wildcardNamesBuilder.TryGetValue(symbolKind.Value, out var value))
 					{
-						wildcardNamesBuilder.Add(symbolKind.Value, PooledDictionary<string, TValue>.GetInstance());
+						value=PooledDictionary<string, TValue>.GetInstance();
+						wildcardNamesBuilder.Add(symbolKind.Value, value);
 					}
-					wildcardNamesBuilder[symbolKind.Value].Add(parts.SymbolName[2..^1], parts.AssociatedValue);
+
+					value.Add(parts.SymbolName[2..^1], parts.AssociatedValue);
 				}
 			}
 
@@ -290,22 +294,24 @@ namespace Analyzer.Utilities
 #pragma warning restore CS8762 // Parameter 'firstMatchValue' must have a non-null value when exiting with 'true'
 			}
 
-			var symbolDeclarationId = _symbolToDeclarationId.GetOrAdd(symbol, s => GetDeclarationId(s));
+			var symbolDeclarationId = _symbolToDeclarationId.GetOrAdd(symbol, GetDeclarationId);
 
 			// We start by trying to match with the most precise definition (prefix)...
-			if (_wildcardNamesBySymbolKind.TryGetValue(symbol.Kind, out var names) &&
-				names.FirstOrDefault(kvp => symbolDeclarationId.StartsWith(kvp.Key, StringComparison.Ordinal)) is var prefixedFirstMatchOrDefault &&
-				!string.IsNullOrWhiteSpace(prefixedFirstMatchOrDefault.Key))
+			if (_wildcardNamesBySymbolKind.TryGetValue(symbol.Kind, out var namesBySymbolKind)
+				&& namesBySymbolKind.FirstOrDefault(kvp => symbolDeclarationId.StartsWith(kvp.Key, StringComparison.Ordinal)) is var prefixedFirstMatchOrDefault
+				&& !string.IsNullOrWhiteSpace(prefixedFirstMatchOrDefault.Key))
 			{
 				(firstMatchName, firstMatchValue) = prefixedFirstMatchOrDefault;
 				_wildcardMatchResult.AddOrUpdate(symbol, prefixedFirstMatchOrDefault.AsNullable(), (s, match) => prefixedFirstMatchOrDefault.AsNullable());
 				return true;
 			}
 
+			var foundNamesByAllKinds = _wildcardNamesBySymbolKind.TryGetValue(AllKinds, out var namesByAllKinds);
+
 			// If not found, then we try to match with the symbol full declaration ID...
-			if (_wildcardNamesBySymbolKind.ContainsKey(AllKinds) &&
-				_wildcardNamesBySymbolKind[AllKinds].FirstOrDefault(kvp => symbolDeclarationId.StartsWith(kvp.Key, StringComparison.Ordinal)) is var unprefixedFirstMatchOrDefault &&
-				!string.IsNullOrWhiteSpace(unprefixedFirstMatchOrDefault.Key))
+			if (foundNamesByAllKinds
+				&& namesByAllKinds.FirstOrDefault(kvp => symbolDeclarationId.StartsWith(kvp.Key, StringComparison.Ordinal)) is var unprefixedFirstMatchOrDefault
+				&& !string.IsNullOrWhiteSpace(unprefixedFirstMatchOrDefault.Key))
 			{
 				(firstMatchName, firstMatchValue) = unprefixedFirstMatchOrDefault;
 				_wildcardMatchResult.AddOrUpdate(symbol, unprefixedFirstMatchOrDefault.AsNullable(), (s, match) => unprefixedFirstMatchOrDefault.AsNullable());
@@ -313,9 +319,9 @@ namespace Analyzer.Utilities
 			}
 
 			// If not found, then we try to match with the symbol name...
-			if (_wildcardNamesBySymbolKind.ContainsKey(AllKinds) &&
-				_wildcardNamesBySymbolKind[AllKinds].FirstOrDefault(kvp => symbol.Name.StartsWith(kvp.Key, StringComparison.Ordinal)) is var partialFirstMatchOrDefault &&
-				!string.IsNullOrWhiteSpace(partialFirstMatchOrDefault.Key))
+			if (foundNamesByAllKinds
+				&& namesByAllKinds.FirstOrDefault(kvp => symbol.Name.StartsWith(kvp.Key, StringComparison.Ordinal)) is var partialFirstMatchOrDefault
+				&& !string.IsNullOrWhiteSpace(partialFirstMatchOrDefault.Key))
 			{
 				(firstMatchName, firstMatchValue) = partialFirstMatchOrDefault;
 				_wildcardMatchResult.AddOrUpdate(symbol, partialFirstMatchOrDefault.AsNullable(), (s, match) => partialFirstMatchOrDefault.AsNullable());
@@ -330,7 +336,7 @@ namespace Analyzer.Utilities
 
 			static string GetDeclarationId(ISymbol symbol)
 			{
-				var declarationIdWithoutPrefix = DocumentationCommentId.CreateDeclarationId(symbol)[2..];
+				var declarationIdWithoutPrefix = DocumentationCommentId.CreateDeclarationId(symbol)?[2..] ?? string.Empty;
 
 				// Documentation comment ID for constructors uses '#ctor', but '#' is a comment start token for editorconfig.
 				declarationIdWithoutPrefix = declarationIdWithoutPrefix
@@ -375,16 +381,10 @@ namespace Analyzer.Utilities
 		/// On the rule CA1710, we allow user specific suffix to be registered for symbol names using the following format:
 		/// MyClass->Suffix or T:MyNamespace.MyClass->Suffix or N:MyNamespace->Suffix.
 		/// </example>
-		public sealed class NameParts
+		public sealed class NameParts(string symbolName, TValue associatedValue)
 		{
-			public NameParts(string symbolName, TValue associatedValue)
-			{
-				SymbolName = symbolName.Trim();
-				AssociatedValue = associatedValue;
-			}
-
-			public string SymbolName { get; }
-			public TValue AssociatedValue { get; }
+			public string SymbolName { get; } = symbolName.Trim();
+			public TValue AssociatedValue { get; } = associatedValue;
 		}
 	}
 }

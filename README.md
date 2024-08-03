@@ -21,7 +21,7 @@ Maintaining a very high percentage of test coverage over these libraries will be
 
 * [Tutorial - Write your first dotnet analyzer](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix)
 * [How to write a Roslyn Analyzer dev blog post](https://devblogs.microsoft.com/dotnet/how-to-write-a-roslyn-analyzer/)
-
+* [Source Generators Overview](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview)
 
 
 ## License

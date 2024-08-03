@@ -4,7 +4,7 @@
 # This file must be named .EditorConfig with exact case for msbuild to automatically find it
 # when running on linux or other platforms that use a case sensitive file system
 
-# top-most .editorconfig file
+# top-most .EditorConfig file
 root = true
 
 
@@ -46,8 +46,8 @@ indent_style = space
 indent_size = 2
 trim_trailing_whitespace = true
 
-# .editorconfig files
-[*.editorconfig]
+# .EditorConfig files
+[*.EditorConfig]
 
 dotnet_diagnostic.EC101.severity    = error
 # Rule (EC104)  - Language rules must specify severity  - Reason: No longer required as of VS 2019 v16.9+ but editor config analyzer incorrectly flags it
@@ -69,7 +69,134 @@ charset = utf-8-bom
 
 
 # Default analyzer severity to error for all rules. Any non error severity values will be explicitly configured below
+# NOTE: This setting is only applied to analyzers which are enabled by default. For analyzers which are not enabled by default, the severity must be set explicitly
+# using the specific dotnet_diagnostic.<ID>.severity setting. See https://github.com/dotnet/roslyn-analyzers/blob/main/src/NetAnalyzers/Core/AnalyzerReleases.Shipped.md for
+# the list of which shipped rules are disabled by default.
 dotnet_analyzer_diagnostic.severity     = error
+
+## Explicitly enable rules that are disabled by default 
+
+## - NET 5.0 Release Rules
+
+# Rule (CA1000) - Do not declare static members on generic types
+dotnet_diagnostic.CA1000.severity = warning
+
+# Rule (CA1001) - Types that own disposable fields should be disposable
+dotnet_diagnostic.CA1001.severity = error
+
+# Rule (CA1002) - Do not expose generic lists
+dotnet_diagnostic.CA1002.severity = warning
+
+# Rule (CA1003) - Use generic event handler instances
+dotnet_diagnostic.CA1003.severity = none # Reason: Don't use events/handlers. They suck.
+
+# Rule (CA1010) - Collections should implement generic interface
+dotnet_diagnostic.CA1010.severity = warning
+
+# Rule (CA1012) - Abstract types should not have public constructors
+dotnet_diagnostic.CA1012.severity = error
+
+# Rule (CA1014) - Mark assemblies with CLSCompliantAttribute
+dotnet_diagnostic.CA1014.severity = error
+
+# Rule (CA1016) - Mark assemblies with AssemblyVersionAttribute
+dotnet_diagnostic.CA1016.severity = suggestion
+
+# Rule (CA1018) - Custom attributes should have AttributeUsageAttribute
+dotnet_diagnostic.CA1018.severity = error
+
+# Rule (CA1019) - Define accessors for attribute arguments
+dotnet_diagnostic.CA1019.severity = error
+
+# Rule (CA1021) - Avoid out parameters
+dotnet_diagnostic.CA1021.severity = none # Reason: I know what I'm doing and understand pointers
+
+# Rule (CA1024) - Use properties where appropriate
+dotnet_diagnostic.CA1024.severity = suggestion
+
+# Rule (CA1027) - Mark enums with FlagsAttribute
+dotnet_diagnostic.CA1027.severity = warning
+
+# Rule (CA1028) - Enum storage should be Int32
+dotnet_diagnostic.CA1028.severity = none
+
+# Rule (CA1030) - Use events where appropriate
+dotnet_diagnostic.CA1030.severity = none # Reason: Don't use events. They suck.
+
+# Rule (CA1031) - Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = suggestion
+
+# Rule (CA1032) - Implement standard exception constructors
+dotnet_diagnostic.CA1032.severity = warning
+
+# Rule (CA1033) - Interface methods should be callable by child types
+dotnet_diagnostic.CA1033.severity = error # Reason: Unexpected recursion and stack overflows are BAD!
+
+# Rule (CA1034) - Nested types should not be visible
+dotnet_diagnostic.CA1034.severity = suggestion
+
+# Rule (CA1036) - Override methods on comparable types
+dotnet_diagnostic.CA1036.severity = warning
+
+# Rule(CA1040) - Avoid empty interfaces
+dotnet_diagnostic.CA1040.severity = suggestion
+
+# Rule (CA1043) - Use integral or string argument for indexers
+dotnet_diagnostic.CA1043.severity = warning
+
+# Rule (CA1044) - Properties should not be write only
+dotnet_diagnostic.CA1044.severity = error
+
+# Rule (CA1045) - Don't use the ref keyword
+dotnet_diagnostic.CA1045.severity = none # Reason: I know what I'm doing and understand pointers
+
+# Rule (CA1046) - Do not overload operator equals on reference types
+dotnet_diagnostic.CA1046.severity = error
+
+# Rule (CA1051) - Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = suggestion
+
+# Rule (CA1052) - Static holder types should be static (or sealed)
+dotnet_diagnostic.CA1052.severity = warning
+
+# Rule (CA1054) - URI parameters should not be strings
+dotnet_diagnostic.CA1054.severity = suggestion
+
+# Rule (CA1055) - URI return values should not be strings
+dotnet_diagnostic.CA1055.severity = suggestion
+
+# Rule (CA1056) - URI properties should not be strings
+dotnet_diagnostic.CA1056.severity = suggestion
+
+# Rule (CA1058) - Avoid bad practice subclass of certain System base types
+dotnet_diagnostic.CA1058.severity = error
+
+# TODO: Resume filling out this list with the rest of the disabled/hidden analzyer rules
+
+
+
+
+##################################################
+##    CSharp Compiler - Level 1 to 4 Warnings   ##
+##################################################
+# See https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/
+
+# Rule (CS1591) - Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = error
+
+
+##############################################
+##    CSharp Compiler - Nullable Warnings   ##
+##############################################
+# See https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/nullable-warnings
+
+# All should be error - Reason: NullReferenceExceptions are BAD, See also https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/
+# Additional Reasons: Features and tools (like Open API spec generation) work better when they can determine nullability of all types
+
+# NOTE: Since we default the severity above for everything to error we don't need to do anything further for these. 
+# If that changed we could specify <WarningsAsErrors>Nullable</WarningsAsErrors> in the msbuild files to ensure these are all treated as errors
+
+
 
 
 ########################################
@@ -101,21 +228,6 @@ dotnet_code_quality.CA1303.excluded_type_names_with_derived_types = System.Excep
 
 # Rule: (CA2211) Non-constant fields should not be visible.
 #dotnet_diagnostic.CA2211.severity    = suggestion
-
-
-
-
-#############################
-##    Basic Code Checks    ##
-#############################
-# e.g. Rules in the CS00XX range
-
-
-
-############################################
-##    Nullable Reference Type Severity    ##
-############################################
-# e.g. Rules in the CS8000 ish range
 
 
 
@@ -174,6 +286,13 @@ dotnet_style_qualification_for_property                 = false
 dotnet_style_qualification_for_method                   = false
 dotnet_style_qualification_for_event                    = false
 
+# Rule (IDE0005) Using directive is unnecessary
+dotnet_diagnostic.IDE0005.severity                      = error
+dotnet_remove_unnecessary-usings                        = true
+
+dotnet_sort_system_directives_first		= false
+dotnet_separate_import_directive_groups	= false
+
 # IDE0007 and IDE0008 - Use 'var' keyword
 csharp_style_var_for_built_in_types                     = true
 csharp_style_var_when_type_is_apparent                  = true
@@ -193,7 +312,9 @@ csharp_style_expression_bodied_methods                  = when_on_single_line
 csharp_style_expression_bodied_operators = when_on_single_line
 
 # Rule (IDE0028)    - Use Collection Initializers
-#dotnet_diagnostic.IDE0028.severity                     = refactoring
+# Reason: Switching to collection expressions can change the behavior/semantics depending on the member type 
+# e.g. IEnumerable vs ICollection vs IReadOnlyCollection. I recommend keeping it a suggestion only, for use when you really know what you're doing
+dotnet_diagnostic.IDE0028.severity                     = suggestion
 #dotnet_style_collection_initializer                    = true
 
 # Rule (IDE0029) and (IDE0030)  - Use Coalesce Expression
@@ -211,6 +332,9 @@ dotnet_style_explicit_tuple_names                       = true
 # Rule (IDE0037)    - Use inferred member name for tuples
 dotnet_style_prefer_inferred_tuple_names                    = true
 dotnet_style_prefer_inferred_anonymous_type_member_names    = true
+
+# Rule (IDE0041)    - Use 'is null' check
+dotnet_diagnostic.IDE0046.severity      = error
 
 # Rule (IDE0046)    - If Statement Can Be Simplified        - Reason: Suggestion only. We only prefer ternary conditional expressions for very simple conditionals.
 dotnet_diagnostic.IDE0046.severity      = suggestion
@@ -249,6 +373,31 @@ dotnet_diagnostic.IDE0090.severity                          = refactoring
 
 # Rule (IDE0130)    - Namespace does not match folder structure     - Reason: Not required and analyzer is broken
 dotnet_diagnostic.IDE0130.severity                      = refactoring
+
+# Rule (IDE0300)    - Use collection expression for array
+# Reason: Warning only as switching to collection expressions can change the behavior/semantics depending on the member type
+dotnet_diagnostic.IDE0300.severity                     = warning
+
+# Rule (IDE0301)    - Use collection expression for Array.Empty
+# Reason: Warning only as switching to collection expressions can change the behavior/semantics depending on the member type. 
+# Make sure the member type being assigned to is readonly (e.g. IEnumeable or IReadOnlyCollection) or else switch to this will change the behavior to instantiating a mutable instance
+dotnet_diagnostic.IDE0301.severity                     = warning
+
+# Rule (IDE0302)    - Use collection expression for stackalloc
+# Reason: Prefer explicit use of the stackalloc keyword as it is an advanced feature and developers should be explicitly aware of when it is being used
+dotnet_diagnostic.IDE0302.severity                     = none
+
+# Rule (IDE0303)    - Use collection expression for Create() methods e.g. ImmutableArray.Create()
+# Reason: Warning only as switching to collection expressions can change the behavior/semantics depending on the member type. Use when you know what you're doing.
+dotnet_diagnostic.IDE0303.severity                     = warning
+
+# Rule (IDE0304)    - Use collection expression for CreateBuilder() methods e.g. ImmutableArray.Builder.ToImmutable()
+# Reason: Warning only as switching to collection expressions can change the behavior/semantics depending on the member type. Use when you know what you're doing.
+dotnet_diagnostic.IDE0304.severity                     = warning
+
+# Rule (IDE0305)    - Use collection expression for fluent style collection builder calls
+# Reason: Suggestion only as sometimes the fluent style calls may be preferable for readability
+dotnet_diagnostic.IDE0305.severity                     = suggestion
 
 # File Scoped Namespaces    -   Much Better Than Block Scoped. Reduced Nesting.
 csharp_style_namespace_declarations     = file_scoped:error

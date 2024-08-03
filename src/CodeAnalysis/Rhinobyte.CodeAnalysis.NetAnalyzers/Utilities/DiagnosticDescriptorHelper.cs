@@ -1,14 +1,20 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
-using System.Linq;
 
 namespace Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 
+/// <summary>
+/// Utility class for creating <see cref="DiagnosticDescriptor"/> instances
+/// </summary>
 public static class DiagnosticDescriptorHelper
 {
 	internal const string DesignCategory = "Design";
 	internal const string MaintainabilityCategory = "Maintainability";
 
+
+	/// <summary>
+	/// Create a new <see cref="DiagnosticDescriptor"/> instance for the provided id and category.
+	/// </summary>
 	public static DiagnosticDescriptor Create(
 			string id,
 			string category,
@@ -28,14 +34,14 @@ public static class DiagnosticDescriptorHelper
 
 		string[]? customTags = null;
 		if (isReportedAtCompilationEnd)
-			customTags = new string[] { WellKnownDiagnosticTags.CompilationEnd };
+			customTags = [WellKnownDiagnosticTags.CompilationEnd];
 
 #pragma warning disable CA1062 // Validate arguments of public methods
 		if (additionalCustomTags.Length > 0)
-			customTags = customTags is null ? additionalCustomTags : customTags.Concat(additionalCustomTags).ToArray();
+			customTags = customTags is null ? additionalCustomTags : [.. customTags, .. additionalCustomTags];
 #pragma warning restore CA1062 // Validate arguments of public methods
 
-		return new DiagnosticDescriptor(id, title, messageFormat, category, diagnosticSeverity, isEnabledByDefault, description, helpLink, customTags ?? Array.Empty<string>());
+		return new DiagnosticDescriptor(id, title, messageFormat, category, diagnosticSeverity, isEnabledByDefault, description, helpLink, customTags ?? []);
 	}
 
 	internal static class WellKnownDiagnosticTags

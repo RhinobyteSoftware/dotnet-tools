@@ -65,7 +65,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	);
 
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(RuleRBCS0001, RuleRBCS0002, RuleRBCS0003);
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleRBCS0001, RuleRBCS0002, RuleRBCS0003];
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
 		in SymbolAnalysisContext context,
@@ -323,7 +323,6 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 					return MemberGroupType.MutableInstanceFields;
 				else
 					return MemberGroupType.ReadonlyInstanceFields;
-
 			}
 
 			case SymbolKind.Method:
@@ -386,7 +385,6 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	}
 
 	/// <inheritdoc />
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Unnecessary in code analyzer extension")]
 	public override void Initialize(AnalysisContext context)
 	{
 		context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -402,27 +400,17 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		);
 	}
 
-	internal class NamedTypeLocationData
+	internal class NamedTypeLocationData(
+		MemberGroupType[][] groupOrder,
+		Location location,
+		FileLinePositionSpan positionSpan)
 	{
-		public NamedTypeLocationData(
-			MemberGroupType[][] groupOrder,
-			Location location,
-			FileLinePositionSpan positionSpan)
-		{
-			CompletedGroups = new List<MemberGroupType>();
-			CurrentGroup = groupOrder[0];
-			CurrentGroupIndex = 1;
-			Location = location;
-			PositionSpan = positionSpan;
-			PreviousMemberNameForCurrentGroup = null;
-		}
-
-		internal List<MemberGroupType> CompletedGroups { get; }
-		internal MemberGroupType[] CurrentGroup { get; private set; }
-		internal int CurrentGroupIndex { get; private set; }
-		internal Location Location { get; }
+		internal List<MemberGroupType> CompletedGroups { get; } = [];
+		internal MemberGroupType[] CurrentGroup { get; private set; } = groupOrder[0];
+		internal int CurrentGroupIndex { get; private set; } = 1;
+		internal Location Location { get; } = location;
 		internal bool IsAlphabetizingGroup { get; set; }
-		internal FileLinePositionSpan PositionSpan { get; }
+		internal FileLinePositionSpan PositionSpan { get; } = positionSpan;
 		internal string? PreviousMemberNameForCurrentGroup { get; set; }
 
 		internal bool AdvanceCurrentGroupTo(in MemberGroupType groupForCurrentMemberSymbol, MemberGroupType[][] groupOrder)
