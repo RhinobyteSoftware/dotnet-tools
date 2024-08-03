@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the MIT license.  See https://github.com/dotnet/roslyn-analyzers/blob/release/6.0.1xx-rc2/License.txt for license information.
 
-#nullable enable
-
 using System.Diagnostics.CodeAnalysis;
 
 namespace Analyzer.Utilities

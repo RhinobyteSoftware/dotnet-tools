@@ -107,7 +107,9 @@ namespace Analyzer.Utilities.PooledObjects
 #endif
 
 		internal ObjectPool(Factory factory)
+#pragma warning disable RS1035 // Do not use APIs banned for analyzers - Reason: Environment is banned for reading environment variables, but checking the ProcessorCount should be fine
 			: this(factory, Environment.ProcessorCount * 2)
+#pragma warning restore RS1035 // Do not use APIs banned for analyzers
 		{ }
 
 		internal ObjectPool(Factory factory, int size)

@@ -49,7 +49,7 @@ public class AnalyzerOptionsTests
 
 		var editorConfigSettings = new List<(string, string)>()
 		{
-			("/.editorconfig", $@"root = true
+			("/.EditorConfig", $@"root = true
 
 [*]
 dotnet_code_quality.RBCS0001.type_members_group_order = Constants,StaticReadonlyFields:StaticMutableFields:StaticProperties:StaticConstructors:MutableInstanceFields,ReadonlyInstanceFields:InstanceProperties:Constructors:StaticMethods,InstanceMethods:NestedEnumType,NestedRecordType,NestedOtherType
@@ -85,7 +85,7 @@ dotnet_code_quality.RBCS0002.property_names_to_order_first = Id
 
 		var editorConfigSettings = new List<(string, string)>()
 		{
-			("/.editorconfig", $@"root = true
+			("/.EditorConfig", $@"root = true
 
 [*]
 dotnet_code_quality.RBCS0001.type_members_group_order = Constants,StaticReadonlyFields:StaticMutableFields:StaticProperties:StaticConstructors:MutableInstanceFields,ReadonlyInstanceFields:InstanceProperties:Constructors:StaticMethods,InstanceMethods:NestedEnumType,NestedRecordType,NestedOtherType
@@ -136,7 +136,7 @@ dotnet_code_quality.RBCS0002.property_names_to_order_first = Id
 
 		var editorConfigSettings = new List<(string, string)>()
 		{
-			("/.editorconfig", $@"root = true
+			("/.EditorConfig", $@"root = true
 
 [*]
 dotnet_code_quality.RBCS0001.type_members_group_order = Constants,StaticReadonlyFields:StaticMutableFields:StaticProperties:StaticConstructors:MutableInstanceFields,ReadonlyInstanceFields:InstanceProperties:Constructors:StaticMethods,InstanceMethods:NestedEnumType,NestedRecordType,NestedOtherType

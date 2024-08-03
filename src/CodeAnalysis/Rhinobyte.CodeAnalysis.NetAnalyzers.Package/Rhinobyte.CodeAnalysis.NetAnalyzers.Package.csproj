@@ -10,7 +10,7 @@
 
         <!-- VERSION VALUES -->
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
-        <PackageVersion>1.0.0.0-beta.3</PackageVersion>
+        <PackageVersion>1.0.0.0-beta.4</PackageVersion>
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
         <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
@@ -27,20 +27,31 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/RhinobyteSoftware/dotnet-tools</RepositoryUrl>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- Dotnet Sourcelink Package Properties -->
+        <!-- See https://github.com/dotnet/sourcelink/blob/main/docs/README.md -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
         <Description>Rhinobyte.CodeAnalysis.NetAnalyzers</Description>
         <PackageReleaseNotes>
+            v1.0.0-beta.4
+            - Updated nuget package dependencies to latest versions
+            - Resolved analyzer warnings for newer analyzer rules
+            - Updated the MembersOrderedCorrectlyAnalyzerCodeFixProvider to use a class type in lieu of struct type for sort member key data to reduce possibility of a stack overflow exception in really big files
+
             v1.0.0-beta.3
             - Fixed the url used in the analzyer rule help links to point to the https://github.com/RhinobyteSoftware/dotnet-tools/blob/main/docs/codeanalysis/rules/ folder
-            - Updated the README.md that is included in the package to include the list of rules from the AnalyzerReleases.Shipped.md file and to use absolute urls for the rule docs pointed at the github repo 
+            - Updated the README.md that is included in the package to include the list of rules from the AnalyzerReleases.Shipped.md file and to use absolute urls for the rule docs pointed at the github repo
 
             v1.0.0-beta.2
-            - Updated the MembersOrderedCorrectly analyzer and code fix provider to support configuration via .editorconfig properties
+            - Updated the MembersOrderedCorrectly analyzer and code fix provider to support configuration via .EditorConfig properties
             - Added new rule RBCS0003: Member assignments in an object initializer are ordered correctly
 
             v1.0.0-beta.1
             - Added new MembersOrderedCorrectlyAnalyzer and MembersOrderedCorrectlyAnalyzerCodeFixProvider
-              with rules RBCS0001: Type members should be ordered by group and RBCS0002: Type members within the same group should be ordered correctly
+            with rules RBCS0001: Type members should be ordered by group and RBCS0002: Type members within the same group should be ordered correctly
         </PackageReleaseNotes>
         <PackageTags>Rhinobyte.CodeAnalysis.NetAnalyzers, analyzers</PackageTags>
         <DevelopmentDependency>true</DevelopmentDependency>
@@ -53,6 +64,13 @@
     <ItemGroup>
         <ProjectReference Include="..\Rhinobyte.CodeAnalysis.NetAnalyzers\Rhinobyte.CodeAnalysis.NetAnalyzers.csproj" />
         <ProjectReference Include="..\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes\Rhinobyte.CodeAnalysis.NetAnalyzers.CodeFixes.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -83,21 +101,9 @@
             <PackageReadmeOutputFile>$(MSBuildProjectDirectory)\README.package.md</PackageReadmeOutputFile>
         </PropertyGroup>
 
-        <Message Importance="high"
-                 Text="
-Writing transformed readme content to: $(PackageReadmeOutputFile)
+        <Message Importance="high" Text="&#xD;&#xA;Writing transformed readme content to: $(PackageReadmeOutputFile)&#xD;&#xA;&#xD;&#xA;PackageReadmeContent:&#xD;&#xA;&#xD;&#xA;$(PackageReadmeContent)" />
 
-PackageReadmeContent:
-
-$(PackageReadmeContent)"
-        />
-
-        <WriteLinesToFile
-            File="$(PackageReadmeOutputFile)"
-            Lines="$(PackageReadmeContent)"
-            Overwrite="true"
-            Encoding="UTF-8"
-        />
+        <WriteLinesToFile File="$(PackageReadmeOutputFile)" Lines="$(PackageReadmeContent)" Overwrite="true" Encoding="UTF-8" />
 
     </Target>
 

@@ -3,7 +3,7 @@
 namespace Analyzer.Utilities
 {
 	/// <summary>
-	/// Option names to configure analyzer execution through an .editorconfig file.
+	/// Option names to configure analyzer execution through an .EditorConfig file.
 	/// </summary>
 	internal static partial class EditorConfigOptionNames
 	{
@@ -13,13 +13,13 @@ namespace Analyzer.Utilities
 
 		/// <summary>
 		/// Option to configure analyzed API surface.
-		/// Allowed option values: One or more fields of flags enum <see cref="SymbolVisibilityGroup"/> as a comma separated list.
+		/// Allowed option values: One or more fields of flags enum SymbolVisibilityGroup as a comma separated list.
 		/// </summary>
 		public const string ApiSurface = "api_surface";
 
 		/// <summary>
 		/// Option to configure required modifiers for analyzed APIs.
-		/// Allowed option values: One or more fields of flags enum <see cref="SymbolModifiers"/> as a comma separated list.
+		/// Allowed option values: One or more fields of flags enum SymbolModifiers as a comma separated list.
 		/// </summary>
 		public const string RequiredModifiers = "required_modifiers";
 

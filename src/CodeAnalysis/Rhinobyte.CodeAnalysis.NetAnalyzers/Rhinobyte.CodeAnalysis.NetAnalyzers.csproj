@@ -1,28 +1,39 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-
-        <AnalysisLevel>latest</AnalysisLevel>
-        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <WarningsAsErrors>Nullable</WarningsAsErrors>
 
         <!-- Avoid ID conflicts with the package project. -->
         <PackageId>*$(MSBuildProjectFile)*</PackageId>
 
         <RoslynAnalyzersRepoRoot Condition="'$(RoslynAnalyzersRepoRoot)' == ''">$(MSBuildThisFileDirectory)\..\..\..\..\dotnet-roslyn-analyzers</RoslynAnalyzersRepoRoot>
 
+        <!-- Dotnet Sourcelink Package Properties -->
+        <!-- See https://github.com/dotnet/sourcelink/blob/main/docs/README.md -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
         <DefineConstants>$(DefineConstants);CODEANALYSIS_V3_OR_BETTER;CODEANALYSIS_V3_7_OR_BETTER</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -32,10 +43,10 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>$(ProjectName).CodeFixes</_Parameter1>
+            <_Parameter1>$(MSBuildProjectName).CodeFixes</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>$(ProjectName).Tests</_Parameter1>
+            <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

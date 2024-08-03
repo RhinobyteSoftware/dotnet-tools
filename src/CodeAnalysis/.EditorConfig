@@ -1,6 +1,12 @@
 
 
 [*.cs]
+# Default analyzer severity to error for all rules. Any non error severity values will be explicitly configured below
+# NOTE: This setting is only applied to analyzers which are enabled by default. For analyzers which are not enabled by default, the severity must be set explicitly
+# using the specific dotnet_diagnostic.<ID>.severity setting. See https://github.com/dotnet/roslyn-analyzers/blob/main/src/NetAnalyzers/Core/AnalyzerReleases.Shipped.md for
+# the list of which shipped rules are disabled by default.
+dotnet_analyzer_diagnostic.severity     = error
+
 # Rule: (CA1014) Mark assemblies with CLSCompliant - Reason: Suppressed for code analyzer projects
 dotnet_diagnostic.CA1014.severity       = none
 
@@ -10,6 +16,12 @@ dotnet_diagnostic.CA1824.severity       = none
 
 # Suppress various analyzer warnings in polyfill files copied from opensource microsoft github repos
 [*/Polyfills/*.cs]
+# Rule (CS1587) - XML comment is not placed on a valid language element
+dotnet_diagnostic.CS1587.severity = none
+
+# Rule (1591) - Missing XML comment for publicly visible type
+dotnet_diagnostic.CS1591.severity = none
+
 dotnet_diagnostic.IDE0005.severity       = none
 dotnet_diagnostic.IDE0007.severity       = none
 dotnet_diagnostic.IDE0010.severity       = none
@@ -22,4 +34,7 @@ dotnet_diagnostic.IDE0058.severity       = none
 dotnet_diagnostic.IDE0061.severity       = none
 dotnet_diagnostic.IDE0065.severity       = none
 dotnet_diagnostic.IDE0161.severity       = none
+dotnet_diagnostic.IDE0161.severity       = none
 dotnet_diagnostic.RS1024.severity        = none
+
+

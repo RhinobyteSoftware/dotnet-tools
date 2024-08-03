@@ -22,18 +22,15 @@
         <Nullable>enable</Nullable>
 
         <!-- ANALYZER AND CODE STYLE FEATURES -->
-        <AnalysisLevel>latest</AnalysisLevel>
-        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-        <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <WarningsAsErrors>Nullable</WarningsAsErrors>
 
-        
+
         <!-- Common Package/Project Property Values -->
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
         <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSymbols>true</IncludeSymbols>
         <NeutralLanguage>en-US</NeutralLanguage>
         <PackageIcon>Icon.png</PackageIcon>
@@ -56,7 +53,7 @@
 
         <!-- Subproject Package Versions -->
         <!-- Note: CodeAnalyzers Package Wouldn't Work If I Add The -beta.1 Suffix -->
-        <CodeAnalyzersPackageVersion>1.0.2</CodeAnalyzersPackageVersion>
+        <CodeAnalyzersPackageVersion>1.0.3</CodeAnalyzersPackageVersion>
         <CodeAnalysisSourceRoot>$(RepoRoot)\src\CodeAnalysis</CodeAnalysisSourceRoot>
         <CodeAnalysisTestsRoot>$(RepoRoot)\tests\CodeAnalysis</CodeAnalysisTestsRoot>
 
@@ -82,7 +79,7 @@
 
     <!-- SOLUTION WIDE CODE ANALYZER PACKAGES -->
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.10.*">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.*">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
@@ -92,10 +89,10 @@
     <!-- ASSEMBLY ATTRIBUTE GENERATION -->
     <ItemGroup Condition=" '$(Configuration)' == 'Debug' OR '$(Configuration)' == 'ReleaseTesting' ">
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>$(ProjectName).Tests</_Parameter1>
+            <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>$(ProjectName).UnitTests</_Parameter1>
+            <_Parameter1>$(MSBuildProjectName).UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 

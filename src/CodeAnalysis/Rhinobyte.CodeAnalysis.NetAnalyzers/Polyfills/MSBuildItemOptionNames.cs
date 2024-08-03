@@ -23,7 +23,7 @@ namespace Analyzer.Utilities
 	internal static class MSBuildItemOptionNamesHelpers
 	{
 		public const char ValuesSeparator = ',';
-		private static readonly char[] s_itemMetadataValuesSeparators = new[] { ValuesSeparator };
+		private static readonly char[] s_itemMetadataValuesSeparators = [ValuesSeparator];
 
 		public static string GetPropertyNameForItemOptionName(string itemOptionName)
 		{
@@ -39,12 +39,9 @@ namespace Analyzer.Utilities
 
 		public static ImmutableArray<string> ParseItemOptionValue(string? itemOptionValue)
 		{
-			if (itemOptionValue == null)
-			{
-				return ImmutableArray<string>.Empty;
-			}
-
-			return ProduceTrimmedArray(itemOptionValue).ToImmutableArray();
+			return itemOptionValue is null
+				? []
+				: ProduceTrimmedArray(itemOptionValue).ToImmutableArray();
 		}
 
 		private static IEnumerable<string> ProduceTrimmedArray(string itemOptionValue)

@@ -1,5 +1,0 @@
-<Project>
-
-    <Import Project="..\solution.targets" Condition="'$(SolutionTargetsIsImported)' == ''" />
-
-</Project>

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{753E6246-64FC-44F5-BB43-39AFB2734B06}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
+		.EditorConfig = .EditorConfig
 		.gitignore = .gitignore
 		development.local.props = development.local.props
 		development.local.targets = development.local.targets
@@ -25,22 +25,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "devops", "devops", "{F32BFC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2C0C7F28-E5F3-4966-BCB6-0963D7BD5FBE}"
 	ProjectSection(SolutionItems) = preProject
-		src\directory.build.props = src\directory.build.props
-		src\directory.build.targets = src\directory.build.targets
+		src\Directory.Build.props = src\Directory.Build.props
+		src\Directory.Build.targets = src\Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C7DE61D8-0FD5-4E16-AD6C-C7085DA1BCF7}"
 	ProjectSection(SolutionItems) = preProject
-		tests\.editorconfig = tests\.editorconfig
-		tests\directory.build.props = tests\directory.build.props
-		tests\directory.build.targets = tests\directory.build.targets
+		tests\.EditorConfig = tests\.EditorConfig
+		tests\Directory.Build.props = tests\Directory.Build.props
+		tests\Directory.Build.targets = tests\Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{4885358A-622A-4312-8A92-AB3C160018FB}"
 	ProjectSection(SolutionItems) = preProject
-		src\CodeAnalysis\.editorconfig = src\CodeAnalysis\.editorconfig
-		src\CodeAnalysis\directory.build.props = src\CodeAnalysis\directory.build.props
-		src\CodeAnalysis\directory.build.targets = src\CodeAnalysis\directory.build.targets
+		src\CodeAnalysis\.EditorConfig = src\CodeAnalysis\.EditorConfig
+		src\CodeAnalysis\Directory.Build.props = src\CodeAnalysis\Directory.Build.props
+		src\CodeAnalysis\Directory.Build.targets = src\CodeAnalysis\Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeAnalysis", "CodeAnalysis", "{D946C8A5-BC7F-4BAC-95C9-5E9F3C15F7F8}"
