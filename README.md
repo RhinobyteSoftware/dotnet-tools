@@ -16,6 +16,14 @@ Code changes that modify a library's public API signature will require a new maj
 
 Maintaining a very high percentage of test coverage over these libraries will be an important requirement when reviewing pull requests. The `devops/create-code-coverage-report` shell script can be run to execute the tests with code coverage enabled and to generate an html version of the coverage results report. When making a code contribution please ensure you update all existing tests as necessary and add new test cases to cover new code.
 
+
+## Reference Documentation
+
+* [Tutorial - Write your first dotnet analyzer](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix)
+* [How to write a Roslyn Analyzer dev blog post](https://devblogs.microsoft.com/dotnet/how-to-write-a-roslyn-analyzer/)
+
+
+
 ## License
 
 This repository is licensed under the [MIT](LICENSE.txt) license.
