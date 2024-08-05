@@ -22,14 +22,14 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    internal class AnalyzerResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal AnalyzerResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Rhinobyte.CodeAnalysis.NetAnalyzers.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Rhinobyte.CodeAnalysis.NetAnalyzers.AnalyzerResources", typeof(AnalyzerResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,81 +63,108 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         /// <summary>
         ///   Looks up a localized string similar to Type members should be ordered correcty into their respective groups..
         /// </summary>
-        internal static string RBCS0001_AnalyzerDescription {
+        internal static string RBCS_0001_AnalyzerDescription {
             get {
-                return ResourceManager.GetString("RBCS0001_AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("RBCS_0001_AnalyzerDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Member &apos;{0}&apos; is not ordered correctly by group.
         /// </summary>
-        internal static string RBCS0001_AnalyzerMessageFormat {
+        internal static string RBCS_0001_AnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("RBCS0001_AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("RBCS_0001_AnalyzerMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Type members should be ordered by group.
         /// </summary>
-        internal static string RBCS0001_AnalyzerTitle {
+        internal static string RBCS_0001_AnalyzerTitle {
             get {
-                return ResourceManager.GetString("RBCS0001_AnalyzerTitle", resourceCulture);
+                return ResourceManager.GetString("RBCS_0001_AnalyzerTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Type members within the same group should be ordered correctly..
         /// </summary>
-        internal static string RBCS0002_AnalyzerDescription {
+        internal static string RBCS_0002_AnalyzerDescription {
             get {
-                return ResourceManager.GetString("RBCS0002_AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("RBCS_0002_AnalyzerDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Member &apos;{0}&apos; is not ordered alphabetically or by configured priority.
         /// </summary>
-        internal static string RBCS0002_AnalyzerMessageFormat {
+        internal static string RBCS_0002_AnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("RBCS0002_AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("RBCS_0002_AnalyzerMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Type members within the same group should be ordered correctly.
         /// </summary>
-        internal static string RBCS0002_AnalyzerTitle {
+        internal static string RBCS_0002_AnalyzerTitle {
             get {
-                return ResourceManager.GetString("RBCS0002_AnalyzerTitle", resourceCulture);
+                return ResourceManager.GetString("RBCS_0002_AnalyzerTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Member assignments in the object initializer are not ordered correctly..
         /// </summary>
-        internal static string RBCS0003_AnalyzerDescription {
+        internal static string RBCS_0003_AnalyzerDescription {
             get {
-                return ResourceManager.GetString("RBCS0003_AnalyzerDescription", resourceCulture);
+                return ResourceManager.GetString("RBCS_0003_AnalyzerDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The member assignments &apos;{0}&apos; are out of order.
         /// </summary>
-        internal static string RBCS0003_AnalyzerMessageFormat {
+        internal static string RBCS_0003_AnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("RBCS0003_AnalyzerMessageFormat", resourceCulture);
+                return ResourceManager.GetString("RBCS_0003_AnalyzerMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Member assignments in an object initializer are ordered correctly.
         /// </summary>
-        internal static string RBCS0003_AnalyzerTitle {
+        internal static string RBCS_0003_AnalyzerTitle {
             get {
-                return ResourceManager.GetString("RBCS0003_AnalyzerTitle", resourceCulture);
+                return ResourceManager.GetString("RBCS_0003_AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Using explicitly named optional parameters can help with code maintainability and help guard against errors and unintended behavior changes..
+        /// </summary>
+        internal static string RBCS_0010_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RBCS_0010_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Optional parameter &apos;{0}&apos; should be passed explicitly using it&apos;s name.
+        /// </summary>
+        internal static string RBCS_0010_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RBCS_0010_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use explicitly named optional parameters.
+        /// </summary>
+        internal static string RBCS_0010_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RBCS_0010_AnalyzerTitle", resourceCulture);
             }
         }
     }

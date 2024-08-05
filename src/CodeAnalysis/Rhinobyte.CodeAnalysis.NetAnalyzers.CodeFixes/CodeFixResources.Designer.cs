@@ -77,5 +77,14 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
                 return ResourceManager.GetString("MemberOrderCodeFixTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use explicit name for optional parameters.
+        /// </summary>
+        internal static string UseExplicitNameForOptionalParametersCodeFixTitle {
+            get {
+                return ResourceManager.GetString("UseExplicitNameForOptionalParametersCodeFixTitle", resourceCulture);
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Rhinobyte.CodeAnalysis.NetAnalyzers.Utilities;
 
-internal struct MemberOrderingOptions
+internal readonly struct MemberOrderingOptions
 {
 	/// <summary>
 	/// The default member group ordering for the analyzer
@@ -26,6 +26,16 @@ internal struct MemberOrderingOptions
 		[MemberGroupType.NestedEnumType, MemberGroupType.NestedOtherType],
 	];
 
+	private MemberOrderingOptions(
+		bool arePropertyNamesToOrderFirstCaseSensitive,
+		string? groupOrderSettings,
+		string? propertyNamesToOrderFirst)
+	{
+		ArePropertyNamesToOrderFirstCaseSensitive = arePropertyNamesToOrderFirstCaseSensitive;
+		GroupOrderSettings = groupOrderSettings;
+		PropertyNamesToOrderFirst = propertyNamesToOrderFirst;
+	}
+
 	/// <summary>
 	/// Whether or not the <see cref="PropertyNamesToOrderFirst"/> comparison should be case sensitive.
 	/// False (case-insensitive) by default.
@@ -34,7 +44,7 @@ internal struct MemberOrderingOptions
 	/// <code>dotnet_code_quality.RBCS0002.property_names_to_order_first_are_case_sensitive</code>
 	/// </para>
 	/// </summary>
-	public bool ArePropertyNamesToOrderFirstCaseSensitive { get; set; }
+	public bool ArePropertyNamesToOrderFirstCaseSensitive { get; }
 
 	/// <summary>
 	/// The raw value for the group order.
@@ -43,7 +53,7 @@ internal struct MemberOrderingOptions
 	/// <code>dotnet_code_quality.RBCS0001.type_members_group_order</code>
 	/// </para>
 	/// </summary>
-	public string? GroupOrderSettings { get; set; }
+	public string? GroupOrderSettings { get; }
 
 	/// <summary>
 	/// The optional set of property names to order first before alphabetizing.
@@ -52,7 +62,7 @@ internal struct MemberOrderingOptions
 	/// <code>dotnet_code_quality.RBCS0002.property_names_to_order_first</code>
 	/// </para>
 	/// </summary>
-	public string? PropertyNamesToOrderFirst { get; set; }
+	public string? PropertyNamesToOrderFirst { get; }
 
 
 	internal static ImmutableDictionary<string, string?> BuildDiagnosticPropertiesDictionary(in MemberOrderingOptions memberOrderingOptions)
@@ -142,18 +152,22 @@ internal struct MemberOrderingOptions
 
 	internal static MemberOrderingOptions ParseOptions(AnalyzerOptions analyzerOptions, Compilation compilation)
 	{
-		var options = new MemberOrderingOptions();
 		if (analyzerOptions is null || compilation is null)
-			return options;
+			return new MemberOrderingOptions();
 
 		try
 		{
 			var syntaxTree = compilation.SyntaxTrees.FirstOrDefault();
-			options.GroupOrderSettings = analyzerOptions.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.RuleRBCS0001, syntaxTree, compilation);
-			options.PropertyNamesToOrderFirst = analyzerOptions.GetStringOptionValue("property_names_to_order_first", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation);
-
-			options.ArePropertyNamesToOrderFirstCaseSensitive = analyzerOptions
+			var groupOrderSettings = analyzerOptions.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.RuleRBCS0001, syntaxTree, compilation);
+			var propertyNamesToOrderFirst = analyzerOptions.GetStringOptionValue("property_names_to_order_first", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation);
+			var arePropertyNamesToOrderFirstCaseSensitive = analyzerOptions
 				.GetBoolOptionValue("property_names_to_order_first_are_case_sensitive", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation, false);
+
+			return new MemberOrderingOptions(
+				arePropertyNamesToOrderFirstCaseSensitive,
+				groupOrderSettings,
+				propertyNamesToOrderFirst
+			);
 		}
 #pragma warning disable CA1031 // Do not catch general exception types
 #pragma warning disable CS0168 // Variable is declared but never used
@@ -166,7 +180,7 @@ internal struct MemberOrderingOptions
 #endif
 		}
 
-		return options;
+		return new MemberOrderingOptions();
 	}
 
 }
