@@ -191,7 +191,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 				equivalenceKey: nameof(CodeFixResources.MemberOrderCodeFixTitle)
 			);
 
-			// Only need to register one document fix for the type member re-order pass it all the individual member diagnostics that are being fixed
+			// Only need to register one document fix for the type member re-order, so pass it all the individual member diagnostics that are being fixed
 			context.RegisterCodeFix(codeFixAction, typeMemberDiagnosticsToFix);
 		}
 	}

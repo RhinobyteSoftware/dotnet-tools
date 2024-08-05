@@ -37,30 +37,30 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	internal static readonly DiagnosticDescriptor RuleRBCS0001 = DiagnosticDescriptorHelper.Create(
 		RBCS0001,
 		DiagnosticDescriptorHelper.MaintainabilityCategory,
-		new LocalizableResourceString(nameof(Resources.RBCS0001_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0001_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		DiagnosticSeverity.Info,
-		new LocalizableResourceString(nameof(Resources.RBCS0001_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
-		new LocalizableResourceString(nameof(Resources.RBCS0001_AnalyzerTitle), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0001_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0001_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		isEnabledByDefault: true
 	);
 
 	internal static readonly DiagnosticDescriptor RuleRBCS0002 = DiagnosticDescriptorHelper.Create(
 		RBCS0002,
 		DiagnosticDescriptorHelper.MaintainabilityCategory,
-		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0002_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		DiagnosticSeverity.Info,
-		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
-		new LocalizableResourceString(nameof(Resources.RBCS0002_AnalyzerTitle), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0002_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0002_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		isEnabledByDefault: true
 	);
 
 	internal static readonly DiagnosticDescriptor RuleRBCS0003 = DiagnosticDescriptorHelper.Create(
 		RBCS0003,
 		DiagnosticDescriptorHelper.MaintainabilityCategory,
-		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerDescription), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0003_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		DiagnosticSeverity.Info,
-		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources)),
-		new LocalizableResourceString(nameof(Resources.RBCS0003_AnalyzerTitle), Resources.ResourceManager, typeof(Resources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0003_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0003_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		isEnabledByDefault: true
 	);
 

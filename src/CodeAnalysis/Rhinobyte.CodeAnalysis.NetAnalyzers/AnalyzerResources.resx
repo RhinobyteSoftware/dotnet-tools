@@ -117,34 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="RBCS0001_AnalyzerDescription" xml:space="preserve">
+  <data name="RBCS_0001_AnalyzerDescription" xml:space="preserve">
     <value>Type members should be ordered correcty into their respective groups.</value>
     <comment>An optional longer localizable description of the diagnostic.</comment>
   </data>
-  <data name="RBCS0001_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="RBCS_0001_AnalyzerMessageFormat" xml:space="preserve">
     <value>Member '{0}' is not ordered correctly by group</value>
     <comment>The format-able message the diagnostic displays.</comment>
   </data>
-  <data name="RBCS0001_AnalyzerTitle" xml:space="preserve">
+  <data name="RBCS_0001_AnalyzerTitle" xml:space="preserve">
     <value>Type members should be ordered by group</value>
     <comment>The title of the diagnostic.</comment>
   </data>
-  <data name="RBCS0002_AnalyzerDescription" xml:space="preserve">
+  <data name="RBCS_0002_AnalyzerDescription" xml:space="preserve">
     <value>Type members within the same group should be ordered correctly.</value>
   </data>
-  <data name="RBCS0002_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="RBCS_0002_AnalyzerMessageFormat" xml:space="preserve">
     <value>Member '{0}' is not ordered alphabetically or by configured priority</value>
   </data>
-  <data name="RBCS0002_AnalyzerTitle" xml:space="preserve">
+  <data name="RBCS_0002_AnalyzerTitle" xml:space="preserve">
     <value>Type members within the same group should be ordered correctly</value>
   </data>
-  <data name="RBCS0003_AnalyzerDescription" xml:space="preserve">
+  <data name="RBCS_0003_AnalyzerDescription" xml:space="preserve">
     <value>Member assignments in the object initializer are not ordered correctly.</value>
   </data>
-  <data name="RBCS0003_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="RBCS_0003_AnalyzerMessageFormat" xml:space="preserve">
     <value>The member assignments '{0}' are out of order</value>
   </data>
-  <data name="RBCS0003_AnalyzerTitle" xml:space="preserve">
+  <data name="RBCS_0003_AnalyzerTitle" xml:space="preserve">
     <value>Member assignments in an object initializer are ordered correctly</value>
+  </data>
+  <data name="RBCS_0010_AnalyzerDescription" xml:space="preserve">
+    <value>Using explicitly named optional parameters can help with code maintainability and help guard against errors and unintended behavior changes.</value>
+  </data>
+  <data name="RBCS_0010_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Optional parameter '{0}' should be passed explicitly using it's name</value>
+  </data>
+  <data name="RBCS_0010_AnalyzerTitle" xml:space="preserve">
+    <value>Use explicitly named optional parameters</value>
   </data>
 </root>
