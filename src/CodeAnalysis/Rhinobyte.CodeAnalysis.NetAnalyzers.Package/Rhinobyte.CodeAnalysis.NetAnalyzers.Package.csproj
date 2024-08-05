@@ -10,7 +10,7 @@
 
         <!-- VERSION VALUES -->
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
-        <PackageVersion>1.0.0.0-beta.4</PackageVersion>
+        <PackageVersion>1.0.0.0-preview.5</PackageVersion>
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
         <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
@@ -36,6 +36,9 @@
 
         <Description>Rhinobyte.CodeAnalysis.NetAnalyzers</Description>
         <PackageReleaseNotes>
+            v1.0.0.0-preview.5
+            - Add new rule RBCS0010: Arguments for optional parameters should be passed explicitly by name
+
             v1.0.0-beta.4
             - Updated nuget package dependencies to latest versions
             - Resolved analyzer warnings for newer analyzer rules

@@ -52,7 +52,7 @@
 
 
         <!-- Subproject Package Versions -->
-        <!-- Note: CodeAnalyzers Package Wouldn't Work If I Add The -beta.1 Suffix -->
+        <!-- Note: CodeAnalyzers Package Wouldn't Work If I Add The -preview.5 Suffix -->
         <CodeAnalyzersPackageVersion>1.0.3</CodeAnalyzersPackageVersion>
         <CodeAnalysisSourceRoot>$(RepoRoot)\src\CodeAnalysis</CodeAnalysisSourceRoot>
         <CodeAnalysisTestsRoot>$(RepoRoot)\tests\CodeAnalysis</CodeAnalysisTestsRoot>
