@@ -120,6 +120,20 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 	}
 
 	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_enum_members_diagnostic()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(13, 2, 13, 8).WithArguments("ValueB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(15, 2, 15, 8).WithArguments("ValueD"),
+		};
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
+	}
+
+	[TestMethod]
 	public async Task MembersOrderedCorrectlyAnalyzer_ignores_primary_constructor()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);

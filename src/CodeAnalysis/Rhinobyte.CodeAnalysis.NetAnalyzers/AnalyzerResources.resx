@@ -147,6 +147,15 @@
   <data name="RBCS_0003_AnalyzerTitle" xml:space="preserve">
     <value>Member assignments in an object initializer are ordered correctly</value>
   </data>
+  <data name="RBCS_0004_AnalyzerDescription" xml:space="preserve">
+    <value>Our code fix provider can automatically alphabetize your enum member names. Use with caution.</value>
+  </data>
+  <data name="RBCS_0004_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Order enum member names alphabetically (potentially breaking change)</value>
+  </data>
+  <data name="RBCS_0004_AnalyzerTitle" xml:space="preserve">
+    <value>Order enum members alphabetically</value>
+  </data>
   <data name="RBCS_0010_AnalyzerDescription" xml:space="preserve">
     <value>Using explicitly named optional parameters can help with code maintainability and help guard against errors and unintended behavior changes.</value>
   </data>

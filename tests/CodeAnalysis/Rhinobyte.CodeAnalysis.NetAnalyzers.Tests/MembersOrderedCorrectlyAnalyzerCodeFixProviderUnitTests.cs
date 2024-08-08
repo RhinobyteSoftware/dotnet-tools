@@ -132,4 +132,21 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProviderUnitTests
 
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
 	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_reorders_enum_members()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(13, 2, 13, 7).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(15, 2, 15, 7).WithArguments("Delta"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(34, 2, 34, 7).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(44, 2, 44, 7).WithArguments("Delta"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
 }

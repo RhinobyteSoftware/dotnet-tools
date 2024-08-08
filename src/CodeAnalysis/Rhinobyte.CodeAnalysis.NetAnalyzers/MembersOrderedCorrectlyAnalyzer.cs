@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 
@@ -31,6 +30,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// The diagnostic rule id for member names in an object initializer being ordered alphabetically
 	/// </summary>
 	public const string RBCS0003 = nameof(RBCS0003);
+
+	/// <summary>
+	/// The diagnostic rule id for enum member names not being ordered alphabetically
+	/// </summary>
+	public const string RBCS0004 = nameof(RBCS0004);
 
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
@@ -65,8 +69,18 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0004 = DiagnosticDescriptorHelper.Create(
+		RBCS0004,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		DiagnosticSeverity.Hidden,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		isEnabledByDefault: true
+	);
+
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleRBCS0001, RuleRBCS0002, RuleRBCS0003];
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleRBCS0001, RuleRBCS0002, RuleRBCS0003, Rule_RBCS_0004];
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
 		in SymbolAnalysisContext context,
@@ -94,6 +108,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		}
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
+		var isEnumType = namedTypeSymbol.TypeKind == TypeKind.Enum;
+
 		foreach (var memberSymbol in memberSymbols)
 		{
 			if (memberSymbol.IsImplicitlyDeclared)
@@ -140,6 +156,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 								&& string.Compare(locationData.PreviousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0))
 						{
 							diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
+
+							var diagnosticRule = isEnumType
+								? Rule_RBCS_0004
+								: RuleRBCS0002;
+
 							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 							context.ReportDiagnostic(diagnostic);
 							continue;
@@ -185,6 +206,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		ImmutableDictionary<string, string?>? diagnosticProperties = null;
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
+		var isEnumType = namedTypeSymbol.TypeKind == TypeKind.Enum;
+
 		var completedGroups = new List<MemberGroupType>();
 		var currentGroup = groupOrder[0];
 		var currentGroupIndex = 1;
@@ -235,7 +258,12 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 						&& string.Compare(previousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0))
 				{
 					diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
-					var diagnostic = Diagnostic.Create(RuleRBCS0002, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
+
+					var diagnosticRule = isEnumType
+						? Rule_RBCS_0004
+						: RuleRBCS0002;
+
+					var diagnostic = Diagnostic.Create(diagnosticRule, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 					context.ReportDiagnostic(diagnostic);
 					continue;
 				}

@@ -23,7 +23,12 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 {
 	/// <inheritdoc/>
 	public sealed override ImmutableArray<string> FixableDiagnosticIds
-		=> [MembersOrderedCorrectlyAnalyzer.RBCS0001, MembersOrderedCorrectlyAnalyzer.RBCS0002, MembersOrderedCorrectlyAnalyzer.RBCS0003];
+		=> [
+			MembersOrderedCorrectlyAnalyzer.RBCS0001,
+			MembersOrderedCorrectlyAnalyzer.RBCS0002,
+			MembersOrderedCorrectlyAnalyzer.RBCS0003,
+			MembersOrderedCorrectlyAnalyzer.RBCS0004
+		];
 
 	/// <summary>
 	/// Count the number of newlines and non-whitespace trivia in the provided trivia list.
@@ -120,6 +125,9 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		if (root is null)
 			return;
 
+		List<Diagnostic>? enumDiagnosticsToFix = null;
+		List<EnumDeclarationSyntax>? enumDeclarationsToFix = null;
+
 		List<Diagnostic>? typeMemberDiagnosticsToFix = null;
 		List<TypeDeclarationSyntax>? typeDeclarationsToFix = null;
 
@@ -158,14 +166,29 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 				continue;
 			}
 
-			var typeDeclarationSyntaxNode = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
-			if (typeDeclarationSyntaxNode is null)
-				continue;
+			var typeDeclarationSyntaxNode = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().FirstOrDefault();
+			if (typeDeclarationSyntaxNode is not null)
+			{
+				typeMemberDiagnosticsToFix ??= [];
+				typeMemberDiagnosticsToFix.Add(diagnosticToFix);
 
-			typeMemberDiagnosticsToFix ??= [];
-			typeMemberDiagnosticsToFix.Add(diagnosticToFix);
-			typeDeclarationsToFix ??= [];
-			typeDeclarationsToFix.Add(typeDeclarationSyntaxNode);
+				typeDeclarationsToFix ??= [];
+				typeDeclarationsToFix.Add(typeDeclarationSyntaxNode);
+
+				continue;
+			}
+
+			var enumDeclarationSyntaxNode = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<EnumDeclarationSyntax>().FirstOrDefault();
+			if (enumDeclarationSyntaxNode is not null)
+			{
+				enumDiagnosticsToFix ??= [];
+				enumDiagnosticsToFix.Add(diagnosticToFix);
+
+				enumDeclarationsToFix ??= [];
+				enumDeclarationsToFix.Add(enumDeclarationSyntaxNode);
+
+				continue;
+			}
 		}
 
 		if (typeMemberDiagnosticsToFix is not null && typeDeclarationsToFix is not null)
@@ -194,6 +217,68 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			// Only need to register one document fix for the type member re-order, so pass it all the individual member diagnostics that are being fixed
 			context.RegisterCodeFix(codeFixAction, typeMemberDiagnosticsToFix);
 		}
+
+		if (enumDiagnosticsToFix is not null && enumDeclarationsToFix is not null)
+		{
+			// TODO: Support custom options to order specific names first?
+
+			var codeFixAction = CodeAction.Create(
+				title: CodeFixResources.MemberOrderCodeFixTitle,
+				createChangedDocument: (cancellationToken) => ReorderEnumMembersAsync(
+					context.Document,
+					enumDeclarationsToFix,
+					cancellationToken
+				),
+				equivalenceKey: nameof(CodeFixResources.MemberOrderCodeFixTitle)
+			);
+
+			// Only need to register one document fix for the enum member re-order, so pass it all the individual member diagnostics that are being fixed
+			context.RegisterCodeFix(codeFixAction, enumDiagnosticsToFix);
+		}
+	}
+
+	private static async Task<Document> ReorderEnumMembersAsync(
+		Document document,
+		ICollection<EnumDeclarationSyntax> enumDeclarationsToFix,
+		CancellationToken cancellationToken)
+	{
+		var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+		if (oldRoot is null)
+			return document;
+
+#if DEBUG
+		var oldSyntaxTree = await document.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
+		var oldSyntaxTreeContent = oldSyntaxTree?.ToString();
+#endif
+
+		var newRoot = oldRoot;
+		foreach (var enumDeclaration in enumDeclarationsToFix)
+		{
+			var reorderedMembers = enumDeclaration.Members
+				.OrderBy(memberDeclarationSyntax => memberDeclarationSyntax.Identifier.Text)
+				.ToList();
+
+			var separators = enumDeclaration.Members.GetSeparators();
+
+			var newEnumMemberOrder = SyntaxFactory.SeparatedList(reorderedMembers, separators);
+
+			var newEnumDeclaration = enumDeclaration.WithMembers(newEnumMemberOrder);
+
+			newRoot = newRoot.ReplaceNode(enumDeclaration, newEnumDeclaration);
+		}
+
+		if (newRoot == oldRoot)
+			return document;
+
+#if DEBUG
+		var newDocument = document.WithSyntaxRoot(newRoot);
+		var newSyntaxTree = await newDocument.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
+		var newSyntaxTreeContent = newSyntaxTree?.ToString();
+		return newDocument;
+#else
+		return document.WithSyntaxRoot(newRoot);
+#endif
+
 	}
 
 	private static async Task<Document> ReorderObjectInitializerMemberAssignmentsAsync(
