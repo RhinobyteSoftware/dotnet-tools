@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Rhinobyte.CodeAnalysis.NetAnalyzers;
 
@@ -199,6 +200,15 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			if (!memberSymbol.CanBeReferencedByName && currentMemberGroupType != MemberGroupType.Constructors && currentMemberGroupType != MemberGroupType.StaticConstructors)
 				continue;
 
+			if (currentMemberGroupType == MemberGroupType.Constructors)
+			{
+				var declaringSyntax = memberSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(context.CancellationToken);
+				var isPrimaryConstructor = declaringSyntax is ClassDeclarationSyntax;
+
+				if (isPrimaryConstructor)
+					continue;
+			}
+
 			if (completedGroups.Contains(currentMemberGroupType))
 			{
 				diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
@@ -327,7 +337,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 			case SymbolKind.Method:
 			{
-				var isConstructor = symbol.Name.Contains(".ctor") || symbol.Name.Contains(".cctor");
+				var methodSymbol = symbol as IMethodSymbol;
+				var isConstructor = methodSymbol?.MethodKind == MethodKind.Constructor
+					|| symbol.Name.Contains(".ctor")
+					|| symbol.Name.Contains(".cctor");
+
 				if (isConstructor && symbol.IsStatic)
 					return MemberGroupType.StaticConstructors;
 				else if (isConstructor)

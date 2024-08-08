@@ -118,4 +118,29 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 
 		await VerifyCS.VerifyAnalyzerAsync(testContent);
 	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_ignores_primary_constructor()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(13, 23, 13, 34).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(17, 24, 17, 31).WithArguments("_fieldB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(28, 15, 28, 24).WithArguments("IsEnabled"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(35, 28, 35, 44).WithArguments("DoSomethingAsync"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(40, 17, 40, 35).WithArguments("OutOfOrderProperty"),
+		};
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_ignores_primary_constructor2()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent);
+	}
 }

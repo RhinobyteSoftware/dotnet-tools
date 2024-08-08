@@ -114,4 +114,22 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProviderUnitTests
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
 		//await VerifyCS.VerifyCodeFixAsync(testContent, codeFixResult);
 	}
+
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_correctly_reorders_with_primary_constructor()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(26, 23, 26, 42).WithArguments("_outOfOrderedField1"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(28, 9, 28, 47).WithArguments(".ctor"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(39, 16, 39, 34).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(41, 14, 41, 33).WithArguments("_outOfOrderedField2"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
 }
