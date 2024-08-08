@@ -10,7 +10,7 @@
 
         <!-- VERSION VALUES -->
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
-        <PackageVersion>1.0.0.0-preview.5</PackageVersion>
+        <PackageVersion>1.0.0.0-preview.6</PackageVersion>
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
         <Copyright>Copyright © Ryan Thomas. All rights reserved.</Copyright>
@@ -36,6 +36,12 @@
 
         <Description>Rhinobyte.CodeAnalysis.NetAnalyzers</Description>
         <PackageReleaseNotes>
+            v1.0.0.0-preview.6
+            - Update analyzer for RBCS0001 to ignore a primary constructor when determining if member groups are ordered correctly
+            - Fix bug that would result in a sequence contains no elements exception when the MembersOrderedCorrectlyAnalyzer was run on an enum type declaration
+            - Add new rule RBCS0004: Order enum member names alphabetically
+            - Add new rule RBCS0005: Order enum member values in ascending order
+            
             v1.0.0.0-preview.5
             - Add new rule RBCS0010: Arguments for optional parameters should be passed explicitly by name
 
