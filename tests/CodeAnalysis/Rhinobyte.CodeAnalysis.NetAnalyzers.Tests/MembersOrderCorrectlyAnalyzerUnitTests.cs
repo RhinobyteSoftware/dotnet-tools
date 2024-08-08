@@ -47,8 +47,11 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(87, 16, 87, 23).WithArguments("AMethod"),
 		};
 
-		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
-		//await VerifyCS.VerifyAnalyzerAsync(testContent);
+		await VerifyCS.VerifyAnalyzerAsync(
+			testContent,
+			expected: expectedDiagnosticResults,
+			disabledDiagnostics: [MembersOrderedCorrectlyAnalyzer.RBCS0005]
+		);
 	}
 
 	[TestMethod]

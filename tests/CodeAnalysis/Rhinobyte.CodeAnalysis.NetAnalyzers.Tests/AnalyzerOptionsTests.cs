@@ -57,7 +57,7 @@ dotnet_code_quality.RBCS0002.property_names_to_order_first = Id
 ")
 		};
 
-		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, editorConfigSettings);
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 		//await VerifyCS.VerifyCodeFixAsync(testContent, codeFixResult);
 	}
 
@@ -93,7 +93,7 @@ dotnet_code_quality.RBCS0002.property_names_to_order_first = Id
 ")
 		};
 
-		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, editorConfigSettings);
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 	}
 
 
@@ -143,7 +143,7 @@ dotnet_code_quality.RBCS0001.type_members_group_order = Constants,StaticReadonly
 ")
 		};
 
-		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, editorConfigSettings);
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 		//await VerifyCS.VerifyCodeFixAsync(testContent, codeFixResult);
 	}
 

@@ -36,6 +36,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// </summary>
 	public const string RBCS0004 = nameof(RBCS0004);
 
+	/// <summary>
+	/// The diagnostic rule id for method parameter names not being ordered alphabetically
+	/// </summary>
+	public const string RBCS0005 = nameof(RBCS0005);
+
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
 
@@ -76,11 +81,78 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		DiagnosticSeverity.Hidden,
 		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
 		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
-		isEnabledByDefault: true
+		isEnabledByDefault: false
+	);
+
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0005 = DiagnosticDescriptorHelper.Create(
+		RBCS0005,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0005_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		DiagnosticSeverity.Hidden,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0005_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0005_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		isEnabledByDefault: false
 	);
 
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleRBCS0001, RuleRBCS0002, RuleRBCS0003, Rule_RBCS_0004];
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+	[
+		RuleRBCS0001,
+		RuleRBCS0002,
+		RuleRBCS0003,
+		Rule_RBCS_0004,
+		Rule_RBCS_0005
+	];
+
+	private static void AnalyzeMethodDeclarationSyntax(SyntaxNodeAnalysisContext context)
+	{
+		var classDeclarationSyntax = context.Node as ClassDeclarationSyntax;
+		var constructorDeclarationSyntax = context.Node as ConstructorDeclarationSyntax;
+		var methodDeclarationSyntax = context.Node as MethodDeclarationSyntax;
+
+		if (classDeclarationSyntax is null
+			&& constructorDeclarationSyntax is null
+			&& methodDeclarationSyntax is null)
+		{
+			return;
+		}
+
+		var parameterList = classDeclarationSyntax?.ParameterList
+			?? constructorDeclarationSyntax?.ParameterList
+			?? methodDeclarationSyntax?.ParameterList;
+
+		if (parameterList is null)
+			return;
+
+		var parameterCount = parameterList.Parameters.Count;
+		if (parameterCount < 1)
+			return;
+
+		var outOfOrderParameterNames = new List<string>();
+		string? previousParameterName = null;
+
+		foreach (var parameterSyntax in parameterList.Parameters)
+		{
+			var parameterName = parameterSyntax.Identifier.ValueText ?? parameterSyntax.Identifier.Text;
+			if (string.IsNullOrEmpty(parameterName))
+				continue;
+
+			if (previousParameterName is not null
+				&& string.Compare(previousParameterName, parameterName, StringComparison.OrdinalIgnoreCase) > 0)
+			{
+				outOfOrderParameterNames.Add(parameterName);
+				continue;
+			}
+
+			previousParameterName = parameterName;
+		}
+
+		if (outOfOrderParameterNames.Count > 0)
+		{
+			var diagnostic = Diagnostic.Create(Rule_RBCS_0005, parameterList.GetLocation(), string.Join(", ", outOfOrderParameterNames));
+			context.ReportDiagnostic(diagnostic);
+		}
+	}
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
 		in SymbolAnalysisContext context,
@@ -439,6 +511,13 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		context.RegisterSyntaxNodeAction<Microsoft.CodeAnalysis.CSharp.SyntaxKind>(
 			AnalyzeObjectInitializerSyntax,
 			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ObjectInitializerExpression
+		);
+
+		context.RegisterSyntaxNodeAction<Microsoft.CodeAnalysis.CSharp.SyntaxKind>(
+			AnalyzeMethodDeclarationSyntax,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ClassDeclaration,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ConstructorDeclaration,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration
 		);
 	}
 

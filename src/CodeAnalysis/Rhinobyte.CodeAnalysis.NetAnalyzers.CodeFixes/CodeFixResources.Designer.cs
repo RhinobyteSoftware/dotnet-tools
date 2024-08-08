@@ -79,6 +79,15 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reorder the method parameters.
+        /// </summary>
+        internal static string ParameterOrderCodeFixTitle {
+            get {
+                return ResourceManager.GetString("ParameterOrderCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use explicit name for optional parameters.
         /// </summary>
         internal static string UseExplicitNameForOptionalParametersCodeFixTitle {

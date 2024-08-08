@@ -28,14 +28,29 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 		=> CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>.Diagnostic(descriptor);
 
 	/// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-	public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
+	public static async Task VerifyAnalyzerAsync(
+		string source,
+		DiagnosticResult[]? expected = null,
+		ICollection<string>? disabledDiagnostics = null,
+		ICollection<(string filename, string fileContent)>? analyzerConfigFiles = null)
 	{
 		var test = new Test
 		{
 			TestCode = source,
 		};
 
-		test.ExpectedDiagnostics.AddRange(expected);
+		if (disabledDiagnostics is not null)
+		{
+			test.DisabledDiagnostics.AddRange(disabledDiagnostics);
+		}
+
+		if (analyzerConfigFiles is not null)
+		{
+			foreach (var (filename, fileContent) in analyzerConfigFiles)
+				test.TestState.AnalyzerConfigFiles.Add((filename, fileContent));
+		}
+
+		test.ExpectedDiagnostics.AddRange(expected ?? []);
 		await test.RunAsync(CancellationToken.None);
 	}
 
@@ -52,6 +67,7 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 		string source,
 		DiagnosticResult[] expected,
 		string fixedSource,
+		ICollection<string>? disabledDiagnostics = null,
 		ICollection<(string filename, string fileContent)>? analyzerConfigFiles = null)
 	{
 		var test = new Test
@@ -59,6 +75,11 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 			TestCode = source,
 			FixedCode = fixedSource,
 		};
+
+		if (disabledDiagnostics is not null)
+		{
+			test.DisabledDiagnostics.AddRange(disabledDiagnostics);
+		}
 
 		if (analyzerConfigFiles is not null)
 		{

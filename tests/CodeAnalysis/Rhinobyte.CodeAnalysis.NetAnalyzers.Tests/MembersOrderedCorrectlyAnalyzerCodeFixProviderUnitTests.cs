@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using VerifyCS = Rhinobyte.CodeAnalysis.NetAnalyzers.Tests.CSharpCodeFixVerifier<
@@ -148,5 +149,32 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProviderUnitTests
 		};
 
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_reorders_method_parameters()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0005).WithSpan(9, 40, 11, 15).WithArguments("alpha"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0005).WithSpan(20, 35, 25, 16).WithArguments("bravo, delta"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0005).WithSpan(41, 25, 41, 46).WithArguments("alpha"),
+		};
+
+		var editorConfigSettings = new List<(string, string)>()
+		{
+			("/.EditorConfig", $@"root = true
+
+[*]
+dotnet_diagnostic.RBCS0001.severity = none
+dotnet_diagnostic.RBCS0002.severity = none
+dotnet_diagnostic.RBCS0003.severity = none
+")
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 	}
 }
