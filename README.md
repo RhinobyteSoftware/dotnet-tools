@@ -6,7 +6,9 @@ This repo contains the code to build the Rhinobyte tools libraries for .NET
 
 ## Libraries/Projects
 
+### [Rhinobyte.CodeAnalysis.NetAnalyzers](/src/CodeAnalysis/Rhinobyte.CodeAnalysis.NetAnalyzers.Package/README.md)
 
+[![NuGet version (Rhinobyte.CodeAnalysis.NetAnalyzers)](https://img.shields.io/nuget/v/Rhinobyte.CodeAnalysis.NetAnalyzers.svg?style=flat)](https://www.nuget.org/packages/Rhinobyte.CodeAnalysis.NetAnalyzers/)
 
 ## Contributing
 

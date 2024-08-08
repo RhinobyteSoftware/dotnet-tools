@@ -31,6 +31,16 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// </summary>
 	public const string RBCS0003 = nameof(RBCS0003);
 
+	/// <summary>
+	/// The diagnostic rule id for enum member names not being ordered alphabetically
+	/// </summary>
+	public const string RBCS0004 = nameof(RBCS0004);
+
+	/// <summary>
+	/// The diagnostic rule id for method parameter names not being ordered alphabetically
+	/// </summary>
+	public const string RBCS0005 = nameof(RBCS0005);
+
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
 
@@ -64,8 +74,85 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0004 = DiagnosticDescriptorHelper.Create(
+		RBCS0004,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		DiagnosticSeverity.Hidden,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0004_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		isEnabledByDefault: false
+	);
+
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0005 = DiagnosticDescriptorHelper.Create(
+		RBCS0005,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0005_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		DiagnosticSeverity.Hidden,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0005_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0005_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		isEnabledByDefault: false
+	);
+
 	/// <inheritdoc />
-	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [RuleRBCS0001, RuleRBCS0002, RuleRBCS0003];
+	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+	[
+		RuleRBCS0001,
+		RuleRBCS0002,
+		RuleRBCS0003,
+		Rule_RBCS_0004,
+		Rule_RBCS_0005
+	];
+
+	private static void AnalyzeMethodDeclarationSyntax(SyntaxNodeAnalysisContext context)
+	{
+		var classDeclarationSyntax = context.Node as ClassDeclarationSyntax;
+		var constructorDeclarationSyntax = context.Node as ConstructorDeclarationSyntax;
+		var methodDeclarationSyntax = context.Node as MethodDeclarationSyntax;
+
+		if (classDeclarationSyntax is null
+			&& constructorDeclarationSyntax is null
+			&& methodDeclarationSyntax is null)
+		{
+			return;
+		}
+
+		var parameterList = classDeclarationSyntax?.ParameterList
+			?? constructorDeclarationSyntax?.ParameterList
+			?? methodDeclarationSyntax?.ParameterList;
+
+		if (parameterList is null)
+			return;
+
+		var parameterCount = parameterList.Parameters.Count;
+		if (parameterCount < 1)
+			return;
+
+		var outOfOrderParameterNames = new List<string>();
+		string? previousParameterName = null;
+
+		foreach (var parameterSyntax in parameterList.Parameters)
+		{
+			var parameterName = parameterSyntax.Identifier.ValueText ?? parameterSyntax.Identifier.Text;
+			if (string.IsNullOrEmpty(parameterName))
+				continue;
+
+			if (previousParameterName is not null
+				&& string.Compare(previousParameterName, parameterName, StringComparison.OrdinalIgnoreCase) > 0)
+			{
+				outOfOrderParameterNames.Add(parameterName);
+				continue;
+			}
+
+			previousParameterName = parameterName;
+		}
+
+		if (outOfOrderParameterNames.Count > 0)
+		{
+			var diagnostic = Diagnostic.Create(Rule_RBCS_0005, parameterList.GetLocation(), string.Join(", ", outOfOrderParameterNames));
+			context.ReportDiagnostic(diagnostic);
+		}
+	}
 
 	private static void AnalyzeMultipartNamedTypeSymbol(
 		in SymbolAnalysisContext context,
@@ -93,6 +180,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		}
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
+		var isEnumType = namedTypeSymbol.TypeKind == TypeKind.Enum;
+
 		foreach (var memberSymbol in memberSymbols)
 		{
 			if (memberSymbol.IsImplicitlyDeclared)
@@ -139,6 +228,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 								&& string.Compare(locationData.PreviousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0))
 						{
 							diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
+
+							var diagnosticRule = isEnumType
+								? Rule_RBCS_0004
+								: RuleRBCS0002;
+
 							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 							context.ReportDiagnostic(diagnostic);
 							continue;
@@ -184,6 +278,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		ImmutableDictionary<string, string?>? diagnosticProperties = null;
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
+		var isEnumType = namedTypeSymbol.TypeKind == TypeKind.Enum;
+
 		var completedGroups = new List<MemberGroupType>();
 		var currentGroup = groupOrder[0];
 		var currentGroupIndex = 1;
@@ -198,6 +294,15 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			var currentMemberGroupType = GetGroupType(memberSymbol);
 			if (!memberSymbol.CanBeReferencedByName && currentMemberGroupType != MemberGroupType.Constructors && currentMemberGroupType != MemberGroupType.StaticConstructors)
 				continue;
+
+			if (currentMemberGroupType == MemberGroupType.Constructors)
+			{
+				var declaringSyntax = memberSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(context.CancellationToken);
+				var isPrimaryConstructor = declaringSyntax is ClassDeclarationSyntax;
+
+				if (isPrimaryConstructor)
+					continue;
+			}
 
 			if (completedGroups.Contains(currentMemberGroupType))
 			{
@@ -225,7 +330,12 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 						&& string.Compare(previousMemberNameForCurrentGroup, memberSymbol.Name, StringComparison.OrdinalIgnoreCase) > 0))
 				{
 					diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
-					var diagnostic = Diagnostic.Create(RuleRBCS0002, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
+
+					var diagnosticRule = isEnumType
+						? Rule_RBCS_0004
+						: RuleRBCS0002;
+
+					var diagnostic = Diagnostic.Create(diagnosticRule, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 					context.ReportDiagnostic(diagnostic);
 					continue;
 				}
@@ -327,7 +437,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 			case SymbolKind.Method:
 			{
-				var isConstructor = symbol.Name.Contains(".ctor") || symbol.Name.Contains(".cctor");
+				var methodSymbol = symbol as IMethodSymbol;
+				var isConstructor = methodSymbol?.MethodKind == MethodKind.Constructor
+					|| symbol.Name.Contains(".ctor")
+					|| symbol.Name.Contains(".cctor");
+
 				if (isConstructor && symbol.IsStatic)
 					return MemberGroupType.StaticConstructors;
 				else if (isConstructor)
@@ -397,6 +511,13 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		context.RegisterSyntaxNodeAction<Microsoft.CodeAnalysis.CSharp.SyntaxKind>(
 			AnalyzeObjectInitializerSyntax,
 			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ObjectInitializerExpression
+		);
+
+		context.RegisterSyntaxNodeAction<Microsoft.CodeAnalysis.CSharp.SyntaxKind>(
+			AnalyzeMethodDeclarationSyntax,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ClassDeclaration,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ConstructorDeclaration,
+			Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration
 		);
 	}
 

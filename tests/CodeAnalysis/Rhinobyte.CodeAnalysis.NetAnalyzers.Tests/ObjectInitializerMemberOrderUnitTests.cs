@@ -65,6 +65,6 @@ dotnet_code_quality.RBCS0002.property_names_to_order_first = Id
 ")
 		};
 
-		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, editorConfigSettings);
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 	}
 }

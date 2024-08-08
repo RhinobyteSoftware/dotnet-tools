@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using VerifyCS = Rhinobyte.CodeAnalysis.NetAnalyzers.Tests.CSharpCodeFixVerifier<
@@ -113,5 +114,67 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProviderUnitTests
 
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
 		//await VerifyCS.VerifyCodeFixAsync(testContent, codeFixResult);
+	}
+
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_correctly_reorders_with_primary_constructor()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(26, 23, 26, 42).WithArguments("_outOfOrderedField1"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(28, 9, 28, 47).WithArguments(".ctor"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(39, 16, 39, 34).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(41, 14, 41, 33).WithArguments("_outOfOrderedField2"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_reorders_enum_members()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(13, 2, 13, 7).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(15, 2, 15, 7).WithArguments("Delta"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(34, 2, 34, 7).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(44, 2, 44, 7).WithArguments("Delta"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_reorders_method_parameters()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0005).WithSpan(9, 40, 11, 15).WithArguments("alpha"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0005).WithSpan(20, 35, 25, 16).WithArguments("bravo, delta"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0005).WithSpan(41, 25, 41, 46).WithArguments("alpha"),
+		};
+
+		var editorConfigSettings = new List<(string, string)>()
+		{
+			("/.EditorConfig", $@"root = true
+
+[*]
+dotnet_diagnostic.RBCS0001.severity = none
+dotnet_diagnostic.RBCS0002.severity = none
+dotnet_diagnostic.RBCS0003.severity = none
+")
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 	}
 }

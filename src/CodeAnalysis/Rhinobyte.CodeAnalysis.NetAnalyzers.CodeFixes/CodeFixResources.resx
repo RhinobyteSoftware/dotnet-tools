@@ -124,6 +124,9 @@
     <value>Reorder the members</value>
     <comment>The title of the code fix.</comment>
   </data>
+  <data name="ParameterOrderCodeFixTitle" xml:space="preserve">
+    <value>Reorder the method parameters</value>
+  </data>
   <data name="UseExplicitNameForOptionalParametersCodeFixTitle" xml:space="preserve">
     <value>Use explicit name for optional parameters</value>
   </data>

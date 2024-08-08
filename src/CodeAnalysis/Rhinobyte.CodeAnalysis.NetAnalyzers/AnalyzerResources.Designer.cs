@@ -142,6 +142,60 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Our code fix provider can automatically alphabetize your enum member names. Use with caution..
+        /// </summary>
+        internal static string RBCS_0004_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RBCS_0004_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order enum member names alphabetically (potentially breaking change).
+        /// </summary>
+        internal static string RBCS_0004_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RBCS_0004_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order enum members alphabetically.
+        /// </summary>
+        internal static string RBCS_0004_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RBCS_0004_AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order method parameters alphabetically..
+        /// </summary>
+        internal static string RBCS_0005_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RBCS_0005_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order method parameters alphabetically.
+        /// </summary>
+        internal static string RBCS_0005_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RBCS_0005_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order method parameters alphabetically.
+        /// </summary>
+        internal static string RBCS_0005_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RBCS_0005_AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Using explicitly named optional parameters can help with code maintainability and help guard against errors and unintended behavior changes..
         /// </summary>
         internal static string RBCS_0010_AnalyzerDescription {

@@ -47,8 +47,11 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(87, 16, 87, 23).WithArguments("AMethod"),
 		};
 
-		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
-		//await VerifyCS.VerifyAnalyzerAsync(testContent);
+		await VerifyCS.VerifyAnalyzerAsync(
+			testContent,
+			expected: expectedDiagnosticResults,
+			disabledDiagnostics: [MembersOrderedCorrectlyAnalyzer.RBCS0005]
+		);
 	}
 
 	[TestMethod]
@@ -113,6 +116,45 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 
 	[TestMethod]
 	public async Task MembersOrderedCorrectlyAnalyzer_does_not_flag_any_symbols_when_group_ordering_is_correct_in_partial_classes()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_enum_members_diagnostic()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(13, 2, 13, 8).WithArguments("ValueB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0004).WithSpan(15, 2, 15, 8).WithArguments("ValueD"),
+		};
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_ignores_primary_constructor()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(13, 23, 13, 34).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(17, 24, 17, 31).WithArguments("_fieldB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(28, 15, 28, 24).WithArguments("IsEnabled"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(35, 28, 35, 44).WithArguments("DoSomethingAsync"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(40, 17, 40, 35).WithArguments("OutOfOrderProperty"),
+		};
+
+		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
+	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyAnalyzer_ignores_primary_constructor2()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
 
