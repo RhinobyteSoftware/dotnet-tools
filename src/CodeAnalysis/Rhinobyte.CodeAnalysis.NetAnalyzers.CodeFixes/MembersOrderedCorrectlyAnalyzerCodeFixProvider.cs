@@ -500,6 +500,16 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 
 				if (memberSymbol is null)
 				{
+					var isPartial = memberSyntax.Modifiers.Any(modifierToken => modifierToken.ValueText == "partial");
+					if (isPartial)
+					{
+						memberSymbol ??= semanticModel.GetSymbolInfo(memberSyntax, cancellationToken).Symbol;
+						memberSymbol ??= semanticModel.GetDeclaredSymbol(memberSyntax, cancellationToken);
+					}
+				}
+
+				if (memberSymbol is null)
+				{
 					sortedMembers.Add(new SortedMemberKey(null, memberCount++), memberSyntax);
 					continue;
 				}

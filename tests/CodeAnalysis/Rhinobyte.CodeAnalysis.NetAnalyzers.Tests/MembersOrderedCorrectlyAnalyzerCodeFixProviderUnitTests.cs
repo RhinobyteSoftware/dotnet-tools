@@ -177,4 +177,22 @@ dotnet_diagnostic.RBCS0003.severity = none
 
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 	}
+
+	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_works_with_primary_constructor_partial_classes()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(16, 34, 16, 50).WithArguments("TimeSpanConstant"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(18, 21, 18, 35).WithArguments("StaticProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(25, 22, 25, 33).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(30, 14, 30, 23).WithArguments("PropertyA"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(37, 23, 37, 30).WithArguments("_field2"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
 }
