@@ -191,6 +191,15 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			if (!memberSymbol.CanBeReferencedByName && currentMemberGroupType != MemberGroupType.Constructors && currentMemberGroupType != MemberGroupType.StaticConstructors)
 				continue;
 
+			if (currentMemberGroupType == MemberGroupType.Constructors)
+			{
+				var declaringSyntax = memberSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(context.CancellationToken);
+				var isPrimaryConstructor = declaringSyntax is ClassDeclarationSyntax;
+
+				if (isPrimaryConstructor)
+					continue;
+			}
+
 			foreach (var memberLocation in memberSymbol.Locations)
 			{
 				var memberLocationLineSpan = memberLocation.GetLineSpan();
