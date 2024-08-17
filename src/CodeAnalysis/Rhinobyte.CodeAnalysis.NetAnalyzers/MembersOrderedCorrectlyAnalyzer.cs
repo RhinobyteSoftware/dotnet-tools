@@ -180,7 +180,10 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 		var orderingOptions = MemberOrderingOptions.ParseOptions(context);
 		var groupOrder = MemberOrderingOptions.GetGroupOrderLookupOrDefault(orderingOptions.GroupOrderSettings);
-		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+
+		var methodNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(orderingOptions.MethodNamesToOrderFirst);
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+
 		var propertyNameOrderComparer = orderingOptions.ArePropertyNamesToOrderFirstCaseSensitive
 			? StringComparer.Ordinal
 			: StringComparer.OrdinalIgnoreCase;
@@ -235,14 +238,26 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 						continue;
 					}
 
+					var isMethodType = currentMemberGroupType == MemberGroupType.InstanceMethods || currentMemberGroupType == MemberGroupType.StaticMethods;
+					var isInstancePropertyType = currentMemberGroupType == MemberGroupType.InstanceProperties;
+
 					var isInCurrentGroup = locationData.CurrentGroup.Contains(currentMemberGroupType);
 					if (isInCurrentGroup)
 					{
 						if (!memberSymbol.CanBeReferencedByName)
 							continue;
 
-						var shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
-							&& propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+						var shouldBeOrderedFirst = false;
+						if (isMethodType)
+						{
+							shouldBeOrderedFirst = methodNamesToOrderFirst is not null
+								&& methodNamesToOrderFirst.Contains(memberSymbol.Name, StringComparer.OrdinalIgnoreCase);
+						}
+						else if (isInstancePropertyType)
+						{
+							shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
+								&& propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+						}
 
 						if (shouldBeOrderedFirst && !locationData.IsAlphabetizingGroup)
 							continue;
@@ -265,7 +280,22 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 					}
 
 					// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
-					locationData.IsAlphabetizingGroup = propertyNamesToOrderFirst is null || !propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+
+
+					// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
+					if (isMethodType)
+					{
+						locationData.IsAlphabetizingGroup = methodNamesToOrderFirst is null || !methodNamesToOrderFirst.Contains(memberSymbol.Name, StringComparer.OrdinalIgnoreCase);
+					}
+					else if (isInstancePropertyType)
+					{
+						locationData.IsAlphabetizingGroup = propertyNamesToOrderFirst is null || !propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+					}
+					else
+					{
+						locationData.IsAlphabetizingGroup = true;
+					}
+
 					locationData.PreviousMemberNameForCurrentGroup = memberSymbol.Name;
 
 					isInCurrentGroup = locationData.AdvanceCurrentGroupTo(currentMemberGroupType, groupOrder);
@@ -291,7 +321,10 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 
 		var orderingOptions = MemberOrderingOptions.ParseOptions(context);
 		var groupOrder = MemberOrderingOptions.GetGroupOrderLookupOrDefault(orderingOptions.GroupOrderSettings);
-		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+
+		var methodNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(orderingOptions.MethodNamesToOrderFirst);
+
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
 		var propertyNameOrderComparer = orderingOptions.ArePropertyNamesToOrderFirstCaseSensitive
 			? StringComparer.Ordinal
 			: StringComparer.OrdinalIgnoreCase;
@@ -334,14 +367,26 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 				continue;
 			}
 
+			var isMethodType = currentMemberGroupType == MemberGroupType.InstanceMethods || currentMemberGroupType == MemberGroupType.StaticMethods;
+			var isInstancePropertyType = currentMemberGroupType == MemberGroupType.InstanceProperties;
+
 			var isInCurrentGroup = currentGroup.Contains(currentMemberGroupType);
 			if (isInCurrentGroup)
 			{
 				if (!memberSymbol.CanBeReferencedByName)
 					continue;
 
-				var shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
-					&& propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+				var shouldBeOrderedFirst = false;
+				if (isMethodType)
+				{
+					shouldBeOrderedFirst = methodNamesToOrderFirst is not null
+						&& methodNamesToOrderFirst.Contains(memberSymbol.Name, StringComparer.OrdinalIgnoreCase);
+				}
+				else if (isInstancePropertyType)
+				{
+					shouldBeOrderedFirst = propertyNamesToOrderFirst is not null
+						&& propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+				}
 
 				if (shouldBeOrderedFirst && !isAlphabetizingGroup)
 					continue;
@@ -364,7 +409,19 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			}
 
 			// If the symbol wasn't in the current group, update the previous member name to the first symbol for this new group
-			isAlphabetizingGroup = propertyNamesToOrderFirst is null || !propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+			if (isMethodType)
+			{
+				isAlphabetizingGroup = methodNamesToOrderFirst is null || !methodNamesToOrderFirst.Contains(memberSymbol.Name, StringComparer.OrdinalIgnoreCase);
+			}
+			else if (isInstancePropertyType)
+			{
+				isAlphabetizingGroup = propertyNamesToOrderFirst is null || !propertyNamesToOrderFirst.Contains(memberSymbol.Name, propertyNameOrderComparer);
+			}
+			else
+			{
+				isAlphabetizingGroup = true;
+			}
+
 			previousMemberNameForCurrentGroup = memberSymbol.Name;
 
 			while (!isInCurrentGroup && currentGroupIndex < groupOrder.Length)
@@ -384,7 +441,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			return;
 
 		var orderingOptions = MemberOrderingOptions.ParseOptions(context);
-		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(orderingOptions.PropertyNamesToOrderFirst);
 		var propertyNameOrderComparer = orderingOptions.ArePropertyNamesToOrderFirstCaseSensitive
 			? StringComparer.Ordinal
 			: StringComparer.OrdinalIgnoreCase;

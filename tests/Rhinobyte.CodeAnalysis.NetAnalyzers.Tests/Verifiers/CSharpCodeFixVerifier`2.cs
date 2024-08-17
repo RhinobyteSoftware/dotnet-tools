@@ -68,7 +68,8 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 		DiagnosticResult[] expected,
 		string fixedSource,
 		ICollection<string>? disabledDiagnostics = null,
-		ICollection<(string filename, string fileContent)>? analyzerConfigFiles = null)
+		ICollection<(string filename, string fileContent)>? analyzerConfigFiles = null,
+		ICollection<(string filename, string fileContent)>? additionalFiles = null)
 	{
 		var test = new Test
 		{
@@ -85,6 +86,12 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
 		{
 			foreach (var (filename, fileContent) in analyzerConfigFiles)
 				test.TestState.AnalyzerConfigFiles.Add((filename, fileContent));
+		}
+
+		if (additionalFiles is not null)
+		{
+			foreach (var (filename, fileContent) in additionalFiles)
+				test.TestState.AdditionalFiles.Add((filename, fileContent));
 		}
 
 		test.ExpectedDiagnostics.AddRange(expected);

@@ -227,6 +227,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			_ = bool.TryParse(arePropertyNamesToOrderFirstCaseSensitiveRaw, out var propertyNamesToOrderFirstAreCaseSensitive);
 
 			_ = firstDiagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.GroupOrderSettings), out var groupOrderLookupString);
+			_ = firstDiagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.MethodNamesToOrderFirst), out var methodNamesToOrderFirst);
 			_ = firstDiagnosticToFix.Properties.TryGetValue(nameof(MemberOrderingOptions.PropertyNamesToOrderFirst), out var propertyNamesToOrderFirst);
 
 			var codeFixAction = CodeAction.Create(
@@ -234,6 +235,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 				createChangedDocument: (cancellationToken) => ReorderTypeMembersAsync(
 					context.Document,
 					groupOrderLookupString,
+					methodNamesToOrderFirst,
 					propertyNamesToOrderFirst,
 					propertyNamesToOrderFirstAreCaseSensitive,
 					typeDeclarationsToFix,
@@ -384,7 +386,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		var childExpressions = initializerExpressionSyntax.Expressions;
 		var childSeparatorCount = childExpressions.SeparatorCount;
 
-		var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
+		var propertyNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
 		var propertyNameOrderComparison = propertyNamesToOrderFirstAreCaseSensitive
 			? StringComparison.Ordinal
 			: StringComparison.OrdinalIgnoreCase;
@@ -470,6 +472,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 	private static async Task<Document> ReorderTypeMembersAsync(
 		Document document,
 		string? groupOrderLookupString,
+		string? methodNamesToOrderFirstRawValue,
 		string? propertyNamesToOrderFirstRawValue,
 		bool propertyNamesToOrderFirstAreCaseSensitive,
 		ICollection<TypeDeclarationSyntax> typeDeclarationsToFix,
@@ -501,7 +504,11 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			}
 
 			var groupOrder = MemberOrderingOptions.ConvertStringToGroupOrderLookup(groupOrderLookupString) ?? MemberOrderingOptions.DefaultGroupOrder;
-			var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
+
+			var methodNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(methodNamesToOrderFirstRawValue);
+
+			var propertyNamesToOrderFirst = MemberOrderingOptions.GetMemberNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
+
 			var propertyNameOrderComparison = propertyNamesToOrderFirstAreCaseSensitive
 				? StringComparison.Ordinal
 				: StringComparison.OrdinalIgnoreCase;
@@ -551,9 +558,18 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 				}
 
 				Debug.Assert(matchedGroupIndex > -1);
-				var nameOrderedFirstIndex = propertyNamesToOrderFirst is null
-					? SortedMemberKey.NameShouldBeAlphabetized
-					: Array.FindIndex(propertyNamesToOrderFirst, propertyName => propertyName.Equals(memberSymbol.Name, propertyNameOrderComparison));
+
+				var nameOrderedFirstIndex = SortedMemberKey.NameShouldBeAlphabetized;
+				if ((groupType == MemberGroupType.InstanceMethods || groupType == MemberGroupType.StaticMethods)
+					&& methodNamesToOrderFirst is not null)
+				{
+					nameOrderedFirstIndex = Array.FindIndex(methodNamesToOrderFirst, methodName => methodName.Equals(memberSymbol.Name, StringComparison.OrdinalIgnoreCase));
+				}
+				else if ((groupType == MemberGroupType.InstanceProperties)
+					&& propertyNamesToOrderFirst is not null)
+				{
+					nameOrderedFirstIndex = Array.FindIndex(propertyNamesToOrderFirst, propertyName => propertyName.Equals(memberSymbol.Name, propertyNameOrderComparison));
+				}
 
 				var sortKey = matchedGroupIndex > -1
 					? new SortedMemberKey(matchedGroupIndex, groupType, memberCount++, memberSymbol.Name, nameOrderedFirstIndex)
@@ -622,6 +638,8 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			}
 
 			var reorderedSyntaxList = new SyntaxList<MemberDeclarationSyntax>(reorderedMembers);
+			var test = reorderedSyntaxList.ToString();
+
 			var newTypeDeclaration = typeDeclarationSyntax.WithMembers(reorderedSyntaxList);
 
 			newRoot = newRoot.ReplaceNode(typeDeclarationSyntax, newTypeDeclaration);

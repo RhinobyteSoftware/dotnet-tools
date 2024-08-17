@@ -179,6 +179,24 @@ dotnet_diagnostic.RBCS0003.severity = none
 	}
 
 	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_works_with_primary_constructor_partial_classes()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(16, 34, 16, 50).WithArguments("TimeSpanConstant"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(18, 21, 18, 35).WithArguments("StaticProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(25, 22, 25, 33).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(30, 14, 30, 23).WithArguments("PropertyA"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(37, 23, 37, 30).WithArguments("_field2"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
+
+	[TestMethod]
 	public async Task MembersOrderedCorrectlyCodeFixer_reorders_record_members()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
@@ -213,27 +231,34 @@ dotnet_diagnostic.RBCS0003.severity = none
 
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(13, 16, 13, 28).WithArguments("DatabaseName"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(13, 16, 13, 28).WithArguments("DatabaseName"),
 		};
 
 		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
 	}
 
 	[TestMethod]
-	public async Task MembersOrderedCorrectlyCodeFixer_works_with_primary_constructor_partial_classes()
+	public async Task MembersOrderedCorrectlyCodeFixer_works_with_method_names_to_order_first()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
 		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
 
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(16, 34, 16, 50).WithArguments("TimeSpanConstant"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(18, 21, 18, 35).WithArguments("StaticProperty"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(25, 22, 25, 33).WithArguments("ConstantOne"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(30, 14, 30, 23).WithArguments("PropertyA"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0001).WithSpan(37, 23, 37, 30).WithArguments("_field2"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(8, 16, 8, 43).WithArguments("InstanceMethodToPutAtTheTop"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(18, 21, 18, 46).WithArguments("StaticMethodToPutAtTheTop"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(21, 16, 21, 48).WithArguments("OtherInstanceMethodToPutAtTheTop"),
 		};
 
-		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+		var editorConfigSettings = new List<(string, string)>()
+		{
+			("/.EditorConfig", $@"root = true
+
+[*]
+dotnet_code_quality.RBCS0002.method_names_to_order_first = StaticMethodToPutAtTheTop,OtherInstanceMethodToPutAtTheTop,InstanceMethodToPutAtTheTop
+")
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult, analyzerConfigFiles: editorConfigSettings);
 	}
 }
