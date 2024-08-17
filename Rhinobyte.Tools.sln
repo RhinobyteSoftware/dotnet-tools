@@ -64,6 +64,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rules", "rules", "{9DDDF270
 		docs\codeanalysis\rules\RBCS0003.md = docs\codeanalysis\rules\rbcs0003.md
 		docs\codeanalysis\rules\RBCS0004.md = docs\codeanalysis\rules\rbcs0004.md
 		docs\codeanalysis\rules\RBCS0005.md = docs\codeanalysis\rules\rbcs0005.md
+		docs\codeanalysis\rules\RBCS0006.md = docs\codeanalysis\rules\rbcs0006.md
 		docs\codeanalysis\rules\RBCS0010.md = docs\codeanalysis\rules\rbcs0010.md
 	EndProjectSection
 EndProject

@@ -41,6 +41,11 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// </summary>
 	public const string RBCS0005 = nameof(RBCS0005);
 
+	/// <summary>
+	/// The diagnostic rule id for record type member names not being ordered alphabetically
+	/// </summary>
+	public const string RBCS0006 = nameof(RBCS0006);
+
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
 
@@ -94,6 +99,16 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: false
 	);
 
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0006 = DiagnosticDescriptorHelper.Create(
+		RBCS0006,
+		DiagnosticDescriptorHelper.MaintainabilityCategory,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0006_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		DiagnosticSeverity.Hidden,
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0006_AnalyzerMessageFormat), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0006_AnalyzerTitle), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
+		isEnabledByDefault: false
+	);
+
 	/// <inheritdoc />
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 	[
@@ -101,7 +116,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		RuleRBCS0002,
 		RuleRBCS0003,
 		Rule_RBCS_0004,
-		Rule_RBCS_0005
+		Rule_RBCS_0005,
+		Rule_RBCS_0006
 	];
 
 	private static void AnalyzeMethodDeclarationSyntax(SyntaxNodeAnalysisContext context)
@@ -180,7 +196,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		}
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
-		var isEnumType = namedTypeSymbol.TypeKind == TypeKind.Enum;
+		var alphabeticalMemberRuleDescriptorForType = SelectAlphabeticalMemberRuleDescriptorToUse(namedTypeSymbol);
 
 		foreach (var memberSymbol in memberSymbols)
 		{
@@ -238,11 +254,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 						{
 							diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
 
-							var diagnosticRule = isEnumType
-								? Rule_RBCS_0004
-								: RuleRBCS0002;
-
-							var diagnostic = Diagnostic.Create(RuleRBCS0002, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
+							var diagnostic = Diagnostic.Create(alphabeticalMemberRuleDescriptorForType, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 							context.ReportDiagnostic(diagnostic);
 							continue;
 						}
@@ -287,7 +299,8 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		ImmutableDictionary<string, string?>? diagnosticProperties = null;
 
 		var memberSymbols = namedTypeSymbol.GetMembers();
-		var isEnumType = namedTypeSymbol.TypeKind == TypeKind.Enum;
+
+		var alphabeticalMemberRuleDescriptorForType = SelectAlphabeticalMemberRuleDescriptorToUse(namedTypeSymbol);
 
 		var completedGroups = new List<MemberGroupType>();
 		var currentGroup = groupOrder[0];
@@ -340,11 +353,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 				{
 					diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
 
-					var diagnosticRule = isEnumType
-						? Rule_RBCS_0004
-						: RuleRBCS0002;
-
-					var diagnostic = Diagnostic.Create(diagnosticRule, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
+					var diagnostic = Diagnostic.Create(alphabeticalMemberRuleDescriptorForType, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 					context.ReportDiagnostic(diagnostic);
 					continue;
 				}
@@ -528,6 +537,23 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			Microsoft.CodeAnalysis.CSharp.SyntaxKind.ConstructorDeclaration,
 			Microsoft.CodeAnalysis.CSharp.SyntaxKind.MethodDeclaration
 		);
+	}
+
+	/// <summary>
+	/// Select the specific diagnostic rule descriptor for alphabetizing members to use based on the provided named type symbol
+	/// </summary>
+	/// <remarks>
+	/// Returns Rule_RBCS_0004 for enum types, Rule_RBCS_0006 for record types, and RuleRBCS0002 for all other named types
+	/// </remarks>
+	public static DiagnosticDescriptor SelectAlphabeticalMemberRuleDescriptorToUse(INamedTypeSymbol namedTypeSymbol)
+	{
+		if (namedTypeSymbol.TypeKind == TypeKind.Enum)
+			return Rule_RBCS_0004;
+
+		if (namedTypeSymbol.IsRecord)
+			return Rule_RBCS_0006;
+
+		return RuleRBCS0002;
 	}
 
 	internal class NamedTypeLocationData(

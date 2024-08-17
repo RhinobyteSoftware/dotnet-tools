@@ -61,6 +61,15 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reorder the enum member names alphabetically.
+        /// </summary>
+        internal static string EnumMemberOrderCodeFixTitle {
+            get {
+                return ResourceManager.GetString("EnumMemberOrderCodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reorder the member assignments.
         /// </summary>
         internal static string MemberAssignmentOrderCodeFixTitle {

@@ -28,7 +28,8 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			MembersOrderedCorrectlyAnalyzer.RBCS0002,
 			MembersOrderedCorrectlyAnalyzer.RBCS0003,
 			MembersOrderedCorrectlyAnalyzer.RBCS0004,
-			MembersOrderedCorrectlyAnalyzer.RBCS0005
+			MembersOrderedCorrectlyAnalyzer.RBCS0005,
+			MembersOrderedCorrectlyAnalyzer.RBCS0006
 		];
 
 	/// <summary>
@@ -140,7 +141,8 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			var diagnosticSpan = diagnosticToFix.Location.SourceSpan;
 
 			if (diagnosticToFix.Id == MembersOrderedCorrectlyAnalyzer.RBCS0001
-				|| diagnosticToFix.Id == MembersOrderedCorrectlyAnalyzer.RBCS0002)
+				|| diagnosticToFix.Id == MembersOrderedCorrectlyAnalyzer.RBCS0002
+				|| diagnosticToFix.Id == MembersOrderedCorrectlyAnalyzer.RBCS0006)
 			{
 				var typeDeclarationSyntaxNode = root.FindToken(diagnosticSpan.Start).Parent?.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().FirstOrDefault();
 				if (typeDeclarationSyntaxNode is not null)
@@ -249,13 +251,13 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			// TODO: Support custom options to order specific names first?
 
 			var codeFixAction = CodeAction.Create(
-				title: CodeFixResources.MemberOrderCodeFixTitle,
+				title: CodeFixResources.EnumMemberOrderCodeFixTitle,
 				createChangedDocument: (cancellationToken) => ReorderEnumMembersAsync(
 					context.Document,
 					enumDeclarationsToFix,
 					cancellationToken
 				),
-				equivalenceKey: nameof(CodeFixResources.MemberOrderCodeFixTitle)
+				equivalenceKey: nameof(CodeFixResources.EnumMemberOrderCodeFixTitle)
 			);
 
 			// Only need to register one document fix for the enum member re-order, so pass it all the individual member diagnostics that are being fixed
@@ -321,6 +323,24 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 
 	}
 
+	private static SyntaxNode ReorderMethodParametersInRootSyntaxNode(
+		SyntaxNode oldRoot,
+		ParameterListSyntax parameterListToFix)
+	{
+		var reorderedParameters = parameterListToFix.Parameters
+			.OrderBy(parameterSyntax => parameterSyntax.Identifier.ValueText ?? parameterSyntax.Identifier.Text)
+			.ToList();
+
+		var separators = parameterListToFix.Parameters.GetSeparators();
+
+		var newParameters = SyntaxFactory.SeparatedList(reorderedParameters, separators);
+		var newParameterList = parameterListToFix.WithParameters(newParameters);
+
+		var newRoot = oldRoot.ReplaceNode(parameterListToFix, newParameterList);
+
+		return newRoot;
+	}
+
 	private static async Task<Document> ReorderMethodParametersAsync(
 		Document document,
 		ICollection<ParameterListSyntax> parameterListsToFix,
@@ -333,16 +353,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		var newRoot = oldRoot;
 		foreach (var parameterList in parameterListsToFix)
 		{
-			var reorderedParameters = parameterList.Parameters
-				.OrderBy(parameterSyntax => parameterSyntax.Identifier.ValueText ?? parameterSyntax.Identifier.Text)
-				.ToList();
-
-			var separators = parameterList.Parameters.GetSeparators();
-
-			var newParameters = SyntaxFactory.SeparatedList(reorderedParameters, separators);
-			var newParameterList = parameterList.WithParameters(newParameters);
-
-			newRoot = newRoot.ReplaceNode(parameterList, newParameterList);
+			newRoot = ReorderMethodParametersInRootSyntaxNode(newRoot, parameterList);
 		}
 
 		if (newRoot == oldRoot)
@@ -356,7 +367,6 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 #else
 		return document.WithSyntaxRoot(newRoot);
 #endif
-
 	}
 
 	private static async Task<Document> ReorderObjectInitializerMemberAssignmentsAsync(
@@ -465,6 +475,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 		ICollection<TypeDeclarationSyntax> typeDeclarationsToFix,
 		CancellationToken cancellationToken)
 	{
+		var newDocument = document;
 		var oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
 		if (oldRoot is null)
 			return document;
@@ -475,11 +486,19 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			return document;
 
 		var newRoot = oldRoot;
-		foreach (var typeDeclaration in typeDeclarationsToFix)
+		foreach (var typeDeclarationSyntax in typeDeclarationsToFix)
 		{
-			var typeDeclarationSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
+			var typeDeclarationSymbol = semanticModel.GetDeclaredSymbol(typeDeclarationSyntax, cancellationToken);
 			if (typeDeclarationSymbol is null)
 				continue;
+
+			if (typeDeclarationSymbol.IsRecord && typeDeclarationSyntax.ParameterList is not null)
+			{
+				// For positional record type declarations like ExampleRecord(string Alpha, string Charlie, string Bravo);
+				// we'll re-use the method logic for re-ordering method/constructor parameter lists
+				newRoot = ReorderMethodParametersInRootSyntaxNode(newRoot, typeDeclarationSyntax.ParameterList);
+				continue;
+			}
 
 			var groupOrder = MemberOrderingOptions.ConvertStringToGroupOrderLookup(groupOrderLookupString) ?? MemberOrderingOptions.DefaultGroupOrder;
 			var propertyNamesToOrderFirst = MemberOrderingOptions.GetPropertyNamesToOrderFirst(propertyNamesToOrderFirstRawValue);
@@ -488,7 +507,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 				: StringComparison.OrdinalIgnoreCase;
 
 			var memberSymbols = typeDeclarationSymbol.GetMembers();
-			var members = typeDeclaration.Members;
+			var members = typeDeclarationSyntax.Members;
 
 			var sortedMembers = new SortedList<SortedMemberKey, MemberDeclarationSyntax>();
 			var memberCount = 0;
@@ -603,16 +622,16 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			}
 
 			var reorderedSyntaxList = new SyntaxList<MemberDeclarationSyntax>(reorderedMembers);
-			var newTypeDeclaration = typeDeclaration.WithMembers(reorderedSyntaxList);
+			var newTypeDeclaration = typeDeclarationSyntax.WithMembers(reorderedSyntaxList);
 
-			newRoot = newRoot.ReplaceNode(typeDeclaration, newTypeDeclaration);
+			newRoot = newRoot.ReplaceNode(typeDeclarationSyntax, newTypeDeclaration);
 		}
 
 		if (newRoot == oldRoot)
 			return document;
 
 #if DEBUG
-		var newDocument = document.WithSyntaxRoot(newRoot);
+		newDocument = newDocument.WithSyntaxRoot(newRoot);
 		var newSyntaxTree = await newDocument.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
 		var newSyntaxTreeContent = newSyntaxTree?.ToString();
 		return newDocument;

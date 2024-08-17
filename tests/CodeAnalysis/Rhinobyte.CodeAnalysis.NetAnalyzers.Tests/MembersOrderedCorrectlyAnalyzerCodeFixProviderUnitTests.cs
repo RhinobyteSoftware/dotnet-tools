@@ -179,6 +179,33 @@ dotnet_diagnostic.RBCS0003.severity = none
 	}
 
 	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_reorders_record_members()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(21, 66, 21, 73).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(21, 82, 21, 87).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(27, 17, 27, 24).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(28, 17, 28, 22).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(35, 17, 35, 24).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(36, 17, 36, 22).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(39, 82, 39, 89).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(39, 98, 39, 103).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(45, 17, 45, 24).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(46, 17, 46, 22).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(51, 67, 51, 74).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(51, 83, 51, 88).WithArguments("Bravo"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(57, 18, 57, 25).WithArguments("Charlie"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0006).WithSpan(58, 18, 58, 23).WithArguments("Bravo"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
+
+	[TestMethod]
 	public async Task MembersOrderedCorrectlyCodeFixer_works_with_primary_constructor_partial_classes()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);

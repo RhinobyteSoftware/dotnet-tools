@@ -165,6 +165,15 @@
   <data name="RBCS_0005_AnalyzerTitle" xml:space="preserve">
     <value>Order method parameters alphabetically</value>
   </data>
+  <data name="RBCS_0006_AnalyzerDescription" xml:space="preserve">
+    <value>Our code fix provider can automatically alphabetize your record type member names. Use with caution.</value>
+  </data>
+  <data name="RBCS_0006_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Order record type member names alphabetically (potentially breaking change)</value>
+  </data>
+  <data name="RBCS_0006_AnalyzerTitle" xml:space="preserve">
+    <value>Order record type members alphabetically</value>
+  </data>
   <data name="RBCS_0010_AnalyzerDescription" xml:space="preserve">
     <value>Using explicitly named optional parameters can help with code maintainability and help guard against errors and unintended behavior changes.</value>
   </data>
