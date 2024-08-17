@@ -206,6 +206,20 @@ dotnet_diagnostic.RBCS0003.severity = none
 	}
 
 	[TestMethod]
+	public async Task MembersOrderedCorrectlyCodeFixer_handles_casesensitivity_settings1()
+	{
+		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);
+		var codeFixResult = await TestHelper.GetTestCodeFixResultFileAsync(CancellationTokenForTest);
+
+		var expectedDiagnosticResults = new DiagnosticResult[]
+		{
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(13, 16, 13, 28).WithArguments("DatabaseName"),
+		};
+
+		await VerifyCS.VerifyCodeFixAsync(testContent, expectedDiagnosticResults, codeFixResult);
+	}
+
+	[TestMethod]
 	public async Task MembersOrderedCorrectlyCodeFixer_works_with_primary_constructor_partial_classes()
 	{
 		var testContent = await TestHelper.GetTestInputFileAsync(CancellationTokenForTest);

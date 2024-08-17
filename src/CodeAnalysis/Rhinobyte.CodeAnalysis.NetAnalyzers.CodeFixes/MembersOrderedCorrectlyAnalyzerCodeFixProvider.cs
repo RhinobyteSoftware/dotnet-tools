@@ -708,7 +708,7 @@ public class MembersOrderedCorrectlyAnalyzerCodeFixProvider : CodeFixProvider
 			}
 
 			if (comparison == 0)
-				comparison = string.CompareOrdinal(x.Name, y.Name);
+				comparison = string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
 
 			if (comparison == 0)
 				comparison = x.ImplicitMemberIndex.CompareTo(y.ImplicitMemberIndex);
