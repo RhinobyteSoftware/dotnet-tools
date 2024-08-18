@@ -49,7 +49,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	// You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
 	// See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/Localizing%20Analyzers.md for more on localization
 
-	internal static readonly DiagnosticDescriptor RuleRBCS0001 = DiagnosticDescriptorHelper.Create(
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0001 = DiagnosticDescriptorHelper.Create(
 		RBCS0001,
 		DiagnosticDescriptorHelper.MaintainabilityCategory,
 		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0001_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
@@ -59,7 +59,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
-	internal static readonly DiagnosticDescriptor RuleRBCS0002 = DiagnosticDescriptorHelper.Create(
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0002 = DiagnosticDescriptorHelper.Create(
 		RBCS0002,
 		DiagnosticDescriptorHelper.MaintainabilityCategory,
 		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0002_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
@@ -69,7 +69,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		isEnabledByDefault: true
 	);
 
-	internal static readonly DiagnosticDescriptor RuleRBCS0003 = DiagnosticDescriptorHelper.Create(
+	internal static readonly DiagnosticDescriptor Rule_RBCS_0003 = DiagnosticDescriptorHelper.Create(
 		RBCS0003,
 		DiagnosticDescriptorHelper.MaintainabilityCategory,
 		new LocalizableResourceString(nameof(AnalyzerResources.RBCS_0003_AnalyzerDescription), AnalyzerResources.ResourceManager, typeof(AnalyzerResources)),
@@ -112,9 +112,9 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 	/// <inheritdoc />
 	public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 	[
-		RuleRBCS0001,
-		RuleRBCS0002,
-		RuleRBCS0003,
+		Rule_RBCS_0001,
+		Rule_RBCS_0002,
+		Rule_RBCS_0003,
 		Rule_RBCS_0004,
 		Rule_RBCS_0005,
 		Rule_RBCS_0006
@@ -233,7 +233,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 					if (locationData.CompletedGroups.Contains(currentMemberGroupType))
 					{
 						diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
-						var diagnostic = Diagnostic.Create(RuleRBCS0001, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
+						var diagnostic = Diagnostic.Create(Rule_RBCS_0001, memberLocation, properties: diagnosticProperties, memberSymbol.Name);
 						context.ReportDiagnostic(diagnostic);
 						continue;
 					}
@@ -362,7 +362,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 			if (completedGroups.Contains(currentMemberGroupType))
 			{
 				diagnosticProperties ??= MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
-				var diagnostic = Diagnostic.Create(RuleRBCS0001, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
+				var diagnostic = Diagnostic.Create(Rule_RBCS_0001, memberSymbol.Locations[0], properties: diagnosticProperties, memberSymbol.Name);
 				context.ReportDiagnostic(diagnostic);
 				continue;
 			}
@@ -486,7 +486,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		if (outOfOrderMemberAssignments.Count > 0)
 		{
 			var diagnosticProperties = MemberOrderingOptions.BuildDiagnosticPropertiesDictionary(orderingOptions);
-			var diagnostic = Diagnostic.Create(RuleRBCS0003, initializerExpressionSyntax.GetLocation(), properties: diagnosticProperties, string.Join(", ", outOfOrderMemberAssignments));
+			var diagnostic = Diagnostic.Create(Rule_RBCS_0003, initializerExpressionSyntax.GetLocation(), properties: diagnosticProperties, string.Join(", ", outOfOrderMemberAssignments));
 			context.ReportDiagnostic(diagnostic);
 		}
 	}
@@ -610,7 +610,7 @@ public class MembersOrderedCorrectlyAnalyzer : DiagnosticAnalyzer
 		if (namedTypeSymbol.IsRecord)
 			return Rule_RBCS_0006;
 
-		return RuleRBCS0002;
+		return Rule_RBCS_0002;
 	}
 
 	internal class NamedTypeLocationData(

@@ -109,27 +109,27 @@ dotnet_code_quality.RBCS0002.property_names_to_order_first = Id
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
 			// /0/Test0.cs(33,22): info RBCS0002: Member 'ConstantD' is not ordered alphabetically
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(33, 22, 33, 31).WithArguments("ConstantD"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(33, 22, 33, 31).WithArguments("ConstantD"),
 			// /0/Test0.cs(35,22): info RBCS0002: Member 'ConstantB' is not ordered alphabetically
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(35, 22, 35, 31).WithArguments("ConstantB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(35, 22, 35, 31).WithArguments("ConstantB"),
 			// /0/Test0.cs(39,21): info RBCS0002: Member 'StaticPropertyD' is not ordered alphabetically
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(39, 21, 39, 36).WithArguments("StaticPropertyD"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(39, 21, 39, 36).WithArguments("StaticPropertyD"),
 			// /0/Test0.cs(41,21): info RBCS0002: Member 'StaticPropertyB' is not ordered alphabetically
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(41, 21, 41, 36).WithArguments("StaticPropertyB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(41, 21, 41, 36).WithArguments("StaticPropertyB"),
 			// /0/Test0.cs(48,13): info RBCS0001: Member 'PropertyC' is not ordered correctly by group
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(48, 13, 48, 22).WithArguments("PropertyC"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(48, 13, 48, 22).WithArguments("PropertyC"),
 			// /0/Test0.cs(49,13): info RBCS0001: Member 'PropertyE' is not ordered correctly by group
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(49, 13, 49, 22).WithArguments("PropertyE"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(49, 13, 49, 22).WithArguments("PropertyE"),
 			// /0/Test0.cs(50,13): info RBCS0001: Member 'PropertyD' is not ordered correctly by group
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(50, 13, 50, 22).WithArguments("PropertyD"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(50, 13, 50, 22).WithArguments("PropertyD"),
 			// /0/Test0.cs(51,13): info RBCS0001: Member 'PropertyZ' is not ordered correctly by group
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(51, 13, 51, 22).WithArguments("PropertyZ"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(51, 13, 51, 22).WithArguments("PropertyZ"),
 			// /0/Test0.cs(52,13): info RBCS0001: Member 'PropertyB' is not ordered correctly by group
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(52, 13, 52, 22).WithArguments("PropertyB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(52, 13, 52, 22).WithArguments("PropertyB"),
 			// /0/Test0.cs(58,27): info RBCS0002: Member 'MethodD' is not ordered alphabetically
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(58, 27, 58, 34).WithArguments("MethodD"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(58, 27, 58, 34).WithArguments("MethodD"),
 			// /0/Test0.cs(65,23): info RBCS0002: Member 'MethodB' is not ordered alphabetically
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(65, 23, 65, 30).WithArguments("MethodB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(65, 23, 65, 30).WithArguments("MethodB"),
 		};
 
 		// TODO: Figure out why their test runner is also adding spaces, only to the lines where I adjust the whitespace, on the output when applying the fixes

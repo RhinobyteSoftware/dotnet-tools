@@ -35,11 +35,11 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
 			// Partial file1
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(12, 22, 12, 33).WithArguments("ConstantOne"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(16, 23, 16, 30).WithArguments("_fieldB"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(31, 14, 31, 23).WithArguments("IsEnabled"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(38, 27, 38, 43).WithArguments("DoSomethingAsync"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(43, 16, 43, 34).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(12, 22, 12, 33).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(16, 23, 16, 30).WithArguments("_fieldB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(31, 14, 31, 23).WithArguments("IsEnabled"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(38, 27, 38, 43).WithArguments("DoSomethingAsync"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(43, 16, 43, 34).WithArguments("OutOfOrderProperty"),
 
 			// Partial file3
 			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RBCS0002).WithSpan(70, 22, 70, 35).WithArguments("ConstantThree"),
@@ -61,11 +61,11 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(12, 23, 12, 34).WithArguments("ConstantOne"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(16, 24, 16, 31).WithArguments("_fieldB"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(31, 15, 31, 24).WithArguments("IsEnabled"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(38, 28, 38, 44).WithArguments("DoSomethingAsync"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(43, 17, 43, 35).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(12, 23, 12, 34).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(16, 24, 16, 31).WithArguments("_fieldB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(31, 15, 31, 24).WithArguments("IsEnabled"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(38, 28, 38, 44).WithArguments("DoSomethingAsync"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(43, 17, 43, 35).WithArguments("OutOfOrderProperty"),
 		};
 
 		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
@@ -79,10 +79,10 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(23, 23, 23, 42).WithArguments("_outOfOrderedField1"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(25, 9, 25, 47).WithArguments(".ctor"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(35, 16, 35, 34).WithArguments("OutOfOrderProperty"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(37, 14, 37, 33).WithArguments("_outOfOrderedField2"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(23, 23, 23, 42).WithArguments("_outOfOrderedField1"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(25, 9, 25, 47).WithArguments(".ctor"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(35, 16, 35, 34).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(37, 14, 37, 33).WithArguments("_outOfOrderedField2"),
 		};
 
 		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
@@ -95,11 +95,11 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(51, 20, 51, 38).WithArguments("OutOfOrderConstant"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(53, 23, 53, 40).WithArguments("_outOfOrderField1"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(56, 9, 56, 47).WithArguments(".ctor"), // Out of order instance constructor
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(61, 16, 61, 34).WithArguments("OutOfOrderProperty"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(64, 9, 64, 47).WithArguments(".cctor"), // Out of order static constructor
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(51, 20, 51, 38).WithArguments("OutOfOrderConstant"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(53, 23, 53, 40).WithArguments("_outOfOrderField1"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(56, 9, 56, 47).WithArguments(".ctor"), // Out of order instance constructor
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(61, 16, 61, 34).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(64, 9, 64, 47).WithArguments(".cctor"), // Out of order static constructor
 		};
 
 		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);
@@ -143,11 +143,11 @@ public class MembersOrderCorrectlyAnalyzerUnitTests
 
 		var expectedDiagnosticResults = new DiagnosticResult[]
 		{
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(13, 23, 13, 34).WithArguments("ConstantOne"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(17, 24, 17, 31).WithArguments("_fieldB"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(28, 15, 28, 24).WithArguments("IsEnabled"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0002).WithSpan(35, 28, 35, 44).WithArguments("DoSomethingAsync"),
-			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.RuleRBCS0001).WithSpan(40, 17, 40, 35).WithArguments("OutOfOrderProperty"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(13, 23, 13, 34).WithArguments("ConstantOne"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(17, 24, 17, 31).WithArguments("_fieldB"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(28, 15, 28, 24).WithArguments("IsEnabled"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002).WithSpan(35, 28, 35, 44).WithArguments("DoSomethingAsync"),
+			VerifyCS.Diagnostic(MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001).WithSpan(40, 17, 40, 35).WithArguments("OutOfOrderProperty"),
 		};
 
 		await VerifyCS.VerifyAnalyzerAsync(testContent, expectedDiagnosticResults);

@@ -173,14 +173,14 @@ internal readonly struct MemberOrderingOptions
 		try
 		{
 			var syntaxTree = compilation.SyntaxTrees.FirstOrDefault();
-			var groupOrderSettings = analyzerOptions.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.RuleRBCS0001, syntaxTree, compilation);
+			var groupOrderSettings = analyzerOptions.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001, syntaxTree, compilation);
 
-			var methodNamesToOrderFirst = analyzerOptions.GetStringOptionValue("method_names_to_order_first", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation);
+			var methodNamesToOrderFirst = analyzerOptions.GetStringOptionValue("method_names_to_order_first", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002, syntaxTree, compilation);
 
-			var propertyNamesToOrderFirst = analyzerOptions.GetStringOptionValue("property_names_to_order_first", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation);
+			var propertyNamesToOrderFirst = analyzerOptions.GetStringOptionValue("property_names_to_order_first", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002, syntaxTree, compilation);
 
 			var arePropertyNamesToOrderFirstCaseSensitive = analyzerOptions
-				.GetBoolOptionValue("property_names_to_order_first_are_case_sensitive", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation, false);
+				.GetBoolOptionValue("property_names_to_order_first_are_case_sensitive", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002, syntaxTree, compilation, false);
 
 			return new MemberOrderingOptions(
 				arePropertyNamesToOrderFirstCaseSensitive,
