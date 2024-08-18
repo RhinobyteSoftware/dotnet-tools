@@ -196,6 +196,33 @@ namespace Rhinobyte.CodeAnalysis.NetAnalyzers {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Our code fix provider can automatically alphabetize your record type member names. Use with caution..
+        /// </summary>
+        internal static string RBCS_0006_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RBCS_0006_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order record type member names alphabetically (potentially breaking change).
+        /// </summary>
+        internal static string RBCS_0006_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RBCS_0006_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Order record type members alphabetically.
+        /// </summary>
+        internal static string RBCS_0006_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RBCS_0006_AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Using explicitly named optional parameters can help with code maintainability and help guard against errors and unintended behavior changes..
         /// </summary>
         internal static string RBCS_0010_AnalyzerDescription {

@@ -11,7 +11,7 @@
         <!-- VERSION VALUES -->
         <PackageId>Rhinobyte.CodeAnalysis.NetAnalyzers</PackageId>
         
-        <PackageVersion>1.0.0.0-preview.7</PackageVersion>
+        <PackageVersion>1.0.0.0-preview.8</PackageVersion>
 
         <Authors>Ryan Thomas</Authors>
         <Company>Rhinobyte Software</Company>
@@ -38,9 +38,10 @@
 
         <Description>Rhinobyte.CodeAnalysis.NetAnalyzers</Description>
         <PackageReleaseNotes>
-            v1.0.0.0-preview.7
-            - Update analzyer for RBCS0001 to ignore primary constructor when the type is a partial class
-            - Update the MembersOrderedCorrectlyAnalyzerCodeFixProvider to correctly sort both the declaration and definition of partial methods
+            v1.0.0.0-preview.8
+            - Add new RBCS0006 analyzer diagnostic id to flag ordering record type members alphabetically separately from other RBCS0002 flagged type declarations
+            - Update the MembersOrderedCorrectlyAnalyzerCodeFixProvider to sort names using OrdinalIgnoreCase to match how the analyzer compares them
+            - Add support for a new dotnet_code_quality.RBCS0002.method_names_to_order_first customization option
         </PackageReleaseNotes>
         <PackageTags>Rhinobyte.CodeAnalysis.NetAnalyzers, analyzers</PackageTags>
         <DevelopmentDependency>true</DevelopmentDependency>

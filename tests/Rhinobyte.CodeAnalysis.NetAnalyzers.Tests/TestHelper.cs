@@ -22,9 +22,15 @@ internal static class TestHelper
 		return await File.ReadAllTextAsync(filePath);
 	}
 
+	/// <summary>
+	/// Get the test code fix result file which matches the calling test method name and ends with ".codefixresult.cs"
+	/// </summary>
 	public static async Task<string> GetTestCodeFixResultFileAsync(CancellationToken cancellationToken, string? subdirectoryName = null, [CallerMemberName] string? fileNamePrefix = null)
 		=> await GetTestCaseFileAsync(cancellationToken, ".codefixresult.cs", subdirectoryName, fileNamePrefix);
 
+	/// <summary>
+	/// Get the test input file which matches the calling test method name and ends with ".input.cs"
+	/// </summary>
 	public static async Task<string> GetTestInputFileAsync(CancellationToken cancellationToken, string? subdirectoryName = null, [CallerMemberName] string? fileNamePrefix = null)
 		=> await GetTestCaseFileAsync(cancellationToken, ".input.cs", subdirectoryName, fileNamePrefix);
 }

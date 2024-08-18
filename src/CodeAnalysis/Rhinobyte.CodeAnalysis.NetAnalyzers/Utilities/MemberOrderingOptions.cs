@@ -29,10 +29,12 @@ internal readonly struct MemberOrderingOptions
 	private MemberOrderingOptions(
 		bool arePropertyNamesToOrderFirstCaseSensitive,
 		string? groupOrderSettings,
+		string? methodNamesToOrderFirst,
 		string? propertyNamesToOrderFirst)
 	{
 		ArePropertyNamesToOrderFirstCaseSensitive = arePropertyNamesToOrderFirstCaseSensitive;
 		GroupOrderSettings = groupOrderSettings;
+		MethodNamesToOrderFirst = methodNamesToOrderFirst;
 		PropertyNamesToOrderFirst = propertyNamesToOrderFirst;
 	}
 
@@ -56,6 +58,15 @@ internal readonly struct MemberOrderingOptions
 	public string? GroupOrderSettings { get; }
 
 	/// <summary>
+	/// The optional set of method names to order first before alphabetizing.
+	/// <para>
+	/// Can be specified from the .EditorConfig via:
+	/// <code>dotnet_code_quality.RBCS0002.method_names_to_order_first</code>
+	/// </para>
+	/// </summary>
+	public string? MethodNamesToOrderFirst { get; }
+
+	/// <summary>
 	/// The optional set of property names to order first before alphabetizing.
 	/// <para>
 	/// Can be specified from the .EditorConfig via:
@@ -71,6 +82,7 @@ internal readonly struct MemberOrderingOptions
 		{
 			{ nameof(ArePropertyNamesToOrderFirstCaseSensitive), memberOrderingOptions.ArePropertyNamesToOrderFirstCaseSensitive.ToString() },
 			{ nameof(GroupOrderSettings), memberOrderingOptions.GroupOrderSettings },
+			{ nameof(MethodNamesToOrderFirst), memberOrderingOptions.MethodNamesToOrderFirst },
 			{ nameof(PropertyNamesToOrderFirst), memberOrderingOptions.PropertyNamesToOrderFirst },
 		}
 		.ToImmutableDictionary();
@@ -132,15 +144,18 @@ internal readonly struct MemberOrderingOptions
 		return DefaultGroupOrder;
 	}
 
-	internal static string[]? GetPropertyNamesToOrderFirst(string? propertyNamesToOrderFirstRawValue)
+	/// <summary>
+	/// Converts the raw editor config setting (comma delimited) list of member names to order first into a string array
+	/// </summary>
+	internal static string[]? GetMemberNamesToOrderFirst(string? memberNamesToOrderFirstRawValue)
 	{
-		if (string.IsNullOrEmpty(propertyNamesToOrderFirstRawValue))
+		if (string.IsNullOrEmpty(memberNamesToOrderFirstRawValue))
 			return null;
 
-		return propertyNamesToOrderFirstRawValue!
+		return memberNamesToOrderFirstRawValue!
 			.Split(',')
-			.Select(propertyName => propertyName.Trim())
-			.Where(propertyName => !string.IsNullOrEmpty(propertyName))
+			.Select(memberName => memberName.Trim())
+			.Where(memberName => !string.IsNullOrEmpty(memberName))
 			.ToArray();
 	}
 
@@ -158,14 +173,19 @@ internal readonly struct MemberOrderingOptions
 		try
 		{
 			var syntaxTree = compilation.SyntaxTrees.FirstOrDefault();
-			var groupOrderSettings = analyzerOptions.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.RuleRBCS0001, syntaxTree, compilation);
-			var propertyNamesToOrderFirst = analyzerOptions.GetStringOptionValue("property_names_to_order_first", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation);
+			var groupOrderSettings = analyzerOptions.GetStringOptionValue("type_members_group_order", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0001, syntaxTree, compilation);
+
+			var methodNamesToOrderFirst = analyzerOptions.GetStringOptionValue("method_names_to_order_first", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002, syntaxTree, compilation);
+
+			var propertyNamesToOrderFirst = analyzerOptions.GetStringOptionValue("property_names_to_order_first", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002, syntaxTree, compilation);
+
 			var arePropertyNamesToOrderFirstCaseSensitive = analyzerOptions
-				.GetBoolOptionValue("property_names_to_order_first_are_case_sensitive", MembersOrderedCorrectlyAnalyzer.RuleRBCS0002, syntaxTree, compilation, false);
+				.GetBoolOptionValue("property_names_to_order_first_are_case_sensitive", MembersOrderedCorrectlyAnalyzer.Rule_RBCS_0002, syntaxTree, compilation, false);
 
 			return new MemberOrderingOptions(
 				arePropertyNamesToOrderFirstCaseSensitive,
 				groupOrderSettings,
+				methodNamesToOrderFirst,
 				propertyNamesToOrderFirst
 			);
 		}

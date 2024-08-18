@@ -336,6 +336,9 @@ dotnet_style_prefer_inferred_anonymous_type_member_names    = true
 # Rule (IDE0041)    - Use 'is null' check
 dotnet_diagnostic.IDE0046.severity      = error
 
+# Rule (IDE0045)    - If statement can be simplified
+dotnet_diagnostic.IDE0045.severity      = suggestion
+
 # Rule (IDE0046)    - If Statement Can Be Simplified        - Reason: Suggestion only. We only prefer ternary conditional expressions for very simple conditionals.
 dotnet_diagnostic.IDE0046.severity      = suggestion
 
